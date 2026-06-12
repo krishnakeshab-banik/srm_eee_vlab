@@ -24,6 +24,15 @@ This project is built using modern web development technologies to ensure high p
 - **Authentication Flow:** Secure, session-based authentication implemented via NextAuth.js beta, supporting credential logins and seamless route protection via Next.js Middleware.
 - **Design System:** A robust, utility-first design system driven by Tailwind CSS and enriched with `shadcn/ui` for accessible, unstyled, and highly customizable UI primitives.
 
+## Core Features
+
+- **Interactive 3D Experiments (`/experiments`):** Utilizing Three.js to provide immersive, virtual electrical circuit simulations and lab equipment interactions right in the browser.
+- **Dynamic Study Room (`/study-room`):** A centralized hub offering categorized study materials, Previous Year Questions (PYQs), formula sheets, lab manuals, and curated video lectures.
+- **Quizzes & Assessments (`/quizzes`):** Real-time evaluation modules featuring multiple-choice questions, interactive circuits, and instant feedback to reinforce learning.
+- **AI Assistant Integration:** Context-aware AI support within the study room to answer student queries, explain abstract electrical concepts, and assist with complex calculations.
+- **Secure Authentication & Progress Tracking:** Full user management powered by NextAuth.js, allowing students to save their progress, track completed experiments, and view their quiz scores across multiple sessions.
+- **Responsive & Accessible UI:** A fully responsive layout with native dark mode support, crafted meticulously with Tailwind CSS and Radix UI to ensure seamless usage across desktop, tablet, and mobile devices.
+
 ## Project Structure
 
 ```
