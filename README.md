@@ -1,122 +1,78 @@
-# EEE Learning Platform
+# SRM EEE VLAB (Virtual Laboratory)
 
-An interactive Electrical and Electronics Engineering learning platform featuring experiments, quizzes, and educational resources.
+An interactive Electrical and Electronics Engineering (EEE) virtual learning platform featuring immersive 3D experiments, dynamic quizzes, and comprehensive educational resources.
 
-## Prerequisites
+## 🚀 Technical Stack
 
-Before you begin, make sure you have the following installed:
+This project is built using modern web development technologies to ensure high performance, maintainability, and a premium user experience:
 
--   [Node.js](https://nodejs.org/) (version 16 or newer recommended)
+- **Framework:** [Next.js 15](https://nextjs.org/) (App Router)
+- **UI Library:** [React 19](https://react.dev/)
+- **Styling:** [Tailwind CSS 3](https://tailwindcss.com/)
+- **Components:** [shadcn/ui](https://ui.shadcn.com/) (Radix UI primitives)
+- **Animations:** [Framer Motion](https://www.framer.com/motion/)
+- **3D Graphics:** [Three.js](https://threejs.org/)
+- **Authentication:** [NextAuth.js v5 (Auth.js)](https://authjs.dev/)
+- **Validation:** [Zod](https://zod.dev/) & React Hook Form
+- **Language:** TypeScript
 
-## Installation
+## 🧠 Technical Approach & Architecture
 
-### 1. Install pnpm
+- **Server-First Architecture:** Leverages Next.js React Server Components (RSC) to reduce the client-side JavaScript bundle, resulting in faster initial page loads and better SEO.
+- **Client Components for Interactivity:** Interactive elements like 3D experiment viewers (Three.js), dynamic quizzes, and complex animations (Framer Motion) are cleanly separated into Client Components.
+- **Static Site Generation (SSG):** Pages are pre-rendered as much as possible at build time to provide instant loading states.
+- **Authentication Flow:** Secure, session-based authentication implemented via NextAuth.js beta, supporting credential logins and seamless route protection via Next.js Middleware.
+- **Design System:** A robust, utility-first design system driven by Tailwind CSS and enriched with `shadcn/ui` for accessible, unstyled, and highly customizable UI primitives.
 
-pnpm is a fast, disk space efficient package manager. Here's how to install it:
+## 📁 Project Structure
 
-#### Recommended: Install pnpm v10 (Latest)
-
-```bash
-npm install -g pnpm@latest-10
+```
+.
+├── app/                  # Next.js App Router (Pages, API routes, Layouts)
+│   ├── api/              # Backend API handlers (Auth, users, progress)
+│   ├── experiments/      # 3D interactive experiment pages
+│   ├── quizzes/          # Dynamic quiz modules
+│   └── study-room/       # Educational resources and tools
+├── components/           # Reusable Client and Server UI components
+├── public/               # Static assets (images, 3D models)
+├── .npmrc                # NPM config to enforce legacy-peer-deps
+├── next.config.js        # Next.js configuration
+├── package.json          # Project dependencies and scripts
+└── tailwind.config.ts    # Tailwind CSS design system tokens
 ```
 
-#### Windows
+## 💻 Local Development Setup
 
-```bash
-# Using npm
-npm install -g pnpm
+### Prerequisites
+- **Node.js** 20.x (Recommended)
+- **npm** v9 or higher
 
-# Using PowerShell Install Script
-iwr https://get.pnpm.io/install.ps1 -useb | iex
-```
+### Installation
 
-#### macOS/Linux
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/krishnakeshab-banik/srm_eee_vlab.git
+   cd srm_eee_vlab
+   ```
 
-```bash
-# Using npm
-npm install -g pnpm
+2. **Install dependencies:**
+   *(Note: The project uses React 19, so legacy peer dependencies are enabled via `.npmrc`)*
+   ```bash
+   npm install
+   ```
 
-# Using curl
-curl -fsSL https://get.pnpm.io/install.sh | sh -
-```
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+   The application will be available at [http://localhost:3000](http://localhost:3000).
 
-#### Using Chocolatey (Windows)
+## 🚀 Deployment (Vercel)
 
-```bash
-choco install pnpm
-```
+This project is optimized for deployment on [Vercel](https://vercel.com).
 
-#### Using Homebrew (macOS)
-
-```bash
-brew install pnpm
-```
-
-### 2. Clone the repository (if applicable)
-
-```bash
-git clone [repository-url]
-cd eeelearningplatform
-```
-
-### 3. Install dependencies
-
-Navigate to the project directory and run:
-
-```bash
-pnpm install
-```
-
-## Running the Application
-
-### Development Mode
-
-To run the application in development mode with hot-reload:
-
-```bash
-pnpm dev
-```
-
-The application will be available at [http://localhost:3000](http://localhost:3000).
-
-### Build for Production
-
-To build the application for production:
-
-```bash
-pnpm build
-```
-
-### Start Production Server
-
-To start the production server after building:
-
-```bash
-pnpm start
-```
-
-## Features
-
--   Interactive EEE experiments
--   Quizzes and assessments
--   User progress tracking
--   Dark mode
--   Responsive design
-
-## Technologies
-
--   Next.js
--   React
--   Tailwind CSS
--   Radix UI components
--   Three.js for 3D visualizations
--   NextAuth.js for authentication
-
-## Project Structure
-
--   `/app`: Next.js app directory containing pages and API routes
--   `/components`: Reusable UI components
--   `/public`: Static assets
--   `/styles`: Global styles
--   `/lib`: Utility functions and helpers
--   `/hooks`: Custom React hooks
+### Deployment Specifics
+- **Node.js Engine:** explicitly pinned to `20.x` in `package.json` to prevent unwanted auto-upgrades.
+- **Peer Dependencies:** Vercel automatically respects the included `.npmrc` file (which contains `legacy-peer-deps=true`) to seamlessly resolve React 19 vs. Framer Motion dependency conflicts during the build step.
+- **Build Command:** `npm run build`
+- **Install Command:** `npm install`
