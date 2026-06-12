@@ -2,7 +2,7 @@
 
 An interactive Electrical and Electronics Engineering (EEE) virtual learning platform featuring immersive 3D experiments, dynamic quizzes, and comprehensive educational resources.
 
-## 🚀 Technical Stack
+## Technical Stack
 
 This project is built using modern web development technologies to ensure high performance, maintainability, and a premium user experience:
 
@@ -16,7 +16,7 @@ This project is built using modern web development technologies to ensure high p
 - **Validation:** [Zod](https://zod.dev/) & React Hook Form
 - **Language:** TypeScript
 
-## 🧠 Technical Approach & Architecture
+## Technical Approach & Architecture
 
 - **Server-First Architecture:** Leverages Next.js React Server Components (RSC) to reduce the client-side JavaScript bundle, resulting in faster initial page loads and better SEO.
 - **Client Components for Interactivity:** Interactive elements like 3D experiment viewers (Three.js), dynamic quizzes, and complex animations (Framer Motion) are cleanly separated into Client Components.
@@ -24,7 +24,7 @@ This project is built using modern web development technologies to ensure high p
 - **Authentication Flow:** Secure, session-based authentication implemented via NextAuth.js beta, supporting credential logins and seamless route protection via Next.js Middleware.
 - **Design System:** A robust, utility-first design system driven by Tailwind CSS and enriched with `shadcn/ui` for accessible, unstyled, and highly customizable UI primitives.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 .
@@ -41,7 +41,7 @@ This project is built using modern web development technologies to ensure high p
 └── tailwind.config.ts    # Tailwind CSS design system tokens
 ```
 
-## 💻 Local Development Setup
+## Local Development Setup
 
 ### Prerequisites
 - **Node.js** 20.x (Recommended)
@@ -67,7 +67,7 @@ This project is built using modern web development technologies to ensure high p
    ```
    The application will be available at [http://localhost:3000](http://localhost:3000).
 
-## 🚀 Deployment (Vercel)
+## Deployment (Vercel)
 
 This project is optimized for deployment on [Vercel](https://vercel.com).
 
