@@ -2,8 +2,6 @@
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
-  "env": {},
-  "envPrefix": "NEXT_PUBLIC_",
   "framework": "nextjs",
   "nodeVersion": "18.x"
 }
