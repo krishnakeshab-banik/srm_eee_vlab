@@ -1,0 +1,11 @@
+.env.local
+.env*.local
+.git
+.gitignore
+README.md
+node_modules
+npm-debug.log
+.next
+.turbo
+coverage
+.DS_Store

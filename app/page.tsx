@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useScroll, useTransform, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Home,
   BookOpen,
   Settings,
@@ -104,18 +104,6 @@ const features = [
 
 export default function HomePage() {
   const experimentsRef = useRef(null);
-  const geminiRef = useRef(null);
-
-  const { scrollYProgress } = useScroll({
-    target: geminiRef,
-    offset: ["start start", "end start"],
-  });
-
-  const pathLengthFirst = useTransform(scrollYProgress, [0, 0.8], [0.2, 1.2]);
-  const pathLengthSecond = useTransform(scrollYProgress, [0, 0.8], [0.15, 1.2]);
-  const pathLengthThird = useTransform(scrollYProgress, [0, 0.8], [0.1, 1.2]);
-  const pathLengthFourth = useTransform(scrollYProgress, [0, 0.8], [0.05, 1.2]);
-  const pathLengthFifth = useTransform(scrollYProgress, [0, 0.8], [0, 1.2]);
 
   const scrollToExperiments = () => {
     experimentsRef.current?.scrollIntoView({ behavior: "smooth" });
