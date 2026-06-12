@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { DigitalClock } from "@/components/digital-clock"
 import { DynamicSidebar } from "@/components/dynamic-sidebar"
 import Image from "next/image"
-import { GithubIcon, LinkedinIcon, MailIcon, Users, BookOpen, Settings, LogIn, FileQuestion, Info, Home, Award, GraduationCap, BookMarked } from "lucide-react"
+import { GithubIcon, LinkedinIcon, MailIcon, Users, BookOpen, Settings, LogIn, FileQuestion, Info, Home, Award, GraduationCap, BookMarked, Library } from "lucide-react"
 import Link from "next/link"
 import { HoverEffect } from "@/components/ui/card-hover-effect"
 import { MovingBorder } from "@/components/ui/moving-border"
@@ -22,7 +22,7 @@ const teamMembers = [
     role: "Associate Professor",
     department: "Department of Electrical Engineering",
     bio: "Dr. K. Saravanan has over 15 years of experience in electrical engineering education and research. He specializes in power systems and renewable energy integration.",
-    image: "/images/dr-saravanan.jpg",
+    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=500&auto=format&fit=crop",
     social: {
       email: "saravanan@srm.edu.in",
       linkedin: "https://linkedin.com/in/example",
@@ -35,7 +35,7 @@ const teamMembers = [
     role: "Assistant Professor",
     department: "Department of Electronics Engineering",
     bio: "Dr. S. Vidyasagar specializes in power electronics and control systems. He has contributed to several research projects in renewable energy applications.",
-    image: "/images/dr-vidyasagar.jpg",
+    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=500&auto=format&fit=crop",
     social: {
       email: "vidyasagar@srm.edu.in",
       linkedin: "https://linkedin.com/in/example",
@@ -48,7 +48,7 @@ const teamMembers = [
     role: "Associate Professor",
     department: "Department of Electrical Engineering",
     bio: "Dr. D. Sattianandan is an expert in power systems and smart grid technologies. He has led multiple projects on grid integration and power quality improvement.",
-    image: "/images/dr-sattianandan.jpg",
+    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=500&auto=format&fit=crop",
     social: {
       email: "sattianandan@srm.edu.in",
       linkedin: "https://linkedin.com/in/example",
@@ -61,7 +61,7 @@ const teamMembers = [
     role: "Assistant Professor",
     department: "Department of Electrical Engineering",
     bio: "Dr. V. Kalyanasundaram specializes in electrical machines and drives. His research focuses on efficiency improvement and fault diagnosis in electrical systems.",
-    image: "/images/dr-kalyanasundaram.jpg",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=500&auto=format&fit=crop",
     social: {
       email: "kalyanasundaram@srm.edu.in",
       linkedin: "https://linkedin.com/in/example",
@@ -83,6 +83,7 @@ export default function TeamPage() {
   const dockItems = [
     { title: "Home", icon: <Home className="h-full w-full text-neutral-300" />, href: "/" },
     { title: "Experiments", icon: <BookOpen className="h-full w-full text-neutral-300" />, href: "/experiments" },
+    { title: "Study Room", icon: <Library className="h-full w-full text-neutral-300" />, href: "/study-room" },
     { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
     { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
     { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },
@@ -171,13 +172,10 @@ export default function TeamPage() {
                 
                 {/* Profile Image Container - Fixed Height with Object Position */}
                 <div className="relative w-full h-[300px] overflow-hidden">
-                  <Image
+                  <img
                     src={member.image || "/placeholder.svg"}
                     alt={member.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-contain object-center transition-transform duration-700 group-hover:scale-105"
-                    priority
+                    className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   />
                 </div>
                 

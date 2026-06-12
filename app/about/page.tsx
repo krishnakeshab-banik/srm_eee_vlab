@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { DigitalClock } from "@/components/digital-clock"
 import { DynamicSidebar } from "@/components/dynamic-sidebar"
 import Link from "next/link"
-import { Mail, ExternalLink, Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, ChevronRight, Lightbulb, Microscope, BookOpenCheck, Users2, Sparkles } from "lucide-react"
+import { Mail, ExternalLink, Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, ChevronRight, Lightbulb, Microscope, BookOpenCheck, Users2, Sparkles, Library } from "lucide-react"
 import { FloatingDock } from "@/components/ui/floating-dock"
 import { AuroraBackground } from "@/components/aurora-background"
 import { GlowingEffect } from "@/components/ui/glowing-effect"
@@ -16,6 +16,7 @@ export default function AboutPage() {
   const dockItems = [
     { title: "Home", icon: <Home className="h-full w-full text-neutral-300" />, href: "/" },
     { title: "Experiments", icon: <BookOpen className="h-full w-full text-neutral-300" />, href: "/experiments" },
+    { title: "Study Room", icon: <Library className="h-full w-full text-neutral-300" />, href: "/study-room" },
     { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
     { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
     { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },

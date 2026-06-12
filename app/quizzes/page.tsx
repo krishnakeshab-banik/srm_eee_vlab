@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Zap, Cpu, Lightbulb, Bolt, Radio, Wifi } from "lucide-react"
+import { Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Zap, Cpu, Lightbulb, Bolt, Radio, Wifi, Activity, CircuitBoard, Library } from "lucide-react"
 import { motion, useAnimation, useInView, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { DigitalClock } from "@/components/digital-clock"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,8 +10,7 @@ import { FloatingDock } from "@/components/ui/floating-dock"
 import { CircuitAnimation } from "@/components/ui/circuit-animation"
 import { RotatingCircuit } from "@/components/ui/rotating-circuit"
 import { GlowingEffect } from "@/components/ui/glowing-effect"
-import { AuroraBackground } from "@/components/aurora-background"
-import { GoogleGeminiEffect } from "@/components/ui/google-gemini-effect"
+import { HeroGeometric } from "@/components/ui/shape-landing-hero"
 import { cn } from "@/lib/utils"
 
 // Enhanced quizzes with icons and difficulty levels
@@ -21,49 +20,97 @@ const quizzes = [
     title: "Kirchhoff's Voltage Law Quiz",
     description: "Test your knowledge of voltage relationships in closed loop circuits",
     icon: <Zap className="h-8 w-8" />,
-    difficulty: "Intermediate",
+    difficulty: "Beginner",
     color: "blue"
   },
   {
     id: 2,
     title: "Thevenin's Theorem Quiz",
     description: "Challenge yourself on circuit simplification techniques",
+    icon: <Zap className="h-8 w-8" />,
+    difficulty: "Intermediate",
+    color: "blue"
+  },
+  {
+    id: 3,
+    title: "PN Junction Diode Quiz",
+    description: "Test your understanding of forward and reverse bias characteristics",
+    icon: <Activity className="h-8 w-8" />,
+    difficulty: "Beginner",
+    color: "cyan"
+  },
+  {
+    id: 4,
+    title: "Full Wave Rectifier Quiz",
+    description: "Verify your understanding of AC to DC conversion",
+    icon: <Activity className="h-8 w-8" />,
+    difficulty: "Intermediate",
+    color: "cyan"
+  },
+  {
+    id: 5,
+    title: "Clipper Circuit Quiz",
+    description: "Test your knowledge of signal amplitude limiting circuits",
+    icon: <Activity className="h-8 w-8" />,
+    difficulty: "Intermediate",
+    color: "cyan"
+  },
+  {
+    id: 6,
+    title: "Op-Amp Inverting / Non-Inverting Amplifier Quiz",
+    description: "Challenge yourself on operational amplifier circuit design",
     icon: <Cpu className="h-8 w-8" />,
     difficulty: "Advanced",
-    color: "purple"
+    color: "cyan"
   },
-  { 
-    id: 3, 
-    title: "House Wiring Quiz", 
-    description: "Verify your understanding of residential electrical systems",
-    icon: <Lightbulb className="h-8 w-8" />,
+  {
+    id: 7,
+    title: "Basic Logic Gates Quiz",
+    description: "Test your understanding of AND, OR, NOT, NAND, NOR, XOR, XNOR logic gates",
+    icon: <CircuitBoard className="h-8 w-8" />,
     difficulty: "Beginner",
     color: "green"
   },
+  {
+    id: 8,
+    title: "Half Adder & Full Adder Quiz",
+    description: "Challenge yourself on digital arithmetic circuits",
+    icon: <CircuitBoard className="h-8 w-8" />,
+    difficulty: "Intermediate",
+    color: "green"
+  },
+  {
+    id: 9,
+    title: "Energy Measurement Quiz",
+    description: "Test your knowledge of measuring electrical energy consumption",
+    icon: <Lightbulb className="h-8 w-8" />,
+    difficulty: "Beginner",
+    color: "orange"
+  },
   { 
-    id: 4, 
-    title: "Fluorescent Lamp Wiring Quiz", 
-    description: "Test your knowledge of fluorescent lighting systems",
-    icon: <Bolt className="h-8 w-8" />,
+    id: 10, 
+    title: "House Wiring Quiz", 
+    description: "Verify your understanding of residential electrical systems",
+    icon: <Lightbulb className="h-8 w-8" />,
     difficulty: "Intermediate",
     color: "yellow"
   },
   { 
-    id: 5, 
-    title: "Staircase Wiring Quiz", 
-    description: "Challenge yourself on multi-way switching circuits",
-    icon: <Radio className="h-8 w-8" />,
+    id: 11, 
+    title: "Fluorescent Lamp Wiring Quiz", 
+    description: "Test your knowledge of fluorescent lighting systems",
+    icon: <Lightbulb className="h-8 w-8" />,
     difficulty: "Intermediate",
-    color: "red"
+    color: "yellow"
   },
   { 
-    id: 6, 
-    title: "Full Wave Rectifier Quiz", 
-    description: "Verify your understanding of AC to DC conversion",
-    icon: <Wifi className="h-8 w-8" />,
-    difficulty: "Advanced",
-    color: "cyan"
-  },
+    id: 12, 
+    title: "Staircase Wiring Quiz", 
+    description: "Challenge yourself on multi-way switching circuits",
+    icon: <Lightbulb className="h-8 w-8" />,
+    difficulty: "Intermediate",
+    color: "yellow"
+  }
 ]
 
 // Custom animated circuit component for the quiz page
@@ -179,6 +226,12 @@ const AnimatedQuizCard = ({ quiz, index }: { quiz: any, index: number }) => {
         border: "hover:border-cyan-500/50", 
         text: "text-cyan-400",
         hover: "group-hover:bg-cyan-900/30"
+      },
+      orange: { 
+        bg: "from-orange-900/20 to-orange-900/5", 
+        border: "hover:border-orange-500/50", 
+        text: "text-orange-400",
+        hover: "group-hover:bg-orange-900/30"
       }
     }
     
@@ -347,6 +400,7 @@ export default function QuizzesPage() {
   const dockItems = [
     { title: "Home", icon: <Home className="h-full w-full text-neutral-300" />, href: "/" },
     { title: "Experiments", icon: <BookOpen className="h-full w-full text-neutral-300" />, href: "/experiments" },
+    { title: "Study Room", icon: <Library className="h-full w-full text-neutral-300" />, href: "/study-room" },
     { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
     { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
     { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },
@@ -385,35 +439,21 @@ export default function QuizzesPage() {
       <RotatingCircuit />
 
       {/* Hero Section with Aurora Background */}
-      <AuroraBackground className="h-[50vh] flex items-center justify-center mb-16 relative">
-        <CircuitPath />
-        <div className="text-center z-10 px-4 relative">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"
-          >
-            EEE Quizzes
-          </motion.h1>
+      <div className="min-h-[50vh] relative mb-16">
+        <HeroGeometric 
+          badge="Knowledge Check"
+          title1="Test Your"
+          title2="Knowledge"
+        >
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="text-xl md:text-2xl text-neutral-200 max-w-3xl mx-auto"
+            className="text-xl md:text-2xl text-neutral-400 max-w-3xl mx-auto text-center"
           >
-            Test your knowledge with our interactive electrical and electronics engineering quizzes
+            Assess your understanding of electrical engineering concepts with our interactive quizzes.
           </motion.p>
-        </div>
-      </AuroraBackground>
-
-      {/* Gemini Effect Section */}
-      <div className="h-[40vh] mb-24 relative">
-        <GoogleGeminiEffect
-          pathLengths={[pathLengthFirst, pathLengthSecond, pathLengthThird, pathLengthFourth, pathLengthFifth]}
-          title="Master Electrical Concepts"
-          description="Challenge yourself with our comprehensive quiz collection"
-        />
+        </HeroGeometric>
       </div>
 
       <div className="container mx-auto px-4 pb-24 ml-16 md:ml-24 lg:ml-32 relative">

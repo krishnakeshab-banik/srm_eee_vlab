@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { toast } from "sonner"
 import { motion } from "framer-motion"
-import { Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info } from "lucide-react"
+import { Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Library } from "lucide-react"
 import { FloatingDock } from "@/components/ui/floating-dock"
 
 export default function SettingsPage() {
@@ -23,6 +23,7 @@ export default function SettingsPage() {
   const dockItems = [
     { title: "Home", icon: <Home className="h-full w-full text-neutral-300" />, href: "/" },
     { title: "Experiments", icon: <BookOpen className="h-full w-full text-neutral-300" />, href: "/experiments" },
+    { title: "Study Room", icon: <Library className="h-full w-full text-neutral-300" />, href: "/study-room" },
     { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
     { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
     { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },

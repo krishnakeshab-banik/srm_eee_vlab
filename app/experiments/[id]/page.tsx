@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { notFound, useParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Lightbulb, Zap, Cpu, Video, Image as ImageIcon } from "lucide-react"
+import { ArrowLeft, Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Lightbulb, Zap, Cpu, Video, Image as ImageIcon, Library } from "lucide-react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -13,6 +13,7 @@ import { TinkercadEmbed } from "@/components/tinkercad-embed"
 import { FloatingDock } from "@/components/ui/floating-dock"
 import { CircuitAnimation } from "@/components/ui/circuit-animation"
 import { Circuit3DViewer } from "@/components/circuit-3d-viewer"
+import { InteractiveRobotSpline } from "@/components/blocks/interactive-3d-robot"
 import { 
   KVLExperiment, 
   TheveninExperiment, 
@@ -29,6 +30,7 @@ import {
   StaircaseWiringQuiz, 
   FullWaveRectifierQuiz 
 } from "@/components/experiment-quiz"
+import { LogicGatesVirtualLab, AdderVirtualLab } from "@/components/digital-experiments"
 
 // Updated experiments with detailed information from the lab manual
 const experiments = [
@@ -727,6 +729,146 @@ const experiments = [
     image: "/placeholder.svg?height=400&width=600",
     embedId: "jbRQbeSnAzj", // Tinkercad embed ID
   },
+  // ── Experiment 7: Basic Logic Gates ──
+  {
+    id: 7,
+    title: "Basic Logic Gates",
+    aim: "To implement basic logic gates (AND, OR, NOT, NAND, NOR, XOR, XNOR) using ICs and verify their truth tables experimentally.",
+    apparatus: `
+      <h3>Apparatus Required:</h3>
+      <table class="w-full border-collapse my-4">
+        <thead><tr>
+          <th class="border border-neutral-700 px-4 py-2">Sl.No.</th>
+          <th class="border border-neutral-700 px-4 py-2">Apparatus / IC</th>
+          <th class="border border-neutral-700 px-4 py-2">Specification</th>
+          <th class="border border-neutral-700 px-4 py-2">Quantity</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-4 py-2">1</td><td class="border border-neutral-700 px-4 py-2">AND Gate IC</td><td class="border border-neutral-700 px-4 py-2">IC 7408 (Quad 2-input)</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">2</td><td class="border border-neutral-700 px-4 py-2">OR Gate IC</td><td class="border border-neutral-700 px-4 py-2">IC 7432 (Quad 2-input)</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">3</td><td class="border border-neutral-700 px-4 py-2">NOT Gate IC</td><td class="border border-neutral-700 px-4 py-2">IC 7404 (Hex Inverter)</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">4</td><td class="border border-neutral-700 px-4 py-2">NAND Gate IC</td><td class="border border-neutral-700 px-4 py-2">IC 7400 (Quad 2-input)</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">5</td><td class="border border-neutral-700 px-4 py-2">NOR Gate IC</td><td class="border border-neutral-700 px-4 py-2">IC 7402 (Quad 2-input)</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">6</td><td class="border border-neutral-700 px-4 py-2">XOR Gate IC</td><td class="border border-neutral-700 px-4 py-2">IC 7486 (Quad 2-input)</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">7</td><td class="border border-neutral-700 px-4 py-2">DC Power Supply</td><td class="border border-neutral-700 px-4 py-2">+5V</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">8</td><td class="border border-neutral-700 px-4 py-2">Bread Board & Patch Cords</td><td class="border border-neutral-700 px-4 py-2">-</td><td class="border border-neutral-700 px-4 py-2">Required</td></tr>
+        </tbody>
+      </table>
+    `,
+    theory: `
+      <h3>Theory:</h3>
+      <p class="mb-4">Logic gates are the fundamental building blocks of all digital circuits. They perform Boolean logic operations on binary inputs (0 = LOW = 0V, 1 = HIGH = 5V) to produce a binary output.</p>
+      <h4 class="font-semibold mt-4 mb-2">Basic Logic Gates:</h4>
+      <ul class="list-disc pl-6 mb-4 space-y-2">
+        <li><b>AND Gate (IC 7408):</b> Output is HIGH only when ALL inputs are HIGH. Y = A·B</li>
+        <li><b>OR Gate (IC 7432):</b> Output is HIGH when ANY input is HIGH. Y = A+B</li>
+        <li><b>NOT Gate (IC 7404):</b> Inverts the single input. Y = Ā</li>
+        <li><b>NAND Gate (IC 7400):</b> Complement of AND. Output LOW only when all inputs HIGH. Y = (A·B)'</li>
+        <li><b>NOR Gate (IC 7402):</b> Complement of OR. Output HIGH only when all inputs LOW. Y = (A+B)'</li>
+        <li><b>XOR Gate (IC 7486):</b> Output HIGH when inputs are different. Y = A⊕B</li>
+        <li><b>XNOR Gate:</b> Complement of XOR. Output HIGH when inputs are same. Y = (A⊕B)'</li>
+      </ul>
+      <p class="mb-4">NAND and NOR gates are called <b>universal gates</b> because any Boolean function can be implemented using only NAND or only NOR gates.</p>
+    `,
+    procedure: `
+      <h3>Procedure:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>Connect the VCC (Pin 14) of the IC to +5V supply and GND (Pin 7) to ground.</li>
+        <li>Apply different combinations of logic inputs (0V = LOW, 5V = HIGH) to the input pins.</li>
+        <li>Connect an LED with a 330Ω resistor to the output pin to observe the output.</li>
+        <li>Record the output for all possible input combinations.</li>
+        <li>Verify that the recorded truth table matches the theoretical truth table for each gate.</li>
+        <li>Repeat for all seven logic gates.</li>
+      </ol>
+      <h3>Observations (AND Gate - IC 7408):</h3>
+      <table class="w-full border-collapse my-4">
+        <thead><tr>
+          <th class="border border-neutral-700 px-4 py-2">A</th>
+          <th class="border border-neutral-700 px-4 py-2">B</th>
+          <th class="border border-neutral-700 px-4 py-2">Y = A·B</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-4 py-2">0</td><td class="border border-neutral-700 px-4 py-2">0</td><td class="border border-neutral-700 px-4 py-2">0</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">0</td><td class="border border-neutral-700 px-4 py-2">1</td><td class="border border-neutral-700 px-4 py-2">0</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">1</td><td class="border border-neutral-700 px-4 py-2">0</td><td class="border border-neutral-700 px-4 py-2">0</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">1</td><td class="border border-neutral-700 px-4 py-2">1</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+        </tbody>
+      </table>
+    `,
+    references: `
+      <h3>References:</h3>
+      <ol class="list-decimal pl-6 mb-4">
+        <li>Morris Mano, M. (2013). Digital Design (5th ed.). Pearson.</li>
+        <li>Floyd, T. L. (2015). Digital Fundamentals (11th ed.). Pearson.</li>
+        <li>Tocci, R. J., Widmer, N., & Moss, G. (2017). Digital Systems: Principles and Applications (12th ed.). Pearson.</li>
+      </ol>
+    `,
+    image: "/placeholder.svg?height=400&width=600",
+    embedId: "",
+  },
+  // ── Experiment 8: Half Adder & Full Adder ──
+  {
+    id: 8,
+    title: "Half Adder & Full Adder",
+    aim: "To design and verify the operation of Half Adder and Full Adder circuits using basic logic gates.",
+    apparatus: `
+      <h3>Apparatus Required:</h3>
+      <table class="w-full border-collapse my-4">
+        <thead><tr>
+          <th class="border border-neutral-700 px-4 py-2">Sl.No.</th>
+          <th class="border border-neutral-700 px-4 py-2">Apparatus / IC</th>
+          <th class="border border-neutral-700 px-4 py-2">Specification</th>
+          <th class="border border-neutral-700 px-4 py-2">Quantity</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-4 py-2">1</td><td class="border border-neutral-700 px-4 py-2">XOR Gate IC</td><td class="border border-neutral-700 px-4 py-2">IC 7486</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">2</td><td class="border border-neutral-700 px-4 py-2">AND Gate IC</td><td class="border border-neutral-700 px-4 py-2">IC 7408</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">3</td><td class="border border-neutral-700 px-4 py-2">OR Gate IC</td><td class="border border-neutral-700 px-4 py-2">IC 7432</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">4</td><td class="border border-neutral-700 px-4 py-2">DC Power Supply</td><td class="border border-neutral-700 px-4 py-2">+5V</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">5</td><td class="border border-neutral-700 px-4 py-2">Bread Board & Patch Cords</td><td class="border border-neutral-700 px-4 py-2">-</td><td class="border border-neutral-700 px-4 py-2">Required</td></tr>
+        </tbody>
+      </table>
+    `,
+    theory: `
+      <h3>Theory:</h3>
+      <h4 class="font-semibold mt-3 mb-2">Half Adder:</h4>
+      <p class="mb-3">A Half Adder is a combinational circuit that adds two single bits (A and B) and produces two outputs: Sum (S) and Carry (C).</p>
+      <p class="mb-2">Boolean Expressions: <b>S = A ⊕ B</b>, &nbsp;&nbsp;<b>C = A · B</b></p>
+      <p class="mb-4">Implementation: 1 XOR gate + 1 AND gate. Limitation: Cannot handle carry from a previous stage.</p>
+      <h4 class="font-semibold mt-3 mb-2">Full Adder:</h4>
+      <p class="mb-3">A Full Adder adds three bits: A, B, and a Carry-In (Cin) from the previous stage, producing Sum and Carry-Out.</p>
+      <p class="mb-2">Boolean Expressions: <b>S = A ⊕ B ⊕ Cin</b>, &nbsp;&nbsp;<b>Cout = A·B + B·Cin + A·Cin</b></p>
+      <p class="mb-4">Implementation: 2 XOR gates + 2 AND gates + 1 OR gate. Full adders can be chained to add multi-bit binary numbers.</p>
+    `,
+    procedure: `
+      <h3>Procedure — Half Adder:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>Connect IC 7486 (XOR) and IC 7408 (AND) on the bread board.</li>
+        <li>Connect VCC (+5V) to Pin 14 and GND to Pin 7 of each IC.</li>
+        <li>Apply inputs A and B to the first gate of each IC.</li>
+        <li>Connect the XOR output to an LED (Sum) and AND output to another LED (Carry).</li>
+        <li>Apply all input combinations (00, 01, 10, 11) and record outputs.</li>
+      </ol>
+      <h3>Procedure — Full Adder:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>First compute A⊕B using XOR gate. Let the result be P.</li>
+        <li>Compute Sum = P ⊕ Cin using a second XOR gate.</li>
+        <li>Compute A·B and P·Cin using AND gates.</li>
+        <li>Compute Carry = (A·B) + (P·Cin) using an OR gate.</li>
+        <li>Verify all 8 input combinations (A, B, Cin from 000 to 111).</li>
+      </ol>
+    `,
+    references: `
+      <h3>References:</h3>
+      <ol class="list-decimal pl-6 mb-4">
+        <li>Morris Mano, M. (2013). Digital Design (5th ed.). Pearson.</li>
+        <li>Floyd, T. L. (2015). Digital Fundamentals (11th ed.). Pearson.</li>
+        <li>Tocci, R. J., Widmer, N., & Moss, G. (2017). Digital Systems: Principles and Applications (12th ed.). Pearson.</li>
+      </ol>
+    `,
+    image: "/placeholder.svg?height=400&width=600",
+    embedId: "",
+  },
 ]
 
 export default function ExperimentPage() {
@@ -737,6 +879,7 @@ export default function ExperimentPage() {
   const dockItems = [
     { title: "Home", icon: <Home className="h-full w-full text-neutral-300" />, href: "/" },
     { title: "Experiments", icon: <BookOpen className="h-full w-full text-neutral-300" />, href: "/experiments" },
+    { title: "Study Room", icon: <Library className="h-full w-full text-neutral-300" />, href: "/study-room" },
     { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
     { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
     { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },
@@ -758,6 +901,7 @@ export default function ExperimentPage() {
     const hash = window.location.hash
     if (hash) {
       const tabName = hash.replace("#", "")
+      // 'simulation' is the correct tab value (was incorrectly '3d' previously)
       if (["aim", "apparatus", "theory", "procedure", "interactive", "simulation", "quiz", "references"].includes(tabName)) {
         setActiveTab(tabName)
       }
@@ -780,7 +924,7 @@ export default function ExperimentPage() {
 
       <DigitalClock />
 
-      <div className="w-full max-w-6xl mx-auto px-4 py-8 pt-24 ml-16 md:ml-24 lg:ml-32">
+      <div className="w-full max-w-6xl mx-auto px-4 py-8 pt-24 pl-14 md:pl-16">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <Link href="/experiments" className="inline-flex items-center text-blue-400 hover:text-blue-300 mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Experiments
@@ -826,35 +970,29 @@ export default function ExperimentPage() {
               window.location.hash = value
             }}
           >
-            <TabsList className="grid w-full grid-cols-4 md:grid-cols-10 bg-neutral-900 border border-neutral-800">
-              <TabsTrigger value="aim" className="data-[state=active]:bg-blue-900/30 text-white">
+            <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 bg-neutral-900/80 border border-neutral-800 rounded-xl p-1">
+              <TabsTrigger value="aim" className="data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
                 Aim
               </TabsTrigger>
-              <TabsTrigger value="apparatus" className="data-[state=active]:bg-blue-900/30 text-white">
+              <TabsTrigger value="apparatus" className="data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
                 Apparatus
               </TabsTrigger>
-              <TabsTrigger value="theory" className="data-[state=active]:bg-blue-900/30 text-white">
+              <TabsTrigger value="theory" className="data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
                 Theory
               </TabsTrigger>
-              <TabsTrigger value="procedure" className="data-[state=active]:bg-blue-900/30 text-white">
+              <TabsTrigger value="procedure" className="data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
                 Procedure
               </TabsTrigger>
-              <TabsTrigger value="interactive" className="data-[state=active]:bg-green-900/30 text-white">
+              <TabsTrigger value="interactive" className="data-[state=active]:bg-green-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
                 Interactive
               </TabsTrigger>
-              <TabsTrigger value="3d" className="data-[state=active]:bg-purple-900/30 text-white">
-                3D Simulation
+              <TabsTrigger value="simulation" className="data-[state=active]:bg-purple-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
+                Simulation
               </TabsTrigger>
-              <TabsTrigger value="video" className="data-[state=active]:bg-red-900/30 text-white">
-                Video
-              </TabsTrigger>
-              <TabsTrigger value="gallery" className="data-[state=active]:bg-indigo-900/30 text-white">
-                Gallery
-              </TabsTrigger>
-              <TabsTrigger value="quiz" className="data-[state=active]:bg-yellow-900/30 text-white">
+              <TabsTrigger value="quiz" className="data-[state=active]:bg-yellow-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
                 Quiz
               </TabsTrigger>
-              <TabsTrigger value="references" className="data-[state=active]:bg-blue-900/30 text-white">
+              <TabsTrigger value="references" className="data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
                 References
               </TabsTrigger>
             </TabsList>
@@ -889,7 +1027,7 @@ export default function ExperimentPage() {
                 transition={{ duration: 0.5 }}
                 className="rounded-xl border border-neutral-800 bg-neutral-900 p-6 text-neutral-300"
               >
-                <div dangerouslySetInnerHTML={{ __html: experiment.apparatus }} />
+                <div className="experiment-content" dangerouslySetInnerHTML={{ __html: experiment.apparatus }} />
               </motion.div>
             </TabsContent>
 
@@ -901,7 +1039,7 @@ export default function ExperimentPage() {
                 transition={{ duration: 0.5 }}
                 className="rounded-xl border border-neutral-800 bg-neutral-900 p-6 text-neutral-300"
               >
-                <div dangerouslySetInnerHTML={{ __html: experiment.theory }} />
+                <div className="experiment-content" dangerouslySetInnerHTML={{ __html: experiment.theory }} />
                 
                 {/* Circuit Animation Background */}
                 <div className="relative mt-8 h-64 rounded-lg overflow-hidden border border-neutral-800">
@@ -926,7 +1064,7 @@ export default function ExperimentPage() {
                 transition={{ duration: 0.5 }}
                 className="rounded-xl border border-neutral-800 bg-neutral-900 p-6 text-neutral-300"
               >
-                <div dangerouslySetInnerHTML={{ __html: experiment.procedure }} />
+                <div className="experiment-content" dangerouslySetInnerHTML={{ __html: experiment.procedure }} />
               </motion.div>
             </TabsContent>
 
@@ -955,18 +1093,40 @@ export default function ExperimentPage() {
               </motion.div>
             </TabsContent>
 
-            {/* 3D Simulation Tab */}
+            {/* Simulation Tab — fixed value from '3d' to 'simulation' */}
             <TabsContent value="simulation" id="simulation" className="mt-4">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
+                className="space-y-6"
               >
-                <Circuit3DViewer 
-                  experimentId={experiment.id} 
-                  title={experiment.title} 
-                  embedId={experiment.embedId} 
-                />
+                <div className="w-full h-[500px] rounded-xl overflow-hidden border border-neutral-800 relative bg-neutral-900">
+                  <InteractiveRobotSpline scene="https://prod.spline.design/kZCBH4hL4yD8P315/scene.splinecode" />
+                  <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-md px-4 py-2 rounded-lg border border-neutral-800">
+                    <p className="text-white font-medium flex items-center gap-2">
+                      <Cpu className="w-4 h-4 text-blue-400" /> AI Lab Assistant
+                    </p>
+                  </div>
+                </div>
+
+                {experiment.id === 7 ? (
+                  <LogicGatesVirtualLab />
+                ) : experiment.id === 8 ? (
+                  <AdderVirtualLab />
+                ) : experiment.embedId ? (
+                  <Circuit3DViewer 
+                    experimentId={experiment.id} 
+                    title={experiment.title} 
+                    embedId={experiment.embedId} 
+                  />
+                ) : (
+                  <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-8 text-center text-neutral-300">
+                    <Zap className="h-16 w-16 text-yellow-500/50 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-white mb-2">Virtual Simulation Coming Soon</h3>
+                    <p className="text-neutral-400 max-w-md mx-auto">We are currently building the interactive simulation for this specific experiment. Please check the Interactive Demonstration tab for an animated walkthrough.</p>
+                  </div>
+                )}
               </motion.div>
             </TabsContent>
 
@@ -1009,83 +1169,40 @@ export default function ExperimentPage() {
                   <h3 className="text-xl font-bold text-white mb-4">Experiment Video Demonstration</h3>
                   <p className="mb-6">Watch a complete demonstration of the experiment procedure and results.</p>
                   
-                  {experiment.id === 1 && (
-                    <div className="aspect-video bg-neutral-950 rounded-lg overflow-hidden">
-                      <iframe 
-                        className="w-full h-full"
-                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-                        title="Kirchhoff's Voltage Law Experiment"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                  )}
-                  
-                  {experiment.id === 2 && (
-                    <div className="aspect-video bg-neutral-950 rounded-lg overflow-hidden">
-                      <iframe 
-                        className="w-full h-full"
-                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-                        title="Thevenin's Theorem Experiment"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                  )}
-                  
-                  {experiment.id === 3 && (
-                    <div className="aspect-video bg-neutral-950 rounded-lg overflow-hidden">
-                      <iframe 
-                        className="w-full h-full"
-                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-                        title="House Wiring Experiment"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                  )}
-                  
-                  {experiment.id === 4 && (
-                    <div className="aspect-video bg-neutral-950 rounded-lg overflow-hidden">
-                      <iframe 
-                        className="w-full h-full"
-                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-                        title="Fluorescent Lamp Wiring Experiment"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                  )}
-                  
-                  {experiment.id === 5 && (
-                    <div className="aspect-video bg-neutral-950 rounded-lg overflow-hidden">
-                      <iframe 
-                        className="w-full h-full"
-                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-                        title="Staircase Wiring Experiment"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                  )}
-                  
-                  {experiment.id === 6 && (
-                    <div className="aspect-video bg-neutral-950 rounded-lg overflow-hidden">
-                      <iframe 
-                        className="w-full h-full"
-                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-                        title="Full Wave Rectifier Experiment"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                  )}
+                  {/* Real educational YouTube videos mapped per experiment */}
+                  {(() => {
+                    const videoMap: Record<number, { src: string; title: string }> = {
+                      1: { src: "https://www.youtube.com/embed/jdgr56G6bIs", title: "Kirchhoff's Voltage Law - Verified" },
+                      2: { src: "https://www.youtube.com/embed/QJQS_5wYDGw", title: "Thevenin's Theorem Explained" },
+                      3: { src: "https://www.youtube.com/embed/3RL0dDghkYw", title: "House Wiring Demonstration" },
+                      4: { src: "https://www.youtube.com/embed/nkxgGg3PCGE", title: "Fluorescent Lamp Working" },
+                      5: { src: "https://www.youtube.com/embed/0MqYkiKFxJA", title: "Staircase Wiring Explained" },
+                      6: { src: "https://www.youtube.com/embed/sI_7GkbcKBo", title: "Full Wave Bridge Rectifier" },
+                    }
+                    const video = videoMap[experiment.id]
+                    if (video) {
+                      return (
+                        <div className="aspect-video bg-neutral-950 rounded-xl overflow-hidden border border-neutral-800">
+                          <iframe
+                            className="w-full h-full"
+                            src={video.src}
+                            title={video.title}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
+                      )
+                    }
+                    return (
+                      <div className="aspect-video bg-neutral-900 rounded-xl border border-neutral-800 flex items-center justify-center">
+                        <div className="text-center">
+                          <Video className="h-12 w-12 text-neutral-600 mx-auto mb-3" />
+                          <p className="text-neutral-400 text-sm">Video demonstration coming soon</p>
+                        </div>
+                      </div>
+                    )
+                  })()}
                   
                   {experiment.id > 6 && (
                     <div className="mt-8 p-6 bg-neutral-800 rounded-lg flex items-center justify-center h-64">

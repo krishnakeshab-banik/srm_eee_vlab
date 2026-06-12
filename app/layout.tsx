@@ -3,13 +3,18 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata = {
-    title: "EEE Learning Platform",
+    title: {
+        default: "SRM EEE Virtual Lab — 26EEE1001T",
+        template: "%s | SRM EEE Virtual Lab",
+    },
     description:
-        "Interactive Electrical and Electronics Engineering experiments",
-    generator: "v0.dev",
+        "Interactive Virtual Laboratory for Electrical and Electronics Engineering (26EEE1001T) — SRM Institute of Science and Technology. Perform experiments, simulations, and quizzes online.",
+    keywords: ["EEE", "virtual lab", "SRM", "electrical engineering", "electronics", "experiments", "KVL", "Thevenin", "circuits"],
+    authors: [{ name: "SRM EEE Department" }],
+    creator: "SRM Institute of Science and Technology",
 };
 
 export default function RootLayout({
@@ -24,7 +29,7 @@ export default function RootLayout({
             style={{ colorScheme: "dark" }}
         >
             <body
-                className={`${inter.className} bg-black text-white overflow-x-hidden`}
+                className={`${inter.variable} font-sans bg-[#050508] text-white overflow-x-hidden antialiased`}
                 suppressHydrationWarning
             >
                 <ThemeProvider
@@ -34,7 +39,16 @@ export default function RootLayout({
                 >
                     <div className="relative flex min-h-screen flex-col overflow-x-hidden">
                         {children}
-                        <Toaster position="top-right" />
+                        <Toaster
+                            position="top-right"
+                            toastOptions={{
+                                style: {
+                                    background: "#0f1117",
+                                    border: "1px solid rgba(59, 130, 246, 0.2)",
+                                    color: "#e2e8f0",
+                                },
+                            }}
+                        />
                     </div>
                 </ThemeProvider>
             </body>
