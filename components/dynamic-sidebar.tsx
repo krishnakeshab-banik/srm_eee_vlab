@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { usePathname } from "next/navigation"
+import { signOut, useSession } from "next-auth/react"
 import {
   Home,
   BookOpen,
@@ -16,6 +17,8 @@ import {
   Users,
   Info,
   Zap,
+  LogOut,
+  User,
 } from "lucide-react"
 import { Sidebar, SidebarBody, SidebarLink, SidebarProvider } from "@/components/ui/sidebar"
 import { motion } from "framer-motion"
@@ -23,6 +26,8 @@ import { motion } from "framer-motion"
 export function DynamicSidebar() {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
+  const { data: session } = useSession()
+  const user = session?.user
 
   // Check if we're on an experiment page
   const isExperimentPage = pathname.startsWith("/experiments/") && pathname !== "/experiments"
@@ -59,6 +64,11 @@ export function DynamicSidebar() {
       label: "About",
       href: "/about",
       icon: <Info className="h-5 w-5 shrink-0 text-blue-300" />,
+    },
+    {
+      label: "Profile",
+      href: "/profile",
+      icon: <User className="h-5 w-5 shrink-0 text-blue-300" />,
     },
     {
       label: "Settings",
@@ -130,7 +140,33 @@ export function DynamicSidebar() {
                 ))}
               </div>
             </div>
-            <div className="border-t border-white/10 pt-3">
+            <div className="border-t border-white/10 pt-3 space-y-3">
+              {user?.email ? (
+                <div className="rounded-xl border border-white/8 bg-white/5 px-3 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-sm font-bold text-white">
+                      {(user.name || user.email || "S").charAt(0).toUpperCase()}
+                    </div>
+                    {open && (
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-white">{user.name || "SRM Student"}</p>
+                        <p className="truncate text-xs text-neutral-400">
+                          {user.department || user.email}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  {open && (
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/signin" })}
+                      className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-red-300 transition-colors hover:bg-red-500/20"
+                    >
+                      <LogOut className="h-3.5 w-3.5" />
+                      Logout
+                    </button>
+                  )}
+                </div>
+              ) : null}
               <SidebarLink
                 link={{
                   label: "SRM EEE Virtual Lab",

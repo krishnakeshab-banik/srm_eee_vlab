@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { notFound, useParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Lightbulb, Zap, Cpu, Video, Image as ImageIcon, Library } from "lucide-react"
+import { ArrowLeft, Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Lightbulb, Zap, Cpu, Video, Image as ImageIcon, Library, User } from "lucide-react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -883,7 +883,7 @@ export default function ExperimentPage() {
     { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
     { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
     { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },
-    { title: "Settings", icon: <Settings className="h-full w-full text-neutral-300" />, href: "/settings" },
+    { title: "Profile", icon: <User className="h-full w-full text-neutral-300" />, href: "/profile" }, { title: "Settings", icon: <Settings className="h-full w-full text-neutral-300" />, href: "/settings" },
     { title: "Sign Up", icon: <LogIn className="h-full w-full text-neutral-300" />, href: "/signup" },
   ]
 

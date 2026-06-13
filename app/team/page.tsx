@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { DigitalClock } from "@/components/digital-clock"
 import { DynamicSidebar } from "@/components/dynamic-sidebar"
 import Image from "next/image"
-import { GithubIcon, LinkedinIcon, MailIcon, Users, BookOpen, Settings, LogIn, FileQuestion, Info, Home, Award, GraduationCap, BookMarked, Library } from "lucide-react"
+import { GithubIcon, LinkedinIcon, MailIcon, Users, BookOpen, Settings, LogIn, FileQuestion, Info, Home, Award, GraduationCap, BookMarked, Library, User } from "lucide-react"
 import Link from "next/link"
 import { HoverEffect } from "@/components/ui/card-hover-effect"
 import { MovingBorder } from "@/components/ui/moving-border"
@@ -87,7 +87,7 @@ export default function TeamPage() {
     { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
     { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
     { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },
-    { title: "Settings", icon: <Settings className="h-full w-full text-neutral-300" />, href: "/settings" },
+    { title: "Profile", icon: <User className="h-full w-full text-neutral-300" />, href: "/profile" }, { title: "Settings", icon: <Settings className="h-full w-full text-neutral-300" />, href: "/settings" },
     { title: "Sign Up", icon: <LogIn className="h-full w-full text-neutral-300" />, href: "/signup" },
   ]
 

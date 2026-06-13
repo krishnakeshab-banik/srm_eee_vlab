@@ -17,7 +17,7 @@ import { Home,
   FlaskConical,
   Award,
   Clock,
-  BookMarked, Library } from "lucide-react";
+  BookMarked, Library, User } from "lucide-react";
 import { DigitalClock } from "@/components/digital-clock";
 import { GlowingCard } from "@/components/glowing-card";
 import { FloatingDock } from "@/components/ui/floating-dock";
@@ -116,6 +116,7 @@ export default function HomePage() {
     { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
     { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
     { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },
+    { title: "Profile", icon: <User className="h-full w-full text-neutral-300" />, href: "/profile" },
     { title: "Settings", icon: <Settings className="h-full w-full text-neutral-300" />, href: "/settings" },
     { title: "Sign Up", icon: <LogIn className="h-full w-full text-neutral-300" />, href: "/signup" },
   ];

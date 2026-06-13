@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Search, Zap, Lightbulb, Cpu, ChevronRight, CircuitBoard, Activity, Library } from "lucide-react"
+import { Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Search, Zap, Lightbulb, Cpu, ChevronRight, CircuitBoard, Activity, Library, User } from "lucide-react"
 import { FloatingDock } from "@/components/ui/floating-dock"
 import { GlowingCard } from "@/components/glowing-card"
 import { DigitalClock } from "@/components/digital-clock"
@@ -154,7 +154,7 @@ export default function ExperimentsPage() {
     { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
     { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
     { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },
-    { title: "Settings", icon: <Settings className="h-full w-full text-neutral-300" />, href: "/settings" },
+    { title: "Profile", icon: <User className="h-full w-full text-neutral-300" />, href: "/profile" }, { title: "Settings", icon: <Settings className="h-full w-full text-neutral-300" />, href: "/settings" },
     { title: "Sign Up", icon: <LogIn className="h-full w-full text-neutral-300" />, href: "/signup" },
   ]
 

@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { isSrmEmail } from "@/lib/auth"
 
 export default function SignupPage() {
   const router = useRouter()
@@ -42,11 +43,12 @@ export default function SignupPage() {
         throw new Error("Password must be at least 8 characters long")
       }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      if (!isSrmEmail(formData.email)) {
+        throw new Error("Only @srmist.edu.in email accounts are allowed")
+      }
 
       // Success
-      toast.success("Account created successfully! Redirecting to login...")
+      toast.success("SRM email accepted. Redirecting you to sign in...")
 
       // Redirect to home page after successful signup
       setTimeout(() => {
@@ -108,12 +110,12 @@ export default function SignupPage() {
             </div>
             <LabelInputContainer className="mb-4">
               <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                placeholder="john@example.com"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
+                <Input
+                  id="email"
+                  placeholder="john@srmist.edu.in"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
                 required
               />
             </LabelInputContainer>

@@ -1,10 +1,9 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Zap, Cpu, Lightbulb, Bolt, Radio, Wifi, Activity, CircuitBoard, Library } from "lucide-react"
-import { motion, useAnimation, useInView, AnimatePresence, useScroll, useTransform } from "framer-motion"
+import { Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Zap, Cpu, Lightbulb, Bolt, Radio, Wifi, Activity, CircuitBoard, Library, User, Pencil, Trash2, Plus } from "lucide-react"
+import { motion, AnimatePresence, useInView } from "framer-motion"
 import { DigitalClock } from "@/components/digital-clock"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { SidebarDemo } from "@/components/sidebar-demo"
 import { FloatingDock } from "@/components/ui/floating-dock"
 import { CircuitAnimation } from "@/components/ui/circuit-animation"
@@ -12,106 +11,8 @@ import { RotatingCircuit } from "@/components/ui/rotating-circuit"
 import { GlowingEffect } from "@/components/ui/glowing-effect"
 import { HeroGeometric } from "@/components/ui/shape-landing-hero"
 import { cn } from "@/lib/utils"
-
-// Enhanced quizzes with icons and difficulty levels
-const quizzes = [
-  {
-    id: 1,
-    title: "Kirchhoff's Voltage Law Quiz",
-    description: "Test your knowledge of voltage relationships in closed loop circuits",
-    icon: <Zap className="h-8 w-8" />,
-    difficulty: "Beginner",
-    color: "blue"
-  },
-  {
-    id: 2,
-    title: "Thevenin's Theorem Quiz",
-    description: "Challenge yourself on circuit simplification techniques",
-    icon: <Zap className="h-8 w-8" />,
-    difficulty: "Intermediate",
-    color: "blue"
-  },
-  {
-    id: 3,
-    title: "PN Junction Diode Quiz",
-    description: "Test your understanding of forward and reverse bias characteristics",
-    icon: <Activity className="h-8 w-8" />,
-    difficulty: "Beginner",
-    color: "cyan"
-  },
-  {
-    id: 4,
-    title: "Full Wave Rectifier Quiz",
-    description: "Verify your understanding of AC to DC conversion",
-    icon: <Activity className="h-8 w-8" />,
-    difficulty: "Intermediate",
-    color: "cyan"
-  },
-  {
-    id: 5,
-    title: "Clipper Circuit Quiz",
-    description: "Test your knowledge of signal amplitude limiting circuits",
-    icon: <Activity className="h-8 w-8" />,
-    difficulty: "Intermediate",
-    color: "cyan"
-  },
-  {
-    id: 6,
-    title: "Op-Amp Inverting / Non-Inverting Amplifier Quiz",
-    description: "Challenge yourself on operational amplifier circuit design",
-    icon: <Cpu className="h-8 w-8" />,
-    difficulty: "Advanced",
-    color: "cyan"
-  },
-  {
-    id: 7,
-    title: "Basic Logic Gates Quiz",
-    description: "Test your understanding of AND, OR, NOT, NAND, NOR, XOR, XNOR logic gates",
-    icon: <CircuitBoard className="h-8 w-8" />,
-    difficulty: "Beginner",
-    color: "green"
-  },
-  {
-    id: 8,
-    title: "Half Adder & Full Adder Quiz",
-    description: "Challenge yourself on digital arithmetic circuits",
-    icon: <CircuitBoard className="h-8 w-8" />,
-    difficulty: "Intermediate",
-    color: "green"
-  },
-  {
-    id: 9,
-    title: "Energy Measurement Quiz",
-    description: "Test your knowledge of measuring electrical energy consumption",
-    icon: <Lightbulb className="h-8 w-8" />,
-    difficulty: "Beginner",
-    color: "orange"
-  },
-  { 
-    id: 10, 
-    title: "House Wiring Quiz", 
-    description: "Verify your understanding of residential electrical systems",
-    icon: <Lightbulb className="h-8 w-8" />,
-    difficulty: "Intermediate",
-    color: "yellow"
-  },
-  { 
-    id: 11, 
-    title: "Fluorescent Lamp Wiring Quiz", 
-    description: "Test your knowledge of fluorescent lighting systems",
-    icon: <Lightbulb className="h-8 w-8" />,
-    difficulty: "Intermediate",
-    color: "yellow"
-  },
-  { 
-    id: 12, 
-    title: "Staircase Wiring Quiz", 
-    description: "Challenge yourself on multi-way switching circuits",
-    icon: <Lightbulb className="h-8 w-8" />,
-    difficulty: "Intermediate",
-    color: "yellow"
-  }
-]
+import { useSession } from "next-auth/react"
+import { toast } from "sonner"
 
 // Custom animated circuit component for the quiz page
 const ElectronFlow = () => {
@@ -183,10 +84,36 @@ const ElectronFlow = () => {
 }
 
 // Animated quiz card component
-const AnimatedQuizCard = ({ quiz, index }: { quiz: any, index: number }) => {
+const AnimatedQuizCard = ({ 
+  quiz, 
+  index, 
+  isAuthenticated, 
+  isAdmin, 
+  onEdit, 
+  onDelete 
+}: { 
+  quiz: any, 
+  index: number, 
+  isAuthenticated: boolean,
+  isAdmin: boolean,
+  onEdit: (quiz: any) => void,
+  onDelete: (id: number) => void
+}) => {
   const [isHovered, setIsHovered] = useState(false)
   const cardRef = useRef(null)
   const isInView = useInView(cardRef, { once: true, margin: "-100px" })
+
+  const iconMap: Record<string, React.ReactNode> = {
+    Zap: <Zap className="h-8 w-8" />,
+    Cpu: <Cpu className="h-8 w-8" />,
+    Activity: <Activity className="h-8 w-8" />,
+    CircuitBoard: <CircuitBoard className="h-8 w-8" />,
+    Lightbulb: <Lightbulb className="h-8 w-8" />,
+    Radio: <Radio className="h-8 w-8" />,
+    Wifi: <Wifi className="h-8 w-8" />
+  }
+
+  const icon = iconMap[quiz.icon] || <Zap className="h-8 w-8" />
   
   // Get color classes based on quiz color
   const getColorClasses = (color: string) => {
@@ -246,7 +173,7 @@ const AnimatedQuizCard = ({ quiz, index }: { quiz: any, index: number }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="h-full"
+      className="h-full relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -256,23 +183,61 @@ const AnimatedQuizCard = ({ quiz, index }: { quiz: any, index: number }) => {
           <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border-0.75 p-6 bg-neutral-900/80 backdrop-blur-sm shadow-md">
             <div className={cn("absolute inset-0 bg-gradient-to-br opacity-30 transition-opacity duration-300", colorClasses.hover)}></div>
             
+            {isAdmin && (
+              <div className="absolute top-4 right-4 flex gap-2 z-20">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    onEdit(quiz)
+                  }}
+                  className="p-1.5 rounded-lg border border-blue-500/30 bg-blue-950/40 text-blue-400 hover:bg-blue-900/60 hover:text-blue-300 transition-colors"
+                  title="Edit Quiz"
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    onDelete(quiz.id)
+                  }}
+                  className="p-1.5 rounded-lg border border-red-500/30 bg-red-950/40 text-red-400 hover:bg-red-900/60 hover:text-red-300 transition-colors"
+                  title="Delete Quiz"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+
             <div className="relative flex flex-1 flex-col justify-between gap-3">
               <div className="flex items-start justify-between">
                 <div className={cn("p-3 rounded-lg bg-gradient-to-br", colorClasses.bg)}>
-                  {quiz.icon}
+                  {icon}
                 </div>
-                <div className={cn("text-sm font-medium px-3 py-1 rounded-full border", colorClasses.text, "border-neutral-800")}>
-                  {quiz.difficulty}
-                </div>
+                {!isAdmin && (
+                  <div className={cn("text-sm font-medium px-3 py-1 rounded-full border", colorClasses.text, "border-neutral-800")}>
+                    {quiz.difficulty}
+                  </div>
+                )}
               </div>
               
               <div className="space-y-2 mt-4">
                 <h3 className="text-xl font-bold text-white">{quiz.title}</h3>
                 <p className="text-sm text-neutral-400">{quiz.description}</p>
+                {quiz.questions && (
+                  <p className="text-xs text-neutral-500 font-medium">
+                    {quiz.questions.length} Question{quiz.questions.length === 1 ? "" : "s"}
+                  </p>
+                )}
               </div>
               
               <div className={cn("mt-4 text-sm font-medium flex items-center", colorClasses.text)}>
-                <span>Start Quiz</span>
+                {isAdmin ? (
+                  <span>Manage / View Quiz ⚙️</span>
+                ) : (
+                  <span>{isAuthenticated ? "Start Quiz" : "Sign in to Attempt 🔒"}</span>
+                )}
                 <motion.div
                   animate={isHovered ? { x: 5 } : { x: 0 }}
                   transition={{ duration: 0.2 }}
@@ -289,113 +254,200 @@ const AnimatedQuizCard = ({ quiz, index }: { quiz: any, index: number }) => {
   )
 }
 
-// Animated circuit path for the hero section
-const CircuitPath = () => {
-  const pathRef = useRef<SVGPathElement>(null)
-  const [pathLength, setPathLength] = useState(0)
-  
-  useEffect(() => {
-    if (pathRef.current) {
-      setPathLength(pathRef.current.getTotalLength())
+export default function QuizzesPage() {
+  const { data: session } = useSession()
+  const isAuthenticated = !!session?.user?.email
+  const isAdmin = session?.user?.role === "admin"
+
+  const [quizzes, setQuizzes] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState<number | null>(null)
+
+  // Form states
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    difficulty: "Beginner",
+    color: "blue",
+    icon: "Zap"
+  })
+
+  const [questions, setQuestions] = useState<any[]>([
+    { id: 1, question: "", options: ["", "", "", ""], correctAnswer: 0, explanation: "" }
+  ])
+
+  const fetchQuizzes = async () => {
+    try {
+      const res = await fetch("/api/quizzes")
+      if (res.ok) {
+        const data = await res.json()
+        setQuizzes(data)
+      } else {
+        toast.error("Failed to load quizzes.")
+      }
+    } catch (err) {
+      toast.error("An error occurred loading quizzes.")
+    } finally {
+      setLoading(false)
     }
+  }
+
+  useEffect(() => {
+    fetchQuizzes()
   }, [])
 
-  return (
-    <div className="absolute inset-0 z-0 overflow-hidden">
-      <svg
-        viewBox="0 0 1000 300"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full"
-      >
-        <motion.path
-          ref={pathRef}
-          d="M0,150 H200 L250,100 H350 L400,150 H600 L650,100 H750 L800,150 H1000"
-          stroke="url(#circuitGradient)"
-          strokeWidth="3"
-          strokeLinecap="round"
-          initial={{ pathLength: 0, opacity: 0.3 }}
-          animate={{ pathLength: 1, opacity: 0.8 }}
-          transition={{ duration: 2, ease: "easeInOut" }}
-        />
-        
-        {/* Circuit nodes */}
-        <motion.circle cx="200" cy="150" r="5" fill="#60A5FA" 
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.4, duration: 0.2 }}
-        />
-        <motion.circle cx="400" cy="150" r="5" fill="#60A5FA" 
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.8, duration: 0.2 }}
-        />
-        <motion.circle cx="600" cy="150" r="5" fill="#60A5FA" 
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 1.2, duration: 0.2 }}
-        />
-        <motion.circle cx="800" cy="150" r="5" fill="#60A5FA" 
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 1.6, duration: 0.2 }}
-        />
-        
-        {/* Resistor */}
-        <motion.path
-          d="M250,100 L260,80 L270,120 L280,80 L290,120 L300,80 L310,120 L320,80 L330,120 L340,100"
-          stroke="#60A5FA"
-          strokeWidth="3"
-          strokeLinecap="round"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-        />
-        
-        {/* Capacitor */}
-        <motion.path
-          d="M650,100 V80 M650,120 V100 M750,100 V80 M750,120 V100"
-          stroke="#60A5FA"
-          strokeWidth="3"
-          strokeLinecap="round"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ delay: 1.4, duration: 0.5 }}
-        />
-        
-        {/* Electron animation */}
-        <motion.circle
-          cx="0"
-          cy="150"
-          r="3"
-          fill="#fff"
-          animate={{
-            cx: [0, 1000],
-            opacity: [0, 1, 1, 0],
-          }}
-          transition={{
-            duration: 4,
-            ease: "easeInOut",
-            times: [0, 0.1, 0.9, 1],
-            repeat: Infinity,
-            repeatType: "loop",
-            delay: 2
-          }}
-        />
-        
-        <defs>
-          <linearGradient id="circuitGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#1E40AF" />
-            <stop offset="50%" stopColor="#3B82F6" />
-            <stop offset="100%" stopColor="#60A5FA" />
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
-  )
-}
+  const resetForm = () => {
+    setEditingId(null)
+    setFormData({
+      title: "",
+      description: "",
+      difficulty: "Beginner",
+      color: "blue",
+      icon: "Zap"
+    })
+    setQuestions([
+      { id: 1, question: "", options: ["", "", "", ""], correctAnswer: 0, explanation: "" }
+    ])
+    setShowForm(false)
+  }
 
-export default function QuizzesPage() {
+  const handleEdit = (quiz: any) => {
+    setEditingId(quiz.id)
+    setFormData({
+      title: quiz.title || "",
+      description: quiz.description || "",
+      difficulty: quiz.difficulty || "Beginner",
+      color: quiz.color || "blue",
+      icon: quiz.icon || "Zap"
+    })
+    setQuestions(quiz.questions || [
+      { id: 1, question: "", options: ["", "", "", ""], correctAnswer: 0, explanation: "" }
+    ])
+    setShowForm(true)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    if (quizzes.length > 0 && typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const editId = params.get("edit")
+      if (editId) {
+        const quizToEdit = quizzes.find((q: any) => q.id === Number(editId))
+        if (quizToEdit && editingId !== Number(editId)) {
+          handleEdit(quizToEdit)
+        }
+      }
+    }
+  }, [quizzes])
+
+  const handleDelete = async (id: number) => {
+    if (!isAdmin) return
+    if (!confirm("Are you sure you want to delete this quiz?")) return
+
+    try {
+      const res = await fetch(`/api/quizzes?id=${id}`, {
+        method: "DELETE"
+      })
+      if (res.ok) {
+        toast.success("Quiz deleted successfully.")
+        if (editingId === id) resetForm()
+        fetchQuizzes()
+      } else {
+        const errData = await res.json()
+        toast.error(errData.error || "Failed to delete quiz.")
+      }
+    } catch (err) {
+      toast.error("An error occurred deleting the quiz.")
+    }
+  }
+
+  const handleQuestionChange = (index: number, field: string, value: any) => {
+    const updated = [...questions]
+    updated[index] = { ...updated[index], [field]: value }
+    setQuestions(updated)
+  }
+
+  const handleOptionChange = (qIndex: number, optIndex: number, value: string) => {
+    const updated = [...questions]
+    const opts = [...updated[qIndex].options]
+    opts[optIndex] = value
+    updated[qIndex] = { ...updated[qIndex], options: opts }
+    setQuestions(updated)
+  }
+
+  const addQuestionField = () => {
+    setQuestions([
+      ...questions,
+      { id: questions.length + 1, question: "", options: ["", "", "", ""], correctAnswer: 0, explanation: "" }
+    ])
+  }
+
+  const removeQuestionField = (index: number) => {
+    if (questions.length <= 1) return
+    const updated = questions.filter((_, i) => i !== index).map((q, idx) => ({ ...q, id: idx + 1 }))
+    setQuestions(updated)
+  }
+
+  const handleSaveQuiz = async () => {
+    if (!formData.title || !formData.description) {
+      toast.error("Please provide a Title and Description for the quiz.")
+      return
+    }
+
+    // Validate questions
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i]
+      if (!q.question) {
+        toast.error(`Question ${i + 1} text is empty.`)
+        return
+      }
+      for (let j = 0; j < q.options.length; j++) {
+        if (!q.options[j]) {
+          toast.error(`Option ${j + 1} for Question ${i + 1} is empty.`)
+          return
+        }
+      }
+      if (!q.explanation) {
+        toast.error(`Please provide an explanation for Question ${i + 1}.`)
+        return
+      }
+    }
+
+    try {
+      const payload = {
+        ...formData,
+        questions: questions
+      }
+
+      let res
+      if (editingId) {
+        res = await fetch("/api/quizzes", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: editingId, ...payload })
+        })
+      } else {
+        res = await fetch("/api/quizzes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        })
+      }
+
+      if (res.ok) {
+        toast.success(editingId ? "Quiz updated successfully." : "New quiz scheduled successfully.")
+        resetForm()
+        fetchQuizzes()
+      } else {
+        const errData = await res.json()
+        toast.error(errData.error || "Failed to save quiz.")
+      }
+    } catch (err) {
+      toast.error("An error occurred saving the quiz.")
+    }
+  }
+
   // Navigation items for the floating dock
   const dockItems = [
     { title: "Home", icon: <Home className="h-full w-full text-neutral-300" />, href: "/" },
@@ -404,25 +456,13 @@ export default function QuizzesPage() {
     { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
     { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
     { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },
+    { title: "Profile", icon: <User className="h-full w-full text-neutral-300" />, href: "/profile" }, 
     { title: "Settings", icon: <Settings className="h-full w-full text-neutral-300" />, href: "/settings" },
     { title: "Sign Up", icon: <LogIn className="h-full w-full text-neutral-300" />, href: "/signup" },
   ];
 
-  // For the scroll-triggered animations
-  const containerRef = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"],
-  })
-
-  const pathLengthFirst = useTransform(scrollYProgress, [0, 0.3], [0.2, 1.2])
-  const pathLengthSecond = useTransform(scrollYProgress, [0, 0.3], [0.15, 1.2])
-  const pathLengthThird = useTransform(scrollYProgress, [0, 0.3], [0.1, 1.2])
-  const pathLengthFourth = useTransform(scrollYProgress, [0, 0.3], [0.05, 1.2])
-  const pathLengthFifth = useTransform(scrollYProgress, [0, 0.3], [0, 1.2])
-
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden" ref={containerRef}>
+    <div className="min-h-screen bg-black text-white overflow-x-hidden">
       {/* Sidebar */}
       <div className="fixed left-0 top-0 z-40 h-screen">
         <SidebarDemo />
@@ -438,8 +478,8 @@ export default function QuizzesPage() {
       {/* Rotating circuit animation */}
       <RotatingCircuit />
 
-      {/* Hero Section with Aurora Background */}
-      <div className="min-h-[50vh] relative mb-16">
+      {/* Hero Section */}
+      <div className="min-h-[45vh] relative mb-12">
         <HeroGeometric 
           badge="Knowledge Check"
           title1="Test Your"
@@ -457,9 +497,207 @@ export default function QuizzesPage() {
       </div>
 
       <div className="container mx-auto px-4 pb-24 ml-16 md:ml-24 lg:ml-32 relative">
-        {/* Background circuit animation */}
         <CircuitAnimation />
         
+        {/* Admin Dashboard Form */}
+        {isAdmin && (
+          <div className="max-w-4xl mx-auto mb-16 relative z-30">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span>
+                Quiz Administration
+              </h2>
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition-all shadow-lg shadow-blue-500/20"
+              >
+                {showForm ? "Close Panel" : <><Plus className="h-4 w-4" /> Schedule New Quiz</>}
+              </button>
+            </div>
+
+            <AnimatePresence>
+              {showForm && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="rounded-2xl border border-neutral-800 bg-neutral-900/80 backdrop-blur-md p-6 overflow-hidden shadow-2xl"
+                >
+                  <h3 className="text-lg font-bold text-white mb-6">
+                    {editingId ? "✏️ Edit Quiz Details" : "📅 Schedule New Quiz"}
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Quiz Title</label>
+                      <input
+                        type="text"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        placeholder="e.g. Kirchhoff's Voltage Law Quiz"
+                        className="flex h-10 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Description</label>
+                      <input
+                        type="text"
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        placeholder="Brief summary of what this quiz covers"
+                        className="flex h-10 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div>
+                      <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Difficulty</label>
+                      <select
+                        value={formData.difficulty}
+                        onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
+                        className="flex h-10 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      >
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Color Theme</label>
+                      <select
+                        value={formData.color}
+                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                        className="flex h-10 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      >
+                        <option value="blue">Blue</option>
+                        <option value="purple">Purple</option>
+                        <option value="green">Green</option>
+                        <option value="yellow">Yellow</option>
+                        <option value="red">Red</option>
+                        <option value="cyan">Cyan</option>
+                        <option value="orange">Orange</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Icon</label>
+                      <select
+                        value={formData.icon}
+                        onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                        className="flex h-10 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      >
+                        <option value="Zap">⚡ Lightning (Zap)</option>
+                        <option value="Cpu">💻 Microchip (Cpu)</option>
+                        <option value="Activity">📈 Pulse (Activity)</option>
+                        <option value="CircuitBoard">🎛️ Circuit Board</option>
+                        <option value="Lightbulb">💡 Bulb (Lightbulb)</option>
+                        <option value="Radio">📻 Wave (Radio)</option>
+                        <option value="Wifi">📶 Signal (Wifi)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Question Builder */}
+                  <div className="border-t border-neutral-800 pt-6 mb-8">
+                    <div className="flex justify-between items-center mb-6">
+                      <h4 className="font-bold text-white text-base">📝 Quiz Questions ({questions.length})</h4>
+                      <button
+                        onClick={addQuestionField}
+                        className="flex items-center gap-1 px-3 py-1 rounded-lg border border-neutral-700 bg-neutral-950 hover:bg-neutral-800 text-xs font-medium transition-colors"
+                      >
+                        <Plus className="h-3 w-3" /> Add Question
+                      </button>
+                    </div>
+
+                    <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2">
+                      {questions.map((q, qIndex) => (
+                        <div key={q.id} className="p-4 rounded-xl border border-neutral-800 bg-neutral-950/50 space-y-4">
+                          <div className="flex justify-between items-start">
+                            <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">Question #{qIndex + 1}</span>
+                            {questions.length > 1 && (
+                              <button
+                                onClick={() => removeQuestionField(qIndex)}
+                                className="text-xs text-red-400 hover:text-red-300 font-medium"
+                              >
+                                Remove
+                              </button>
+                            )}
+                          </div>
+
+                          <div>
+                            <input
+                              type="text"
+                              value={q.question}
+                              onChange={(e) => handleQuestionChange(qIndex, "question", e.target.value)}
+                              placeholder="Question text..."
+                              className="flex h-9 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-1 text-sm text-white"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {q.options.map((opt: string, optIndex: number) => (
+                              <div key={optIndex} className="flex items-center gap-2">
+                                <span className="text-xs text-neutral-500 font-bold">{String.fromCharCode(65 + optIndex)}:</span>
+                                <input
+                                  type="text"
+                                  value={opt}
+                                  onChange={(e) => handleOptionChange(qIndex, optIndex, e.target.value)}
+                                  placeholder={`Option ${optIndex + 1}`}
+                                  className="flex h-8 w-full rounded-md border border-neutral-800 bg-neutral-950 px-2 py-1 text-xs text-white"
+                                />
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1">Correct Answer</label>
+                              <select
+                                value={q.correctAnswer}
+                                onChange={(e) => handleQuestionChange(qIndex, "correctAnswer", Number(e.target.value))}
+                                className="flex h-8 w-full rounded-md border border-neutral-800 bg-neutral-950 px-2 py-1 text-xs text-white"
+                              >
+                                {q.options.map((_, idx) => (
+                                  <option key={idx} value={idx}>Option {String.fromCharCode(65 + idx)}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1">Explanation</label>
+                              <input
+                                type="text"
+                                value={q.explanation}
+                                onChange={(e) => handleQuestionChange(qIndex, "explanation", e.target.value)}
+                                placeholder="Why is this answer correct?"
+                                className="flex h-8 w-full rounded-md border border-neutral-800 bg-neutral-950 px-2 py-1 text-xs text-white"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 justify-end border-t border-neutral-800 pt-6">
+                    <button
+                      onClick={resetForm}
+                      className="px-4 py-2 rounded-lg border border-neutral-800 hover:bg-neutral-800 text-xs font-semibold text-neutral-300"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveQuiz}
+                      className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-all shadow-lg"
+                    >
+                      {editingId ? "Save Changes" : "Create Quiz"}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+
         <div className="mb-12 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -477,17 +715,45 @@ export default function QuizzesPage() {
           </motion.div>
         </div>
 
-        {/* Enhanced quiz cards with animations */}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto relative z-10">
-          {quizzes.map((quiz, index) => (
-            <AnimatedQuizCard key={quiz.id} quiz={quiz} index={index} />
-          ))}
-        </div>
+        {!isAuthenticated && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="max-w-xl mx-auto mb-12 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-5 text-center text-sm text-neutral-300 relative z-10"
+          >
+            <p className="mb-2">🔒 You must be signed in with your <span className="text-blue-400 font-semibold">@srmist.edu.in</span> student account to attempt the quizzes.</p>
+            <Link href="/signin" className="text-blue-400 hover:text-blue-300 underline font-medium">Sign in to your account</Link>
+          </motion.div>
+        )}
+
+        {loading ? (
+          <div className="flex justify-center items-center h-48">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : quizzes.length === 0 ? (
+          <div className="text-center py-16 text-neutral-500 relative z-10">
+            No quizzes available at the moment.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto relative z-10">
+            {quizzes.map((quiz, index) => (
+              <AnimatedQuizCard 
+                key={quiz.id} 
+                quiz={quiz} 
+                index={index} 
+                isAuthenticated={isAuthenticated} 
+                isAdmin={isAdmin}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        )}
         
-        {/* Electron flow animation in background */}
         <ElectronFlow />
       </div>
     </div>
   )
 }
+
 

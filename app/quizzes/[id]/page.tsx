@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from "react"
 import { notFound, useParams } from "next/navigation"
+import { SrmAccessGate } from "@/components/srm-access-gate"
 import Link from "next/link"
-import { ArrowLeft, CheckCircle2, XCircle, Trophy, AlertCircle, Zap, Cpu, Lightbulb, Bolt, Radio, Wifi } from "lucide-react"
+import { ArrowLeft, CheckCircle2, XCircle, Trophy, AlertCircle, Zap, Cpu, Lightbulb, Bolt, Radio, Wifi, ShieldAlert, Pencil } from "lucide-react"
 import { motion, AnimatePresence, useInView } from "framer-motion"
 import { DigitalClock } from "@/components/digital-clock"
 import { DynamicSidebar } from "@/components/dynamic-sidebar"
@@ -16,6 +17,7 @@ import { GlowingEffect } from "@/components/ui/glowing-effect"
 import { AuroraBackground } from "@/components/aurora-background"
 import { cn } from "@/lib/utils"
 import confetti from 'canvas-confetti'
+import { useSession } from "next-auth/react"
 
 // Animated circuit component for quiz page
 const CircuitDiagram = ({ quizId }: { quizId: number }) => {
@@ -170,7 +172,7 @@ const CircuitDiagram = ({ quizId }: { quizId: number }) => {
             />
           </>
         )
-      case 3: // House Wiring
+      case 10: // House Wiring
         return (
           <>
             {/* House Wiring Circuit */}
@@ -245,7 +247,7 @@ const CircuitDiagram = ({ quizId }: { quizId: number }) => {
             />
           </>
         )
-      case 4: // Fluorescent Lamp
+      case 11: // Fluorescent Lamp
         return (
           <>
             {/* Fluorescent Lamp Circuit */}
@@ -295,7 +297,7 @@ const CircuitDiagram = ({ quizId }: { quizId: number }) => {
             />
           </>
         )
-      case 5: // Staircase Wiring
+      case 12: // Staircase Wiring
         return (
           <>
             {/* Staircase Wiring Circuit */}
@@ -354,7 +356,7 @@ const CircuitDiagram = ({ quizId }: { quizId: number }) => {
             />
           </>
         )
-      case 6: // Full Wave Rectifier
+      case 4: // Full Wave Rectifier
         return (
           <>
             {/* Full Wave Rectifier Circuit */}
@@ -823,7 +825,7 @@ const quizData = [
   },
   // Quiz 3: House Wiring
   {
-    id: 3,
+    id: 10,
     title: "House Wiring Quiz",
     description: "Verify your understanding of residential electrical systems",
     questions: [
@@ -951,7 +953,7 @@ const quizData = [
   },
   // Quiz 4: Fluorescent Lamp Wiring
   {
-    id: 4,
+    id: 11,
     title: "Fluorescent Lamp Wiring Quiz",
     description: "Test your knowledge of fluorescent lighting systems",
     questions: [
@@ -1079,7 +1081,7 @@ const quizData = [
   },
   // Quiz 5: Staircase Wiring
   {
-    id: 5,
+    id: 12,
     title: "Staircase Wiring Quiz",
     description: "Challenge yourself on multi-way switching circuits",
     questions: [
@@ -1207,7 +1209,7 @@ const quizData = [
   },
   // Quiz 6: Full Wave Rectifier
   {
-    id: 6,
+    id: 4,
     title: "Full Wave Rectifier Quiz",
     description: "Verify your understanding of AC to DC conversion",
     questions: [
@@ -1348,13 +1350,42 @@ export default function QuizPage() {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
 
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.role === "admin"
+  const [errorLoading, setErrorLoading] = useState(false)
+
   useEffect(() => {
-    const quiz = quizData.find(q => q.id === quizId);
-    if (!quiz) {
-      notFound();
+    const fetchQuizDetails = async () => {
+      try {
+        const res = await fetch(`/api/quizzes?id=${quizId}`)
+        if (res.ok) {
+          const data = await res.json()
+          setCurrentQuiz(data)
+        } else {
+          // Fallback to static quizData
+          const quiz = quizData.find(q => q.id === quizId)
+          if (quiz) {
+            setCurrentQuiz(quiz)
+          } else {
+            setErrorLoading(true)
+          }
+        }
+      } catch (err) {
+        // Fallback to static quizData
+        const quiz = quizData.find(q => q.id === quizId)
+        if (quiz) {
+          setCurrentQuiz(quiz)
+        } else {
+          setErrorLoading(true)
+        }
+      }
     }
-    setCurrentQuiz(quiz);
-  }, [quizId]);
+    fetchQuizDetails()
+  }, [quizId])
+
+  if (errorLoading) {
+    notFound()
+  }
 
   if (!currentQuiz) {
     return (
@@ -1419,7 +1450,11 @@ export default function QuizPage() {
   const progressPercentage = (currentQuestionIndex / currentQuiz.questions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+    <SrmAccessGate
+      title="Quiz attempt access"
+      description="Only signed-in SRM users can attempt quizzes. Please sign in with your @srmist.edu.in email before starting the test."
+    >
+    <div className="text-white overflow-x-hidden">
       {/* Sidebar */}
       <div className="fixed left-0 top-0 z-40 h-screen">
         <DynamicSidebar />
@@ -1435,7 +1470,81 @@ export default function QuizPage() {
           </Link>
         </div>
 
-        {!quizCompleted ? (
+        {isAdmin ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-3xl mx-auto space-y-8"
+          >
+            <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-6 text-center shadow-lg">
+              <ShieldAlert className="mx-auto mb-3 h-8 w-8 text-blue-400" />
+              <h2 className="text-xl font-bold text-white">Administrator View</h2>
+              <p className="mt-2 text-sm text-neutral-300">
+                You are viewing <strong>{currentQuiz.title}</strong> as an administrator. 
+                Admins can only view, edit, and schedule quizzes, and cannot submit/write attempts.
+              </p>
+              <div className="mt-4 flex justify-center gap-4">
+                <Link
+                  href={`/quizzes?edit=${currentQuiz.id}`}
+                  className="px-4 py-2 rounded-lg border border-blue-500 bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-colors flex items-center gap-1.5"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  Edit Quiz Questions
+                </Link>
+                <Link
+                  href="/quizzes"
+                  className="px-4 py-2 rounded-lg border border-neutral-700 bg-neutral-800 hover:bg-neutral-700 text-xs font-semibold text-white transition-colors"
+                >
+                  Back to Dashboard
+                </Link>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                📋 Questions List ({currentQuiz.questions.length})
+              </h3>
+              
+              {currentQuiz.questions.map((q: any, qIdx: number) => (
+                <Card key={q.id} className="border-neutral-800 bg-neutral-900 shadow-lg">
+                  <CardHeader className="border-b border-neutral-800 bg-neutral-950/40 p-4">
+                    <CardTitle className="text-base font-bold text-white">
+                      Q{qIdx + 1}: {q.question}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4 space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                      {q.options.map((opt: string, optIdx: number) => {
+                        const isCorrectOpt = optIdx === q.correctAnswer;
+                        return (
+                          <div 
+                            key={optIdx} 
+                            className={cn(
+                              "p-3 rounded-lg border",
+                              isCorrectOpt 
+                                ? "border-green-500/40 bg-green-500/10 text-green-400 font-medium" 
+                                : "border-neutral-800 bg-neutral-950/40 text-neutral-400"
+                            )}
+                          >
+                            <span className="mr-2 font-bold">{String.fromCharCode(65 + optIdx)}:</span>
+                            {opt}
+                            {isCorrectOpt && " (Correct Answer)"}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    
+                    <div className="mt-4 p-3 rounded-lg bg-neutral-950 border border-neutral-800 text-xs text-neutral-300">
+                      <strong className="text-blue-400 block mb-1">Explanation:</strong>
+                      {q.explanation}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </motion.div>
+        ) : !quizCompleted ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1630,5 +1739,6 @@ export default function QuizPage() {
         )}
       </div>
     </div>
+    </SrmAccessGate>
   );
 }

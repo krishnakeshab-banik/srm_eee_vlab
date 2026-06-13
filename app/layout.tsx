@@ -2,6 +2,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
+import { AuthSessionProvider } from "@/components/auth-session-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -17,6 +18,8 @@ export const metadata = {
     creator: "SRM Institute of Science and Technology",
 };
 
+
+
 export default function RootLayout({
     children,
 }: {
@@ -27,30 +30,32 @@ export default function RootLayout({
             lang="en"
             className="overflow-x-hidden dark"
             style={{ colorScheme: "dark" }}
+            suppressHydrationWarning
         >
             <body
                 className={`${inter.variable} font-sans bg-[#050508] text-white overflow-x-hidden antialiased`}
-                suppressHydrationWarning
             >
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="dark"
-                    enableSystem={false}
-                >
-                    <div className="relative flex min-h-screen flex-col overflow-x-hidden">
-                        {children}
-                        <Toaster
-                            position="top-right"
-                            toastOptions={{
-                                style: {
-                                    background: "#0f1117",
-                                    border: "1px solid rgba(59, 130, 246, 0.2)",
-                                    color: "#e2e8f0",
-                                },
-                            }}
-                        />
-                    </div>
-                </ThemeProvider>
+                <AuthSessionProvider>
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="dark"
+                        enableSystem={false}
+                    >
+                        <div className="relative flex min-h-screen flex-col overflow-x-hidden">
+                            {children}
+                            <Toaster
+                                position="top-right"
+                                toastOptions={{
+                                    style: {
+                                        background: "#0f1117",
+                                        border: "1px solid rgba(59, 130, 246, 0.2)",
+                                        color: "#e2e8f0",
+                                    },
+                                }}
+                            />
+                        </div>
+                    </ThemeProvider>
+                </AuthSessionProvider>
             </body>
         </html>
     );

@@ -28,6 +28,7 @@ const nextConfig = {
       },
     ],
   },
+  serverExternalPackages: ['puppeteer'],
   compress: true,
   experimental: {
     webpackBuildWorker: true,

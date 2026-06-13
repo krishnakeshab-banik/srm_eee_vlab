@@ -2,26 +2,13 @@ import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GithubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google"
+import { getDisplayNameFromEmail, isSrmEmail, normalizeEmail } from "@/lib/auth"
+import { getUserRole } from "@/lib/auth-server"
+import { authenticateWithAcademia } from "@/lib/academia-auth"
 
-// Mock user database for demo purposes
-const users = [
-  {
-    id: "1",
-    name: "Demo Student",
-    email: "student@example.com",
-    password: "password123",
-    role: "student",
-  },
-  {
-    id: "2",
-    name: "Demo Teacher",
-    email: "teacher@example.com",
-    password: "password123",
-    role: "teacher",
-  },
-]
+export const runtime = "nodejs"
 
-const handler = NextAuth({
+export const { handlers: { GET, POST }, auth } = NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -34,19 +21,32 @@ const handler = NextAuth({
           return null
         }
 
-        // Find user in the mock database
-        const user = users.find((user) => user.email === credentials.email)
+        const email = normalizeEmail(String(credentials.email))
+        const password = String(credentials.password)
 
-        if (user && user.password === credentials.password) {
-          return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-          }
+        if (!isSrmEmail(email) || password.length < 8) {
+          return null
         }
 
-        return null
+        const authenticatedUser = await authenticateWithAcademia(email, password)
+
+        if (!authenticatedUser) {
+          return null
+        }
+
+        return {
+          id: authenticatedUser.email,
+          name: authenticatedUser.name || getDisplayNameFromEmail(email),
+          email: authenticatedUser.email,
+          role: await getUserRole(authenticatedUser.email),
+          registrationNumber: authenticatedUser.registrationNumber,
+          department: authenticatedUser.department,
+          semester: authenticatedUser.semester,
+          section: authenticatedUser.section,
+          batch: authenticatedUser.batch,
+          mobile: authenticatedUser.mobile,
+          program: authenticatedUser.program,
+        }
       },
     }),
     GithubProvider({
@@ -54,23 +54,40 @@ const handler = NextAuth({
       clientSecret: process.env.GITHUB_SECRET || "",
     }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      clientId: process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_SECRET || "",
     }),
   ],
   session: {
     strategy: "jwt",
   },
   callbacks: {
+    async signIn({ user }) {
+      return isSrmEmail(user.email)
+    },
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role
+        token.registrationNumber = user.registrationNumber
+        token.department = user.department
+        token.semester = user.semester
+        token.section = user.section
+        token.batch = user.batch
+        token.mobile = user.mobile
+        token.program = user.program
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.role = token.role
+        session.user.registrationNumber = token.registrationNumber
+        session.user.department = token.department
+        session.user.semester = token.semester
+        session.user.section = token.section
+        session.user.batch = token.batch
+        session.user.mobile = token.mobile
+        session.user.program = token.program
       }
       return session
     },
@@ -80,6 +97,4 @@ const handler = NextAuth({
     error: "/signin",
   },
 })
-
-export { handler as GET, handler as POST }
 

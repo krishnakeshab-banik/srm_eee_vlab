@@ -40,3 +40,10 @@ next-env.d.ts
 
 # OS
 .DS_Store
+
+# custom logs
+*.log
+.next-dev*
+
+# scrap folders
+SRM-Acdemia-Scrap-main*

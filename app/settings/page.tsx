@@ -2,7 +2,8 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSession } from "next-auth/react"
 import { DigitalClock } from "@/components/digital-clock"
 import { DynamicSidebar } from "@/components/dynamic-sidebar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -13,12 +14,83 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { toast } from "sonner"
 import { motion } from "framer-motion"
-import { Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Library } from "lucide-react"
+import { Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Library, User } from "lucide-react"
 import { FloatingDock } from "@/components/ui/floating-dock"
+import { SrmAccessGate } from "@/components/srm-access-gate"
 
 export default function SettingsPage() {
+  const { data: session } = useSession()
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("account")
+  const isAdmin = session?.user?.role === "admin"
+  
+  // Dynamic admin accounts list state
+  const [adminEmails, setAdminEmails] = useState<string[]>([])
+  const [newAdminEmail, setNewAdminEmail] = useState("")
+  const [loadingAdmins, setLoadingAdmins] = useState(false)
+
+  const fetchAdmins = async () => {
+    if (!isAdmin) return
+    setLoadingAdmins(true)
+    try {
+      const res = await fetch("/api/admins")
+      if (res.ok) {
+        const data = await res.json()
+        setAdminEmails(data)
+      } else {
+        toast.error("Failed to load admin emails.")
+      }
+    } catch (error) {
+      toast.error("An error occurred loading admin list.")
+    } finally {
+      setLoadingAdmins(false)
+    }
+  }
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchAdmins()
+    }
+  }, [isAdmin])
+
+  const handleAddAdmin = async () => {
+    if (!newAdminEmail) return
+    try {
+      const res = await fetch("/api/admins", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: newAdminEmail }),
+      })
+      if (res.ok) {
+        toast.success("Admin account added successfully!")
+        setNewAdminEmail("")
+        fetchAdmins()
+      } else {
+        const data = await res.json()
+        toast.error(data.error || "Failed to add admin account.")
+      }
+    } catch (error) {
+      toast.error("An error occurred.")
+    }
+  }
+
+  const handleDeleteAdmin = async (email: string) => {
+    if (!confirm(`Are you sure you want to revoke admin access for ${email}?`)) return
+    try {
+      const res = await fetch(`/api/admins?email=${encodeURIComponent(email)}`, {
+        method: "DELETE",
+      })
+      if (res.ok) {
+        toast.success("Admin access revoked successfully.")
+        fetchAdmins()
+      } else {
+        const data = await res.json()
+        toast.error(data.error || "Failed to revoke admin access.")
+      }
+    } catch (error) {
+      toast.error("An error occurred.")
+    }
+  }
   
   const dockItems = [
     { title: "Home", icon: <Home className="h-full w-full text-neutral-300" />, href: "/" },
@@ -27,15 +99,18 @@ export default function SettingsPage() {
     { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
     { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
     { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },
+    { title: "Profile", icon: <User className="h-full w-full text-neutral-300" />, href: "/profile" },
     { title: "Settings", icon: <Settings className="h-full w-full text-neutral-300" />, href: "/settings" },
     { title: "Sign Up", icon: <LogIn className="h-full w-full text-neutral-300" />, href: "/signup" },
   ]
 
   // Account settings
   const [accountSettings, setAccountSettings] = useState({
-    name: "Student User",
-    email: "student@example.com",
-    bio: "Electrical Engineering student at SRM University",
+    name: session?.user?.name || "SRM Student",
+    email: session?.user?.email || "",
+    bio: session?.user?.department
+      ? `${session.user.department}${session.user.section ? `, Section ${session.user.section}` : ""}`
+      : "Electrical Engineering student at SRM University",
   })
 
   // Appearance settings
@@ -100,7 +175,11 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+    <SrmAccessGate
+      title="SRM settings access"
+      description="Settings are available only to signed-in SRM users."
+    >
+    <div className="text-white overflow-x-hidden">
       {/* Dynamic Sidebar */}
       <DynamicSidebar />
       
@@ -126,8 +205,9 @@ export default function SettingsPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <h1 className="text-3xl font-bold mb-8">Settings</h1>
 
+
           <Tabs defaultValue={activeTab} className="w-full" onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-4 bg-neutral-900 border border-neutral-800">
+            <TabsList className={`grid w-full ${isAdmin ? "grid-cols-5" : "grid-cols-4"} bg-neutral-900 border border-neutral-800`}>
               <TabsTrigger value="account" className="data-[state=active]:bg-blue-900/30 text-white">
                 Account
               </TabsTrigger>
@@ -140,6 +220,11 @@ export default function SettingsPage() {
               <TabsTrigger value="privacy" className="data-[state=active]:bg-blue-900/30 text-white">
                 Privacy
               </TabsTrigger>
+              {isAdmin && (
+                <TabsTrigger value="admins" className="data-[state=active]:bg-emerald-950/40 text-white">
+                  Manage Admins
+                </TabsTrigger>
+              )}
             </TabsList>
 
             {/* Account Settings */}
@@ -167,6 +252,7 @@ export default function SettingsPage() {
                       type="email"
                       value={accountSettings.email}
                       onChange={handleAccountChange}
+                      disabled
                       className="bg-neutral-800 border-neutral-700"
                     />
                   </div>
@@ -182,6 +268,8 @@ export default function SettingsPage() {
                       className="bg-neutral-800 border border-neutral-700 rounded-md p-2 text-white resize-none"
                     />
                   </div>
+
+
                 </div>
               </div>
             </TabsContent>
@@ -372,6 +460,73 @@ export default function SettingsPage() {
                 </div>
               </div>
             </TabsContent>
+
+            {/* Manage Admins Settings (Only for Admins) */}
+            {isAdmin && (
+              <TabsContent value="admins" className="mt-6">
+                <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-6">
+                  <h2 className="text-xl font-semibold mb-2">Manage Administrative Accounts</h2>
+                  <p className="text-neutral-400 text-sm mb-6">
+                    Add or remove accounts that have administrative permissions (creating, editing, and deleting academic resources).
+                  </p>
+
+                  <div className="space-y-6">
+                    {/* Add Admin Email */}
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <div className="flex-grow">
+                        <Input
+                          placeholder="Admin Email (e.g. professor@srmist.edu.in)"
+                          value={newAdminEmail}
+                          onChange={(e) => setNewAdminEmail(e.target.value)}
+                          className="bg-neutral-800 border-neutral-700 text-white focus:ring-emerald-500 focus:border-emerald-500"
+                        />
+                      </div>
+                      <Button
+                        onClick={handleAddAdmin}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                      >
+                        Add Admin
+                      </Button>
+                    </div>
+
+                    {/* Admin List */}
+                    <div className="mt-6 border border-neutral-800 rounded-lg overflow-hidden">
+                      <div className="bg-neutral-950 px-4 py-3 border-b border-neutral-800 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+                        Authorized Admin Emails
+                      </div>
+                      {loadingAdmins ? (
+                        <div className="p-4 text-center text-sm text-neutral-500">Loading admin accounts...</div>
+                      ) : adminEmails.length === 0 ? (
+                        <div className="p-4 text-center text-sm text-neutral-500">No dynamically authorized admins found.</div>
+                      ) : (
+                        <div className="divide-y divide-neutral-800">
+                          {adminEmails.map((email) => {
+                            const isCurrentUser = email.toLowerCase().trim() === session?.user?.email?.toLowerCase().trim()
+                            return (
+                              <div key={email} className="flex items-center justify-between px-4 py-3 bg-neutral-900 hover:bg-neutral-800/50">
+                                <span className="text-sm font-medium text-white">{email}</span>
+                                {isCurrentUser ? (
+                                  <span className="text-xs text-neutral-500 italic px-3 py-1 bg-neutral-800 rounded-full">Current User</span>
+                                ) : (
+                                  <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => handleDeleteAdmin(email)}
+                                    className="h-8 px-3 text-xs bg-red-950/60 border border-red-800/40 text-red-300 hover:bg-red-900"
+                                  >
+                                    Revoke Access
+                                  </Button>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            )}
           </Tabs>
 
           <div className="mt-8 flex justify-end">
@@ -382,6 +537,6 @@ export default function SettingsPage() {
         </motion.div>
       </div>
     </div>
+    </SrmAccessGate>
   )
 }
-
