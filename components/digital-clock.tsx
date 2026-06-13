@@ -41,7 +41,6 @@ export function DigitalClock() {
           {formatTime(time)}
         </span>
       </div>
-      {/* Date hidden on mobile to avoid crowding the top bar */}
       <div className="hidden sm:block rounded-lg border border-neutral-800/80 bg-neutral-950/80 px-3 py-1.5 text-right backdrop-blur-sm">
         <p className="text-[11px] font-medium tracking-wide text-neutral-300">
           {formatDate(time)}

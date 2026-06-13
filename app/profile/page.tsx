@@ -28,7 +28,6 @@ import {
 import { DigitalClock } from "@/components/digital-clock"
 import { SrmAccessGate } from "@/components/srm-access-gate"
 import { StudentProfileSummary } from "@/components/student-profile-summary"
-import { BrandLogo } from "@/components/brand-logo"
 import { getStudentDisplayName } from "@/lib/auth"
 
 export default function ProfilePage() {
@@ -71,15 +70,9 @@ export default function ProfilePage() {
 
         <NavDock />
 
-        <div className="fixed left-4 top-4 z-20">
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <BrandLogo />
-          </motion.div>
-        </div>
-
         <DigitalClock />
 
-        <div className="mx-auto w-full max-w-6xl px-4 py-8 pt-24">
+        <div className="mx-auto w-full max-w-6xl px-4 py-8 pt-28 sm:pt-32">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

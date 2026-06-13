@@ -1,9 +1,9 @@
-"use client"
+﻿"use client"
 
 import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
-import { ArrowLeft, GraduationCap, Lock, Mail } from "lucide-react"
+import { ArrowLeft, Lock, Mail } from "lucide-react"
 import { DigitalClock } from "@/components/digital-clock"
 import { NavDock } from "@/components/nav-dock"
 import { BrandLogo } from "@/components/brand-logo"
@@ -69,10 +69,6 @@ export default function SigninPage() {
       <NavDock />
       <DigitalClock />
 
-      <div className="absolute top-4 left-4 z-20">
-        <BrandLogo />
-      </div>
-
       <div className="relative z-10 w-full max-w-md px-4 py-28">
         <Link
           href="/"
@@ -86,13 +82,10 @@ export default function SigninPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="rounded-2xl border border-neutral-800/80 bg-neutral-950/80 p-8 shadow-2xl backdrop-blur-md"
+          className="rounded-2xl border border-neutral-800/80 bg-neutral-950/80 p-6 sm:p-8 shadow-2xl backdrop-blur-md"
         >
-          {/* Header */}
           <div className="mb-8 flex flex-col items-center gap-3 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600/10 ring-1 ring-blue-500/30">
-              <GraduationCap className="h-6 w-6 text-blue-400" />
-            </div>
+            <BrandLogo linked={false} size="lg" />
             <div>
               <h1 className="text-xl font-bold text-white">Sign in to SRM EEE VLab</h1>
               <p className="mt-1 text-sm text-neutral-400">

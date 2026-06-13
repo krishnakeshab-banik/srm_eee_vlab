@@ -11,8 +11,6 @@ import { MovingBorder } from "@/components/ui/moving-border"
 import { GlowingEffect } from "@/components/ui/glowing-effect"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { useState } from "react"
-import { BrandLogo } from "@/components/brand-logo"
-
 // Team member data with actual photos
 const teamMembers = [
   {
@@ -89,16 +87,6 @@ export default function TeamPage() {
       
       {/* Centered navigation at the top */}
 
-      <div className="fixed top-4 left-4 z-20">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="flex items-center"
-        >
-          <BrandLogo />
-        </motion.div>
-      </div>
 
       <DigitalClock />
 

@@ -902,24 +902,24 @@ export default function ExperimentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white">
       {/* Dynamic Sidebar */}
 
       <NavDock />
 
       <DigitalClock />
 
-      <div className="w-full max-w-6xl mx-auto px-4 py-8 pt-24">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <Link href="/experiments" className="inline-flex items-center text-blue-400 hover:text-blue-300 mb-6">
+      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 pt-28 sm:pt-32 min-w-0">
+        <motion.div className="min-w-0" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <Link href="/experiments" className="inline-flex items-center text-sm sm:text-base text-blue-400 hover:text-blue-300 mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Experiments
           </Link>
 
           <div className="mb-8">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-              <div>
-                <div className="flex items-center space-x-3 mb-2">
-                  <div className="flex items-center justify-center h-8 w-8 rounded-full bg-blue-900/30 text-blue-400 font-bold text-sm">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                  <div className="flex items-center justify-center h-8 w-8 rounded-full bg-blue-900/30 text-blue-400 font-bold text-sm shrink-0">
                     {experiment.id}
                   </div>
                   <div className="px-2 py-1 rounded-md bg-blue-900/20 text-blue-400 text-xs font-medium">
@@ -928,8 +928,8 @@ export default function ExperimentPage() {
                      "Electronics"}
                   </div>
                 </div>
-                <h1 className="text-3xl font-bold text-white">{experiment.title}</h1>
-                <p className="text-neutral-400 mt-2 max-w-2xl">{experiment.aim}</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white break-words">{experiment.title}</h1>
+                <p className="text-neutral-400 mt-2 max-w-2xl text-sm sm:text-base">{experiment.aim}</p>
               </div>
               
               <div className="mt-4 md:mt-0 flex items-center space-x-4">
@@ -949,35 +949,35 @@ export default function ExperimentPage() {
 
           <Tabs
             defaultValue={activeTab}
-            className="w-full"
+            className="w-full min-w-0"
             onValueChange={(value) => {
               setActiveTab(value)
               window.location.hash = value
             }}
           >
-            <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 bg-neutral-900/80 border border-neutral-800 rounded-xl p-1">
-              <TabsTrigger value="aim" className="data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
+            <TabsList className="experiment-tabs flex w-full min-w-0 gap-1 overflow-x-auto bg-neutral-900/80 border border-neutral-800 rounded-xl p-1 scrollbar-hide">
+              <TabsTrigger value="aim" className="shrink-0 data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg px-3 py-2">
                 Aim
               </TabsTrigger>
-              <TabsTrigger value="apparatus" className="data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
+              <TabsTrigger value="apparatus" className="shrink-0 data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg px-3 py-2">
                 Apparatus
               </TabsTrigger>
-              <TabsTrigger value="theory" className="data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
+              <TabsTrigger value="theory" className="shrink-0 data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg px-3 py-2">
                 Theory
               </TabsTrigger>
-              <TabsTrigger value="procedure" className="data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
+              <TabsTrigger value="procedure" className="shrink-0 data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg px-3 py-2">
                 Procedure
               </TabsTrigger>
-              <TabsTrigger value="interactive" className="data-[state=active]:bg-green-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
+              <TabsTrigger value="interactive" className="shrink-0 data-[state=active]:bg-green-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg px-3 py-2">
                 Interactive
               </TabsTrigger>
-              <TabsTrigger value="simulation" className="data-[state=active]:bg-purple-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
+              <TabsTrigger value="simulation" className="shrink-0 data-[state=active]:bg-purple-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg px-3 py-2">
                 Simulation
               </TabsTrigger>
-              <TabsTrigger value="quiz" className="data-[state=active]:bg-yellow-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
+              <TabsTrigger value="quiz" className="shrink-0 data-[state=active]:bg-yellow-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg px-3 py-2">
                 Quiz
               </TabsTrigger>
-              <TabsTrigger value="references" className="data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg">
+              <TabsTrigger value="references" className="shrink-0 data-[state=active]:bg-blue-800/50 data-[state=active]:text-white text-neutral-400 text-xs rounded-lg px-3 py-2">
                 References
               </TabsTrigger>
             </TabsList>
@@ -988,7 +988,7 @@ export default function ExperimentPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="rounded-xl border border-neutral-800 bg-neutral-900 p-6 text-neutral-300"
+                className="rounded-xl border border-neutral-800 bg-neutral-900 p-4 sm:p-6 text-neutral-300 overflow-x-auto"
               >
                 <div className="flex items-center space-x-3 mb-4">
                   {experiment.id <= 2 ? (
@@ -1010,7 +1010,7 @@ export default function ExperimentPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="rounded-xl border border-neutral-800 bg-neutral-900 p-6 text-neutral-300"
+                className="rounded-xl border border-neutral-800 bg-neutral-900 p-4 sm:p-6 text-neutral-300 overflow-x-auto"
               >
                 <div className="experiment-content" dangerouslySetInnerHTML={{ __html: experiment.apparatus }} />
               </motion.div>
@@ -1022,12 +1022,12 @@ export default function ExperimentPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="rounded-xl border border-neutral-800 bg-neutral-900 p-6 text-neutral-300"
+                className="rounded-xl border border-neutral-800 bg-neutral-900 p-4 sm:p-6 text-neutral-300 overflow-x-auto"
               >
                 <div className="experiment-content" dangerouslySetInnerHTML={{ __html: experiment.theory }} />
                 
                 {/* Circuit Animation Background */}
-                <div className="relative mt-8 h-64 rounded-lg overflow-hidden border border-neutral-800">
+                <div className="relative mt-8 h-48 sm:h-64 rounded-lg overflow-hidden border border-neutral-800">
                   <CircuitAnimation />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="text-center max-w-md px-4">
@@ -1047,18 +1047,19 @@ export default function ExperimentPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="rounded-xl border border-neutral-800 bg-neutral-900 p-6 text-neutral-300"
+                className="rounded-xl border border-neutral-800 bg-neutral-900 p-4 sm:p-6 text-neutral-300 overflow-x-auto"
               >
                 <div className="experiment-content" dangerouslySetInnerHTML={{ __html: experiment.procedure }} />
               </motion.div>
             </TabsContent>
 
             {/* Interactive Tab */}
-            <TabsContent value="interactive" id="interactive" className="mt-4">
+            <TabsContent value="interactive" id="interactive" className="mt-4 overflow-x-hidden">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
+                className="w-full max-w-full"
               >
                 {experiment.id === 1 && <KVLExperiment />}
                 {experiment.id === 2 && <TheveninExperiment />}
@@ -1086,7 +1087,7 @@ export default function ExperimentPage() {
                 transition={{ duration: 0.5 }}
                 className="space-y-6"
               >
-                <div className="w-full h-[500px] rounded-xl overflow-hidden border border-neutral-800 relative bg-neutral-900">
+                <div className="w-full min-h-[280px] h-[45vh] sm:h-[50vh] max-h-[560px] rounded-xl overflow-hidden border border-neutral-800 relative bg-neutral-900">
                   <InteractiveRobotSpline scene="https://prod.spline.design/kZCBH4hL4yD8P315/scene.splinecode" />
                   <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-md px-4 py-2 rounded-lg border border-neutral-800">
                     <p className="text-white font-medium flex items-center gap-2">
@@ -1640,7 +1641,7 @@ export default function ExperimentPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="rounded-xl border border-neutral-800 bg-neutral-900 p-6 text-neutral-300"
+                className="rounded-xl border border-neutral-800 bg-neutral-900 p-4 sm:p-6 text-neutral-300 overflow-x-auto"
               >
                 <div dangerouslySetInnerHTML={{ __html: experiment.references }} />
               </motion.div>

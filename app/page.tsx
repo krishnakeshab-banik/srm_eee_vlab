@@ -21,7 +21,6 @@ import { GlowingCard } from "@/components/glowing-card";
 import { HeroGeometric } from "@/components/ui/shape-landing-hero";
 import { Button } from "@/components/ui/moving-border";
 import Link from "next/link";
-import { BrandLogo } from "@/components/brand-logo";
 import { getStudentDisplayName } from "@/lib/auth";
 
 // All experiments aligned with 26EEE1001T syllabus
@@ -109,10 +108,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#050508] text-white selection:bg-blue-500/30 selection:text-blue-200">
-
-      <div className="fixed left-4 top-4 z-20">
-        <BrandLogo />
-      </div>
 
       {/* Digital Clock */}
       <DigitalClock />
@@ -271,13 +266,6 @@ export default function HomePage() {
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="srm-logo">
-                  <Zap className="h-3.5 w-3.5" />
-                  SRM EEE
-                </span>
-                <span className="text-white font-semibold">Virtual Lab</span>
-              </div>
               <p className="text-neutral-500 text-sm">Interactive Electrical Engineering Experiments · 26EEE1001T</p>
             </div>
             <div className="flex gap-6 flex-wrap justify-center">

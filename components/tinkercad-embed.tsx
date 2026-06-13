@@ -15,7 +15,7 @@ export function TinkercadEmbed({ embedId, title }: TinkercadEmbedProps) {
   const embedUrl = `https://www.tinkercad.com/embed/${embedId}?editbtn=1`
 
   return (
-    <div className="relative w-full h-[500px] rounded-lg overflow-hidden border border-neutral-800">
+    <div className="relative w-full min-h-[280px] h-[45vh] sm:h-[50vh] max-h-[560px] rounded-lg overflow-hidden border border-neutral-800">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-neutral-900">
           <div className="flex flex-col items-center gap-2">

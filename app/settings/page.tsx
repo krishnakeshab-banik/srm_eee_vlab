@@ -17,7 +17,6 @@ import { motion } from "framer-motion"
 import { Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Library, User } from "lucide-react"
 import { SrmAccessGate } from "@/components/srm-access-gate"
 import { apiUrl } from "@/lib/api"
-import { BrandLogo } from "@/components/brand-logo"
 import { getStudentDisplayName } from "@/lib/auth"
 import {
   Bell,
@@ -198,21 +197,12 @@ export default function SettingsPage() {
       
       {/* Centered navigation at the top */}
 
-      <div className="fixed top-4 left-4 z-20">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <BrandLogo />
-        </motion.div>
-      </div>
 
       <DigitalClock />
 
       
       <NavDock />
-<div className="w-full max-w-6xl mx-auto px-4 py-8 pt-24">
+<div className="w-full max-w-6xl mx-auto px-4 py-8 pt-28 sm:pt-32">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>

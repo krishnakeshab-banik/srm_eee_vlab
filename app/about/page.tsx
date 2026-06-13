@@ -32,8 +32,6 @@ import {
 } from "lucide-react"
 import { GlowingEffect } from "@/components/ui/glowing-effect"
 import { cn } from "@/lib/utils"
-import { BrandLogo } from "@/components/brand-logo"
-
 
 const stats = [
   { label: "Experiments", value: "12+", icon: FlaskConical, color: "blue" },
@@ -124,25 +122,13 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
 
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
-      </div>
-
-      <div className="fixed top-4 left-4 z-20">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <BrandLogo />
-        </motion.div>
-      </div>
 
       <DigitalClock />
 
       
       <NavDock />
 {/* Hero */}
-      <div className="relative flex min-h-[55vh] flex-col items-center justify-center overflow-hidden px-4 pt-24 pb-16 text-center">
+      <div className="relative flex min-h-[55vh] flex-col items-center justify-center overflow-hidden px-4 pt-28 sm:pt-32 pb-16 text-center">
         {/* Background glow */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[800px] rounded-full bg-blue-600/10 blur-[120px]" />

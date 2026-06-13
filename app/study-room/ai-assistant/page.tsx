@@ -1,8 +1,7 @@
-"use client"
+﻿"use client"
 import { AnimatedAIChat } from "@/components/ui/animated-ai-chat"
 import { NavDock } from "@/components/nav-dock"
 import { DigitalClock } from "@/components/digital-clock"
-import { BrandLogo } from "@/components/brand-logo"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
@@ -12,11 +11,7 @@ export default function AIAssistantPage() {
       <NavDock />
       <DigitalClock />
 
-      <div className="absolute top-4 left-4 z-20">
-        <BrandLogo />
-      </div>
-
-      <div className="absolute top-[4.5rem] left-4 z-30">
+      <div className="absolute top-[4.5rem] left-3 z-30 sm:left-4">
         <Link
           href="/study-room"
           className="inline-flex items-center text-sm text-white/40 hover:text-white transition-colors"

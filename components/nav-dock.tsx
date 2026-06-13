@@ -44,7 +44,7 @@ export function NavDock() {
       }
 
   return (
-    <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50">
+    <div className="fixed top-3 left-1/2 z-50 -translate-x-1/2">
       <FloatingDock items={[...baseItems, authItem]} />
     </div>
   )

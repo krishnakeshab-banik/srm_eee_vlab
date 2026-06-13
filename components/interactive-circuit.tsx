@@ -34,6 +34,25 @@ interface InteractiveCircuitProps {
   highlightPath?: string[]
 }
 
+function getCircuitViewBox(nodes: CircuitNode[], padding = 70) {
+  const xs = nodes.map((node) => node.x)
+  const ys = nodes.map((node) => node.y)
+  const minX = Math.min(...xs) - padding
+  const minY = Math.min(...ys) - padding
+  const maxX = Math.max(...xs) + padding
+  const maxY = Math.max(...ys) + padding
+  const viewWidth = maxX - minX
+  const viewHeight = maxY - minY
+
+  return {
+    minX,
+    minY,
+    viewWidth,
+    viewHeight,
+    viewBox: `${minX} ${minY} ${viewWidth} ${viewHeight}`,
+  }
+}
+
 export const InteractiveCircuit = ({
   nodes,
   connections,
@@ -47,6 +66,7 @@ export const InteractiveCircuit = ({
   const [hoveredConnection, setHoveredConnection] = useState<string | null>(null)
   const [activeNodes, setActiveNodes] = useState<string[]>([])
   const svgRef = useRef<SVGSVGElement>(null)
+  const { viewBox, viewWidth, viewHeight, minX, minY } = getCircuitViewBox(nodes)
 
   // Handle node click
   const handleNodeClick = (nodeId: string) => {
@@ -480,34 +500,35 @@ export const InteractiveCircuit = ({
   }
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative w-full min-w-0 max-w-full ${className}`}>
       <svg
         ref={svgRef}
-        width={width}
-        height={height}
-        viewBox={`0 0 ${width} ${height}`}
-        className="bg-neutral-900 rounded-lg border border-neutral-800"
+        viewBox={viewBox}
+        preserveAspectRatio="xMidYMid meet"
+        role="img"
+        aria-label="Interactive circuit diagram"
+        className="block h-auto w-full max-w-full rounded-lg border border-neutral-800 bg-neutral-900"
       >
         {/* Grid lines for reference */}
         <g className="grid-lines opacity-10">
-          {Array.from({ length: Math.floor(width / 20) + 1 }).map((_, i) => (
+          {Array.from({ length: Math.floor(viewWidth / 20) + 1 }).map((_, i) => (
             <line
               key={`vl-${i}`}
-              x1={i * 20}
-              y1={0}
-              x2={i * 20}
-              y2={height}
+              x1={minX + i * 20}
+              y1={minY}
+              x2={minX + i * 20}
+              y2={minY + viewHeight}
               stroke="#555"
               strokeWidth={0.5}
             />
           ))}
-          {Array.from({ length: Math.floor(height / 20) + 1 }).map((_, i) => (
+          {Array.from({ length: Math.floor(viewHeight / 20) + 1 }).map((_, i) => (
             <line
               key={`hl-${i}`}
-              x1={0}
-              y1={i * 20}
-              x2={width}
-              y2={i * 20}
+              x1={minX}
+              y1={minY + i * 20}
+              x2={minX + viewWidth}
+              y2={minY + i * 20}
               stroke="#555"
               strokeWidth={0.5}
             />
@@ -645,19 +666,19 @@ export const KVLCircuit = ({ highlightPath = [] }) => {
   ]
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-white">KVL Circuit Demonstration</h3>
-        <div className="space-x-2">
+    <div className="experiment-interactive w-full min-w-0 max-w-full space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+        <h3 className="text-base sm:text-lg font-semibold text-white break-words min-w-0">KVL Circuit Demonstration</h3>
+        <div className="flex flex-wrap gap-2">
           <button 
             onClick={handleToggleValues} 
-            className="px-3 py-1 bg-blue-900/30 hover:bg-blue-800/50 text-blue-300 rounded-md text-sm transition-colors"
+            className="px-3 py-1.5 bg-blue-900/30 hover:bg-blue-800/50 text-blue-300 rounded-md text-sm transition-colors"
           >
             {showValues ? "Hide Values" : "Show Values"}
           </button>
           <button 
             onClick={handleCircuitDemo} 
-            className="px-3 py-1 bg-green-900/30 hover:bg-green-800/50 text-green-300 rounded-md text-sm transition-colors"
+            className="px-3 py-1.5 bg-green-900/30 hover:bg-green-800/50 text-green-300 rounded-md text-sm transition-colors"
           >
             Demonstrate KVL
           </button>
@@ -758,19 +779,19 @@ export const TheveninCircuit = ({ highlightPath = [] }) => {
   ]
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-white">Thevenin's Theorem Demonstration</h3>
-        <div className="space-x-2">
+    <div className="experiment-interactive w-full min-w-0 max-w-full space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+        <h3 className="text-base sm:text-lg font-semibold text-white break-words min-w-0">Thevenin&apos;s Theorem Demonstration</h3>
+        <div className="flex flex-wrap gap-2">
           <button 
             onClick={handleToggleValues} 
-            className="px-3 py-1 bg-blue-900/30 hover:bg-blue-800/50 text-blue-300 rounded-md text-sm transition-colors"
+            className="px-3 py-1.5 bg-blue-900/30 hover:bg-blue-800/50 text-blue-300 rounded-md text-sm transition-colors"
           >
             {showValues ? "Hide Values" : "Show Values"}
           </button>
           <button 
             onClick={handleToggleThevenin} 
-            className="px-3 py-1 bg-purple-900/30 hover:bg-purple-800/50 text-purple-300 rounded-md text-sm transition-colors"
+            className="px-3 py-1.5 bg-purple-900/30 hover:bg-purple-800/50 text-purple-300 rounded-md text-sm transition-colors"
           >
             {showThevenin ? "Show Original" : "Show Thevenin"}
           </button>

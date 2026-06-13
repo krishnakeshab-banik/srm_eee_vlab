@@ -188,11 +188,11 @@ export default function ExperimentsPage() {
       <DigitalClock />
 
       {/* ── HERO ── */}
-      <div className="relative pt-24 pb-16 overflow-hidden">
+      <div className="relative pt-28 sm:pt-32 pb-16 overflow-hidden">
         {/* Background glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-64 bg-blue-600/8 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="container mx-auto px-6 max-w-6xl relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl relative z-10">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-neutral-500 mb-8">
             <Link href="/" className="hover:text-neutral-300 transition-colors">Home</Link>
@@ -206,7 +206,7 @@ export default function ExperimentsPage() {
                 <Zap className="h-3.5 w-3.5" />
                 26EEE1001T — All Lab Experiments
               </div>
-              <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-3">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-3">
                 Lab Experiments
               </h1>
               <p className="text-neutral-400 max-w-xl text-base">
@@ -215,7 +215,7 @@ export default function ExperimentsPage() {
             </div>
 
             {/* Search */}
-            <div className="md:w-72">
+            <div className="w-full md:w-72">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 h-4 w-4" />
                 <Input
@@ -230,12 +230,12 @@ export default function ExperimentsPage() {
           </div>
 
           {/* Category Filter Tabs */}
-          <div className="flex flex-wrap gap-2 mb-10">
+          <div className="flex gap-2 mb-10 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 border ${
+                className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 border ${
                   activeCategory === cat
                     ? "bg-blue-600/25 border-blue-500/50 text-blue-200"
                     : "bg-neutral-900/60 border-neutral-800 text-neutral-400 hover:border-neutral-600 hover:text-neutral-300"

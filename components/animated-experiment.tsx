@@ -83,16 +83,16 @@ export const AnimatedExperiment = ({ experimentId, title, steps }: AnimatedExper
   }
 
   return (
-    <div className="bg-neutral-900 rounded-xl border border-neutral-800 overflow-hidden">
-      <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 p-4 border-b border-neutral-800">
-        <h3 className="text-xl font-bold text-white">{title} - Interactive Demonstration</h3>
+    <div className="experiment-interactive w-full min-w-0 max-w-full bg-neutral-900 rounded-xl border border-neutral-800 overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 p-3 sm:p-4 border-b border-neutral-800">
+        <h3 className="text-base sm:text-xl font-bold text-white break-words">{title} - Interactive Demonstration</h3>
       </div>
       
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-2">
+      <div className="p-3 sm:p-6 w-full min-w-0">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+          <div className="flex flex-col gap-2 w-full sm:flex-1 sm:min-w-0">
             <span className="text-sm text-neutral-400">Step {currentStep + 1} of {steps.length}</span>
-            <div className="w-64 h-1 bg-neutral-800 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-neutral-800 rounded-full overflow-hidden">
               <motion.div 
                 className="h-full bg-blue-500"
                 initial={{ width: 0 }}
@@ -102,7 +102,7 @@ export const AnimatedExperiment = ({ experimentId, title, steps }: AnimatedExper
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center justify-center sm:justify-end gap-1 sm:gap-2 shrink-0">
             <button 
               onClick={resetExperiment}
               className="p-2 rounded-full hover:bg-neutral-800 transition-colors"
@@ -153,7 +153,7 @@ export const AnimatedExperiment = ({ experimentId, title, steps }: AnimatedExper
           </AnimatePresence>
         </div>
         
-        <div className="bg-neutral-950 rounded-lg p-4 min-h-[350px] flex items-center justify-center">
+        <div className="bg-neutral-950 rounded-lg p-3 sm:p-4 min-h-[220px] sm:min-h-[300px] md:min-h-[350px] w-full min-w-0 max-w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}
@@ -161,7 +161,7 @@ export const AnimatedExperiment = ({ experimentId, title, steps }: AnimatedExper
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="w-full"
+              className="w-full min-w-0 max-w-full"
             >
               {steps[currentStep].content}
             </motion.div>
@@ -179,7 +179,7 @@ export const KVLExperiment = () => {
       title: "Introduction to Kirchhoff's Voltage Law",
       description: "Kirchhoff's Voltage Law (KVL) states that the sum of all voltages around any closed loop in a circuit must equal zero.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -194,7 +194,7 @@ export const KVLExperiment = () => {
       title: "Setting Up the Circuit",
       description: "We'll use a simple circuit with a voltage source (E) and two resistors (R1 and R2) connected in series to demonstrate KVL.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <KVLCircuit />
         </div>
       )
@@ -203,7 +203,7 @@ export const KVLExperiment = () => {
       title: "Measuring Voltage Across Components",
       description: "Using a voltmeter, we measure the voltage across each component in the circuit. For our example, we have E = 12V, VR1 = 4.54V, and VR2 = 7.46V.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <KVLCircuit highlightPath={['source', 'node1', 'resistor1', 'node2']} />
           <div className="mt-4 p-3 bg-neutral-800 rounded-lg text-neutral-300 text-sm">
             <p>Voltage across R1: 4.54V</p>
@@ -215,7 +215,7 @@ export const KVLExperiment = () => {
       title: "Applying Kirchhoff's Voltage Law",
       description: "According to KVL, the sum of all voltages around the loop should equal zero. Let's verify this by adding all voltage rises and drops.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <KVLCircuit highlightPath={['source', 'node1', 'resistor1', 'node2', 'resistor2', 'node3', 'source']} />
           <div className="mt-4 p-3 bg-neutral-800 rounded-lg text-neutral-300 text-sm">
             <p className="font-mono">E - VR1 - VR2 = 0</p>
@@ -229,7 +229,7 @@ export const KVLExperiment = () => {
       title: "Practical Applications",
       description: "KVL is fundamental for analyzing complex circuits with multiple voltage sources and components. It helps in determining unknown voltages in a circuit.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <KVLCircuit />
           <div className="mt-4 p-3 bg-neutral-800 rounded-lg text-neutral-300 text-sm">
             <p>Applications of KVL:</p>
@@ -254,11 +254,12 @@ export const TheveninExperiment = () => {
       title: "Introduction to Thevenin's Theorem",
       description: "Thevenin's Theorem states that any linear circuit with voltage and current sources can be replaced by an equivalent circuit consisting of a voltage source in series with a resistor.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
+            initial={{ scale: 0.98, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
+            className="w-full min-w-0"
           >
             <TheveninCircuit />
           </motion.div>
@@ -269,7 +270,7 @@ export const TheveninExperiment = () => {
       title: "Original Circuit Analysis",
       description: "We start with the original circuit containing a voltage source and multiple resistors. We'll identify the load resistor (RL) that we want to analyze.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <TheveninCircuit />
         </div>
       )
@@ -278,7 +279,7 @@ export const TheveninExperiment = () => {
       title: "Finding Thevenin Voltage (VTH)",
       description: "To find VTH, we remove the load resistor and measure the open-circuit voltage across the load terminals.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <TheveninCircuit />
           <div className="mt-4 p-3 bg-neutral-800 rounded-lg text-neutral-300 text-sm">
             <p>Measured open-circuit voltage: VTH = 11.25V</p>
@@ -290,7 +291,7 @@ export const TheveninExperiment = () => {
       title: "Finding Thevenin Resistance (RTH)",
       description: "To find RTH, we replace all independent sources with their internal resistances and measure the equivalent resistance looking back into the circuit from the load terminals.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <TheveninCircuit />
           <div className="mt-4 p-3 bg-neutral-800 rounded-lg text-neutral-300 text-sm">
             <p>Calculated equivalent resistance: RTH = 490Ω</p>
@@ -302,7 +303,7 @@ export const TheveninExperiment = () => {
       title: "Thevenin Equivalent Circuit",
       description: "Now we can construct the Thevenin equivalent circuit using VTH and RTH. This simplified circuit will behave identically to the original circuit from the perspective of the load.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <TheveninCircuit showThevenin={true} />
           <div className="mt-4 p-3 bg-neutral-800 rounded-lg text-neutral-300 text-sm">
             <p>Thevenin Equivalent Circuit:</p>
@@ -315,7 +316,7 @@ export const TheveninExperiment = () => {
       title: "Verification",
       description: "To verify Thevenin's Theorem, we connect the load resistor to both the original and Thevenin equivalent circuits and compare the load current and voltage.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <TheveninCircuit showThevenin={true} />
           <div className="mt-4 p-3 bg-neutral-800 rounded-lg text-neutral-300 text-sm">
             <p>Original Circuit: IL = 7.1mA, VL = 7.1V</p>
@@ -336,12 +337,12 @@ export const HouseWiringExperiment = () => {
       title: "Introduction to House Wiring",
       description: "Residential electrical wiring involves the distribution of electrical power throughout a home. It includes circuits for lighting, outlets, and appliances.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="bg-neutral-800 p-6 rounded-lg w-full max-w-md"
+            className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full"
           >
             <div className="flex justify-center mb-4">
               <svg width="300" height="200" viewBox="0 0 300 200" className="border border-neutral-700 rounded">
@@ -381,8 +382,8 @@ export const HouseWiringExperiment = () => {
       title: "Main Components of House Wiring",
       description: "The key components include the service entrance, main distribution panel, branch circuits, and grounding system.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <h4 className="text-white font-semibold mb-3">Main Components:</h4>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-neutral-700 p-3 rounded">
@@ -443,8 +444,8 @@ export const HouseWiringExperiment = () => {
       title: "Residential Wiring Circuit",
       description: "A typical residential circuit includes the energy meter, main box, switches, and various loads like lamps and fans.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <svg width="400" height="250" viewBox="0 0 400 250">
               {/* Energy Meter */}
               <rect x="50" y="50" width="60" height="80" rx="2" fill="#333" stroke="#666" strokeWidth="1" />
@@ -526,8 +527,8 @@ export const HouseWiringExperiment = () => {
       title: "Wiring Color Codes",
       description: "Understanding wire color codes is essential for safe electrical installations. Different countries may have different standards.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <h4 className="text-white font-semibold mb-3">Common Wire Color Codes:</h4>
             <div className="space-y-3">
               <div className="flex items-center">
@@ -590,8 +591,8 @@ export const HouseWiringExperiment = () => {
       title: "Safety Considerations",
       description: "Electrical safety is paramount in house wiring. Proper installation and maintenance help prevent accidents and fires.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <h4 className="text-white font-semibold mb-3">Safety Guidelines:</h4>
             <div className="space-y-3">
               <div className="flex items-start">
@@ -670,12 +671,12 @@ export const FluorescentLampExperiment = () => {
       title: "Introduction to Fluorescent Lamps",
       description: "Fluorescent lamps are energy-efficient light sources that use electricity to excite mercury vapor, which produces ultraviolet light that causes a phosphor coating to glow.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="bg-neutral-800 p-6 rounded-lg w-full max-w-md"
+            className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full"
           >
             <div className="flex justify-center mb-4">
               <svg width="400" height="100" viewBox="0 0 400 100">
@@ -714,8 +715,8 @@ export const FluorescentLampExperiment = () => {
       title: "Components of a Fluorescent Lamp",
       description: "A fluorescent lamp fixture consists of several key components that work together to produce light efficiently.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <h4 className="text-white font-semibold mb-3">Main Components:</h4>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-neutral-700 p-3 rounded">
@@ -783,8 +784,8 @@ export const FluorescentLampExperiment = () => {
       title: "Working Principle",
       description: "Fluorescent lamps work through a process of gas discharge and phosphor excitation to produce visible light.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <h4 className="text-white font-semibold mb-3">Operation Sequence:</h4>
             <div className="space-y-4">
               <div className="relative">
@@ -848,8 +849,8 @@ export const FluorescentLampExperiment = () => {
       title: "Wiring Diagram",
       description: "The wiring of a fluorescent lamp involves connecting the tube, starter, and ballast in the correct configuration.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <svg width="400" height="200" viewBox="0 0 400 200">
               {/* AC Supply */}
               <text x="30" y="100" fill="#ccc" fontSize="12">AC Supply</text>
@@ -913,8 +914,8 @@ export const FluorescentLampExperiment = () => {
       title: "Troubleshooting Common Issues",
       description: "Fluorescent lamps can experience various issues. Understanding common problems helps in effective troubleshooting.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <h4 className="text-white font-semibold mb-3">Common Problems:</h4>
             <div className="space-y-3">
               <div className="bg-neutral-700 p-3 rounded">
@@ -996,12 +997,12 @@ export const StaircaseWiringExperiment = () => {
       title: "Introduction to Staircase Wiring",
       description: "Staircase wiring allows you to control a single lamp from two different locations, typically at the top and bottom of a staircase.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="bg-neutral-800 p-6 rounded-lg w-full max-w-md"
+            className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full"
           >
             <div className="flex justify-center mb-4">
               <svg width="300" height="200" viewBox="0 0 300 200" className="border border-neutral-700 rounded">
@@ -1043,8 +1044,8 @@ export const StaircaseWiringExperiment = () => {
       title: "Two-Way Switches",
       description: "Staircase wiring uses special two-way switches that have three terminals: one common and two travelers.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <h4 className="text-white font-semibold mb-3">Two-Way Switch Structure:</h4>
             <div className="flex justify-center mb-4">
               <svg width="300" height="200" viewBox="0 0 300 200">
@@ -1095,8 +1096,8 @@ export const StaircaseWiringExperiment = () => {
       title: "Wiring Diagram",
       description: "The wiring configuration for staircase control uses two two-way switches connected in a specific pattern.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <svg width="400" height="250" viewBox="0 0 400 250">
               {/* AC Supply */}
               <text x="30" y="100" fill="#ccc" fontSize="12">AC Supply</text>
@@ -1171,8 +1172,8 @@ export const StaircaseWiringExperiment = () => {
       title: "Operation Principle",
       description: "Understanding how the switches work together to control the lamp from two locations.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <h4 className="text-white font-semibold mb-3">Switch Positions and Lamp States:</h4>
             <div className="space-y-4">
               <div className="bg-neutral-700 p-3 rounded">
@@ -1267,8 +1268,8 @@ export const StaircaseWiringExperiment = () => {
       title: "Applications and Benefits",
       description: "Staircase wiring is useful in various scenarios beyond just staircases.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <h4 className="text-white font-semibold mb-3">Common Applications:</h4>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-neutral-700 p-3 rounded">
@@ -1373,12 +1374,12 @@ export const FullWaveRectifierExperiment = () => {
       title: "Introduction to Full Wave Rectifiers",
       description: "A full wave rectifier converts alternating current (AC) to direct current (DC) by utilizing both halves of the AC cycle.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="bg-neutral-800 p-6 rounded-lg w-full max-w-md"
+            className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full"
           >
             <div className="flex justify-center mb-4">
               <svg width="400" height="200" viewBox="0 0 400 200">
@@ -1421,8 +1422,8 @@ export const FullWaveRectifierExperiment = () => {
       title: "Types of Full Wave Rectifiers",
       description: "There are two main types of full wave rectifiers: center-tapped transformer type and bridge rectifier type.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <h4 className="text-white font-semibold mb-3">Full Wave Rectifier Types:</h4>
             <div className="space-y-6">
               <div>
@@ -1553,8 +1554,8 @@ export const FullWaveRectifierExperiment = () => {
       title: "Bridge Rectifier Operation",
       description: "The bridge rectifier uses four diodes to convert both positive and negative half-cycles of AC input to positive DC output.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <h4 className="text-white font-semibold mb-3">Operation During Positive Half-Cycle:</h4>
             <div className="flex justify-center mb-4">
               <svg width="300" height="150" viewBox="0 0 300 150">
@@ -1662,8 +1663,8 @@ export const FullWaveRectifierExperiment = () => {
       title: "Filtering the Output",
       description: "The output of a full wave rectifier is pulsating DC. A capacitor filter can be added to smooth the output.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <div className="flex justify-center mb-4">
               <svg width="400" height="200" viewBox="0 0 400 200">
                 {/* Unfiltered output */}
@@ -1722,8 +1723,8 @@ export const FullWaveRectifierExperiment = () => {
       title: "Performance Characteristics",
       description: "The performance of a full wave rectifier can be evaluated using several key parameters.",
       content: (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="bg-neutral-800 p-6 rounded-lg w-full max-w-md">
+        <div className="flex flex-col items-stretch w-full min-w-0 max-w-full space-y-4">
+          <div className="bg-neutral-800 p-4 sm:p-6 rounded-lg w-full">
             <h4 className="text-white font-semibold mb-3">Key Performance Parameters:</h4>
             <div className="space-y-4">
               <div className="bg-neutral-700 p-3 rounded">
