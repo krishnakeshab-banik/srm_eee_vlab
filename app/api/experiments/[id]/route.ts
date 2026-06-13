@@ -58,8 +58,9 @@ const experiments = [
   },
 ]
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const id = Number.parseInt(params.id)
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id: idParam } = await params
+  const id = Number.parseInt(idParam)
 
   // Find the experiment by ID
   const experiment = experiments.find((exp) => exp.id === id)
@@ -71,9 +72,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
   return NextResponse.json(experiment)
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = Number.parseInt(params.id)
+    const { id: idParam } = await params
+    const id = Number.parseInt(idParam)
     const data = await request.json()
 
     // Find the experiment by ID
@@ -98,8 +100,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  const id = Number.parseInt(params.id)
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id: idParam } = await params
+  const id = Number.parseInt(idParam)
 
   // Find the experiment by ID
   const experimentIndex = experiments.findIndex((exp) => exp.id === id)

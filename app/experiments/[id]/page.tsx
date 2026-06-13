@@ -1,4 +1,5 @@
-"use client"
+﻿"use client"
+import { NavDock } from "@/components/nav-dock"
 
 import { useState, useEffect } from "react"
 import { notFound, useParams } from "next/navigation"
@@ -8,9 +9,7 @@ import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DigitalClock } from "@/components/digital-clock"
-import { DynamicSidebar } from "@/components/dynamic-sidebar"
 import { TinkercadEmbed } from "@/components/tinkercad-embed"
-import { FloatingDock } from "@/components/ui/floating-dock"
 import { CircuitAnimation } from "@/components/ui/circuit-animation"
 import { Circuit3DViewer } from "@/components/circuit-3d-viewer"
 import { InteractiveRobotSpline } from "@/components/blocks/interactive-3d-robot"
@@ -876,16 +875,6 @@ export default function ExperimentPage() {
   const [experiment, setExperiment] = useState(null)
   const [activeTab, setActiveTab] = useState("theory")
   
-  const dockItems = [
-    { title: "Home", icon: <Home className="h-full w-full text-neutral-300" />, href: "/" },
-    { title: "Experiments", icon: <BookOpen className="h-full w-full text-neutral-300" />, href: "/experiments" },
-    { title: "Study Room", icon: <Library className="h-full w-full text-neutral-300" />, href: "/study-room" },
-    { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
-    { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
-    { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },
-    { title: "Profile", icon: <User className="h-full w-full text-neutral-300" />, href: "/profile" }, { title: "Settings", icon: <Settings className="h-full w-full text-neutral-300" />, href: "/settings" },
-    { title: "Sign Up", icon: <LogIn className="h-full w-full text-neutral-300" />, href: "/signup" },
-  ]
 
   useEffect(() => {
     const id = Number.parseInt(params.id)
@@ -915,16 +904,12 @@ export default function ExperimentPage() {
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
       {/* Dynamic Sidebar */}
-      <DynamicSidebar />
 
-      {/* Centered navigation at the top */}
-      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-        <FloatingDock items={dockItems} className="w-auto" mobileClassName="w-auto" />
-      </div>
+      <NavDock />
 
       <DigitalClock />
 
-      <div className="w-full max-w-6xl mx-auto px-4 py-8 pt-24 pl-14 md:pl-16">
+      <div className="w-full max-w-6xl mx-auto px-4 py-8 pt-24">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <Link href="/experiments" className="inline-flex items-center text-blue-400 hover:text-blue-300 mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Experiments

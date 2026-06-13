@@ -11,9 +11,10 @@ type SrmAccessGateProps = {
   children: React.ReactNode
   title: string
   description: string
+  showSummary?: boolean
 }
 
-export function SrmAccessGate({ children, title, description }: SrmAccessGateProps) {
+export function SrmAccessGate({ children, title, description, showSummary = false }: SrmAccessGateProps) {
   const { data: session, status } = useSession()
   const [mounted, setMounted] = useState(false)
 
@@ -68,11 +69,9 @@ export function SrmAccessGate({ children, title, description }: SrmAccessGatePro
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-        <StudentProfileSummary compact />
-        {children}
-      </div>
-    </div>
+    <>
+      {showSummary && <StudentProfileSummary compact />}
+      {children}
+    </>
   )
 }

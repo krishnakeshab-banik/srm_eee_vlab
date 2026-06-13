@@ -2,11 +2,15 @@ import { MongoClient, Db } from "mongodb"
 import fs from "fs/promises"
 import path from "path"
 
-const uri = process.env.MONGODB_URI
 const options = {}
 
-if (!uri) {
-  throw new Error("Please add your MONGODB_URI to your .env file")
+function getMongoUri(): string | null {
+  const uri = process.env.MONGODB_URI?.trim()
+  return uri || null
+}
+
+export function isMongoConfigured(): boolean {
+  return Boolean(getMongoUri())
 }
 
 let client: MongoClient
@@ -71,6 +75,11 @@ async function seedDatabaseIfNeeded(db: Db) {
 }
 
 export async function connectToDatabase() {
+  const uri = getMongoUri()
+  if (!uri) {
+    throw new Error("MONGODB_NOT_CONFIGURED")
+  }
+
   if (process.env.NODE_ENV === "development") {
     if (!globalWithMongo._mongoClientPromise) {
       console.log("Connecting to MongoDB Atlas (development)...")
@@ -113,6 +122,6 @@ export async function connectToDatabase() {
 }
 
 // Export a dummy promise for compatibility if anything expects default import
-const defaultExportPromise = clientPromise || Promise.resolve({} as MongoClient)
+const defaultExportPromise = Promise.resolve({} as MongoClient)
 export default defaultExportPromise
 

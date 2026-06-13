@@ -1,14 +1,9 @@
-"use client";
+﻿"use client"
+import { NavDock } from "@/components/nav-dock";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { motion } from "framer-motion";
-import { Home,
-  BookOpen,
-  Settings,
-  LogIn,
-  FileQuestion,
-  Users,
-  Info,
+import {
   Zap,
   Lightbulb,
   Cpu,
@@ -17,15 +12,17 @@ import { Home,
   FlaskConical,
   Award,
   Clock,
-  BookMarked, Library, User } from "lucide-react";
+  BookMarked,
+  FileQuestion,
+} from "lucide-react";
+import { useSession } from "next-auth/react";
 import { DigitalClock } from "@/components/digital-clock";
 import { GlowingCard } from "@/components/glowing-card";
-import { FloatingDock } from "@/components/ui/floating-dock";
 import { HeroGeometric } from "@/components/ui/shape-landing-hero";
 import { Button } from "@/components/ui/moving-border";
 import Link from "next/link";
-import { DynamicSidebar } from "@/components/dynamic-sidebar";
-import { TypewriterEffectSmooth } from "@/components/ui/typewriter-effect";
+import { BrandLogo } from "@/components/brand-logo";
+import { getStudentDisplayName } from "@/lib/auth";
 
 // All experiments aligned with 26EEE1001T syllabus
 const experiments = [
@@ -104,63 +101,80 @@ const features = [
 
 export default function HomePage() {
   const experimentsRef = useRef(null);
+  const { data: session } = useSession();
 
   const scrollToExperiments = () => {
     experimentsRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const dockItems = [
-    { title: "Home", icon: <Home className="h-full w-full text-neutral-300" />, href: "/" },
-    { title: "Experiments", icon: <BookOpen className="h-full w-full text-neutral-300" />, href: "/experiments" },
-    { title: "Study Room", icon: <Library className="h-full w-full text-neutral-300" />, href: "/study-room" },
-    { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
-    { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
-    { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },
-    { title: "Profile", icon: <User className="h-full w-full text-neutral-300" />, href: "/profile" },
-    { title: "Settings", icon: <Settings className="h-full w-full text-neutral-300" />, href: "/settings" },
-    { title: "Sign Up", icon: <LogIn className="h-full w-full text-neutral-300" />, href: "/signup" },
-  ];
-
   return (
     <div className="min-h-screen bg-[#050508] text-white selection:bg-blue-500/30 selection:text-blue-200">
-      <DynamicSidebar />
+
+      <div className="fixed left-4 top-4 z-20">
+        <BrandLogo />
+      </div>
 
       {/* Digital Clock */}
       <DigitalClock />
 
       {/* Floating Navigation */}
-      <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50">
-        <FloatingDock items={dockItems} className="w-auto" mobileClassName="w-auto" />
-      </div>
+      <NavDock />
 
       {/* ── HERO SECTION ── */}
-      <div
-        className="relative w-full overflow-hidden pl-14 md:pl-16"
-      >
+      <div className="relative w-full overflow-hidden">
         <HeroGeometric badge="26EEE1001T · Virtual Lab" title1="Learn EEE" title2="Interactively">
-          <Button
-            as={Link}
-            href="/experiments"
-            className="bg-black border-blue-500 text-white px-8 py-3"
-            containerClassName="w-auto"
-          >
-            <span className="flex items-center gap-2">
-              Explore Experiments
-              <ArrowRight className="h-4 w-4" />
-            </span>
-          </Button>
-          <Link
-            href="/quizzes"
-            className="flex items-center gap-2 text-neutral-300 hover:text-white transition-colors text-sm font-medium"
-          >
-            <FileQuestion className="h-4 w-4" />
-            Take a Quiz
-          </Link>
+          <div className="flex w-full max-w-3xl flex-col items-center gap-8 sm:gap-10 px-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button
+                as={Link}
+                href="/experiments"
+                className="bg-black border-blue-500 text-white px-8 py-3"
+                containerClassName="w-auto"
+              >
+                <span className="flex items-center gap-2">
+                  Explore Experiments
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </Button>
+              <Link
+                href="/quizzes"
+                className="flex items-center gap-2 text-neutral-300 hover:text-white transition-colors text-sm font-medium"
+              >
+                <FileQuestion className="h-4 w-4" />
+                Take a Quiz
+              </Link>
+            </div>
+
+            {session?.user?.email && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 1.0, ease: [0.25, 0.4, 0.25, 1] }}
+                className="flex flex-col items-center gap-2 sm:gap-3 text-center w-full pt-2"
+              >
+                <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-blue-400/60">
+                  Welcome back
+                </span>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-white to-purple-300">
+                    {getStudentDisplayName(session.user)}
+                  </span>
+                </h2>
+                {(session.user.branch || session.user.department || session.user.program) && (
+                  <p className="text-sm sm:text-base text-neutral-500 tracking-wide">
+                    {session.user.branch ?? session.user.department ?? session.user.program}
+                  </p>
+                )}
+                <div className="mt-1 h-px w-24 sm:w-32 bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
+              </motion.div>
+            )}
+          </div>
         </HeroGeometric>
+
       </div>
 
       {/* ── FEATURES SECTION ── */}
-      <div className="w-full py-20 bg-[#050508] pl-14 md:pl-16">
+      <div className="w-full py-20 bg-[#050508]">
         <div className="container mx-auto px-6 max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -204,7 +218,7 @@ export default function HomePage() {
       <div
         ref={experimentsRef}
         id="experiments"
-        className="w-full py-20 bg-gradient-to-b from-[#050508] to-[#070a15] pl-14 md:pl-16"
+        className="w-full py-20 bg-gradient-to-b from-[#050508] to-[#070a15]"
       >
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
@@ -253,7 +267,7 @@ export default function HomePage() {
       </div>
 
       {/* ── FOOTER ── */}
-      <footer className="w-full py-12 bg-black border-t border-neutral-900 pl-14 md:pl-16">
+      <footer className="w-full py-12 bg-black border-t border-neutral-900">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div>

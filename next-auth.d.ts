@@ -6,6 +6,8 @@ declare module "next-auth" {
       role?: "admin" | "student"
       registrationNumber?: string
       department?: string
+      branch?: string
+      year?: string
       semester?: string
       section?: string
       batch?: string
@@ -18,6 +20,8 @@ declare module "next-auth" {
     role?: "admin" | "student"
     registrationNumber?: string
     department?: string
+    branch?: string
+    year?: string
     semester?: string
     section?: string
     batch?: string
@@ -31,6 +35,8 @@ declare module "next-auth/jwt" {
     role?: "admin" | "student"
     registrationNumber?: string
     department?: string
+    branch?: string
+    year?: string
     semester?: string
     section?: string
     batch?: string

@@ -1,580 +1,282 @@
-"use client";
+"use client"
 
-import { useEffect, useRef, useCallback, useTransition, useState } from "react";
-import { cn } from "@/lib/utils";
-import {
-    ImageIcon,
-    FileUp,
-    Figma,
-    MonitorIcon,
-    CircleUserRound,
-    ArrowUpIcon,
-    Paperclip,
-    PlusIcon,
-    SendIcon,
-    XIcon,
-    LoaderIcon,
-    Sparkles,
-    Command,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import * as React from "react"
+import { useEffect, useRef, useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Send, Bot, User, Loader2, BookOpen } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { apiUrl } from "@/lib/api"
 
-interface UseAutoResizeTextareaProps {
-    minHeight: number;
-    maxHeight?: number;
+interface Message {
+  role: "user" | "assistant"
+  content: string
 }
 
-function useAutoResizeTextarea({
-    minHeight,
-    maxHeight,
-}: UseAutoResizeTextareaProps) {
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
+const SUGGESTIONS = [
+  "Explain KVL with an example",
+  "How does a full wave rectifier work?",
+  "What is Thévenin's theorem?",
+  "Explain op-amp inverting amplifier",
+  "How does staircase wiring work?",
+]
 
-    const adjustHeight = useCallback(
-        (reset?: boolean) => {
-            const textarea = textareaRef.current;
-            if (!textarea) return;
-
-            if (reset) {
-                textarea.style.height = `${minHeight}px`;
-                return;
-            }
-
-            textarea.style.height = `${minHeight}px`;
-            const newHeight = Math.max(
-                minHeight,
-                Math.min(
-                    textarea.scrollHeight,
-                    maxHeight ?? Number.POSITIVE_INFINITY
-                )
-            );
-
-            textarea.style.height = `${newHeight}px`;
-        },
-        [minHeight, maxHeight]
-    );
-
-    useEffect(() => {
-        const textarea = textareaRef.current;
-        if (textarea) {
-            textarea.style.height = `${minHeight}px`;
-        }
-    }, [minHeight]);
-
-    useEffect(() => {
-        const handleResize = () => adjustHeight();
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, [adjustHeight]);
-
-    return { textareaRef, adjustHeight };
-}
-
-interface CommandSuggestion {
-    icon: React.ReactNode;
-    label: string;
-    description: string;
-    prefix: string;
-}
-
-interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  containerClassName?: string;
-  showRing?: boolean;
-}
-
-const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, containerClassName, showRing = true, ...props }, ref) => {
-    const [isFocused, setIsFocused] = React.useState(false);
-    
-    return (
-      <div className={cn(
-        "relative",
-        containerClassName
-      )}>
-        <textarea
-          className={cn(
-            "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm",
-            "transition-all duration-200 ease-in-out",
-            "placeholder:text-muted-foreground",
-            "disabled:cursor-not-allowed disabled:opacity-50",
-            showRing ? "focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0" : "",
-            className
-          )}
-          ref={ref}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          {...props}
-        />
-        
-        {showRing && isFocused && (
-          <motion.span 
-            className="absolute inset-0 rounded-md pointer-events-none ring-2 ring-offset-0 ring-violet-500/30"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          />
+function MessageBubble({ message, index }: { message: Message; index: number }) {
+  const isUser = message.role === "user"
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, delay: index * 0.02 }}
+      className={cn("flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}
+    >
+      {/* Avatar */}
+      <div
+        className={cn(
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+          isUser ? "bg-blue-600" : "bg-neutral-800 ring-1 ring-neutral-700"
         )}
-
-        {props.onChange && (
-          <div 
-            className="absolute bottom-2 right-2 opacity-0 w-2 h-2 bg-violet-500 rounded-full"
-            style={{
-              animation: 'none',
-            }}
-            id="textarea-ripple"
-          />
+      >
+        {isUser ? (
+          <User className="h-4 w-4 text-white" />
+        ) : (
+          <Bot className="h-4 w-4 text-blue-400" />
         )}
       </div>
-    )
-  }
-)
-Textarea.displayName = "Textarea"
+
+      {/* Bubble */}
+      <div
+        className={cn(
+          "max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
+          isUser
+            ? "rounded-tr-sm bg-blue-600 text-white"
+            : "rounded-tl-sm border border-neutral-800 bg-neutral-900 text-neutral-200"
+        )}
+      >
+        {/* Render markdown-like formatting */}
+        <FormattedContent content={message.content} />
+      </div>
+    </motion.div>
+  )
+}
+
+function FormattedContent({ content }: { content: string }) {
+  // Simple markdown rendering: bold, code, line breaks
+  const lines = content.split("\n")
+  return (
+    <div className="space-y-1">
+      {lines.map((line, i) => {
+        if (line.startsWith("**") && line.endsWith("**") && line.length > 4) {
+          return <p key={i} className="font-semibold text-white">{line.slice(2, -2)}</p>
+        }
+        if (line.startsWith("- ")) {
+          return (
+            <p key={i} className="flex gap-1.5">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-blue-400" />
+              <span dangerouslySetInnerHTML={{ __html: renderInline(line.slice(2)) }} />
+            </p>
+          )
+        }
+        if (line.startsWith("> ")) {
+          return (
+            <p key={i} className="border-l-2 border-blue-500/50 pl-3 text-neutral-400 italic text-xs">
+              {line.slice(2)}
+            </p>
+          )
+        }
+        if (line.startsWith("#")) {
+          const level = line.match(/^#+/)?.[0].length ?? 1
+          return (
+            <p key={i} className={cn("font-bold", level === 1 ? "text-lg text-white" : "text-base text-neutral-100")}>
+              {line.replace(/^#+\s*/, "")}
+            </p>
+          )
+        }
+        if (line.trim() === "") return <div key={i} className="h-1" />
+        return <p key={i} dangerouslySetInnerHTML={{ __html: renderInline(line) }} />
+      })}
+    </div>
+  )
+}
+
+function renderInline(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em class="text-neutral-300 italic">$1</em>')
+    .replace(/`(.+?)`/g, '<code class="rounded bg-neutral-800 px-1 py-0.5 text-xs font-mono text-blue-300">$1</code>')
+}
+
+function TypingIndicator() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 4 }}
+      className="flex gap-3"
+    >
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-800 ring-1 ring-neutral-700">
+        <Bot className="h-4 w-4 text-blue-400" />
+      </div>
+      <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-sm border border-neutral-800 bg-neutral-900 px-4 py-3">
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            className="h-1.5 w-1.5 rounded-full bg-blue-400"
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
+          />
+        ))}
+      </div>
+    </motion.div>
+  )
+}
 
 export function AnimatedAIChat() {
-    const [value, setValue] = useState("");
-    const [attachments, setAttachments] = useState<string[]>([]);
-    const [isTyping, setIsTyping] = useState(false);
-    const [isPending, startTransition] = useTransition();
-    const [activeSuggestion, setActiveSuggestion] = useState<number>(-1);
-    const [showCommandPalette, setShowCommandPalette] = useState(false);
-    const [recentCommand, setRecentCommand] = useState<string | null>(null);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    const { textareaRef, adjustHeight } = useAutoResizeTextarea({
-        minHeight: 60,
-        maxHeight: 200,
-    });
-    const [inputFocused, setInputFocused] = useState(false);
-    const commandPaletteRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-    const commandSuggestions: CommandSuggestion[] = [
-        { 
-            icon: <FileUp className="w-4 h-4" />, 
-            label: "Upload Notes", 
-            description: "Upload PDF or image for analysis", 
-            prefix: "/upload" 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => { scrollToBottom() }, [messages, isLoading])
+
+  const sendMessage = async (text?: string) => {
+    const content = (text ?? input).trim()
+    if (!content || isLoading) return
+
+    const userMessage: Message = { role: "user", content }
+    const newMessages = [...messages, userMessage]
+    setMessages(newMessages)
+    setInput("")
+    setIsLoading(true)
+    if (textareaRef.current) textareaRef.current.style.height = "44px"
+
+    try {
+      const res = await fetch(apiUrl("/api/ai/chat"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: newMessages }),
+      })
+
+      if (!res.ok) throw new Error(`Server error: ${res.status}`)
+      const data = await res.json()
+      const reply: string = data.reply ?? "I couldn't generate a response. Please try again."
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }])
+    } catch (err) {
+      console.error("AI chat error:", err)
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Sorry, I encountered an error. Please check your connection and try again.",
         },
-        { 
-            icon: <Sparkles className="w-4 h-4" />, 
-            label: "Explain Concept", 
-            description: "Get a simple explanation of a topic", 
-            prefix: "/explain" 
-        },
-        { 
-            icon: <Command className="w-4 h-4" />, 
-            label: "Generate Quiz", 
-            description: "Create a short quiz on the current topic", 
-            prefix: "/quiz" 
-        },
-    ];
+      ])
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-    useEffect(() => {
-        if (value.startsWith('/') && !value.includes(' ')) {
-            setShowCommandPalette(true);
-            
-            const matchingSuggestionIndex = commandSuggestions.findIndex(
-                (cmd) => cmd.prefix.startsWith(value)
-            );
-            
-            if (matchingSuggestionIndex >= 0) {
-                setActiveSuggestion(matchingSuggestionIndex);
-            } else {
-                setActiveSuggestion(-1);
-            }
-        } else {
-            setShowCommandPalette(false);
-        }
-    }, [value]);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      void sendMessage()
+    }
+  }
 
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            setMousePosition({ x: e.clientX, y: e.clientY });
-        };
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value)
+    const ta = e.target
+    ta.style.height = "44px"
+    ta.style.height = `${Math.min(ta.scrollHeight, 160)}px`
+  }
 
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-        };
-    }, []);
+  return (
+    <div className="flex h-full w-full flex-col bg-transparent">
+      {/* Messages area */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 pt-20 md:px-8">
+        <div className="mx-auto max-w-2xl space-y-4">
+          {messages.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col items-center gap-6 py-12 text-center"
+            >
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600/10 ring-1 ring-blue-500/20">
+                <Bot className="h-8 w-8 text-blue-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-white">EEE Study Assistant</h2>
+                <p className="mt-1.5 text-sm text-neutral-500">
+                  Ask me anything about your 26EEE1001T experiments, circuits, and theory
+                </p>
+              </div>
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            const target = event.target as Node;
-            const commandButton = document.querySelector('[data-command-button]');
-            
-            if (commandPaletteRef.current && 
-                !commandPaletteRef.current.contains(target) && 
-                !commandButton?.contains(target)) {
-                setShowCommandPalette(false);
-            }
-        };
+              <div className="flex flex-wrap justify-center gap-2">
+                {SUGGESTIONS.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => void sendMessage(s)}
+                    className="flex items-center gap-1.5 rounded-full border border-neutral-800 bg-neutral-900/60 px-3 py-1.5 text-xs text-neutral-400 transition hover:border-blue-500/40 hover:text-blue-300"
+                  >
+                    <BookOpen className="h-3 w-3" />
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
+          {messages.map((m, i) => (
+            <MessageBubble key={i} message={m} index={i} />
+          ))}
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (showCommandPalette) {
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                setActiveSuggestion(prev => 
-                    prev < commandSuggestions.length - 1 ? prev + 1 : 0
-                );
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                setActiveSuggestion(prev => 
-                    prev > 0 ? prev - 1 : commandSuggestions.length - 1
-                );
-            } else if (e.key === 'Tab' || e.key === 'Enter') {
-                e.preventDefault();
-                if (activeSuggestion >= 0) {
-                    const selectedCommand = commandSuggestions[activeSuggestion];
-                    setValue(selectedCommand.prefix + ' ');
-                    setShowCommandPalette(false);
-                    
-                    setRecentCommand(selectedCommand.label);
-                    setTimeout(() => setRecentCommand(null), 3500);
-                }
-            } else if (e.key === 'Escape') {
-                e.preventDefault();
-                setShowCommandPalette(false);
-            }
-        } else if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            if (value.trim()) {
-                handleSendMessage();
-            }
-        }
-    };
+          <AnimatePresence>
+            {isLoading && <TypingIndicator />}
+          </AnimatePresence>
 
-    const handleSendMessage = () => {
-        if (value.trim()) {
-            startTransition(() => {
-                setIsTyping(true);
-                setTimeout(() => {
-                    setIsTyping(false);
-                    setValue("");
-                    adjustHeight(true);
-                }, 3000);
-            });
-        }
-    };
-
-    const handleAttachFile = () => {
-        const mockFileName = `document-${Math.floor(Math.random() * 1000)}.pdf`;
-        setAttachments(prev => [...prev, mockFileName]);
-    };
-
-    const removeAttachment = (index: number) => {
-        setAttachments(prev => prev.filter((_, i) => i !== index));
-    };
-    
-    const selectCommandSuggestion = (index: number) => {
-        const selectedCommand = commandSuggestions[index];
-        setValue(selectedCommand.prefix + ' ');
-        setShowCommandPalette(false);
-        
-        setRecentCommand(selectedCommand.label);
-        setTimeout(() => setRecentCommand(null), 2000);
-    };
-
-    return (
-        <div className="w-full h-full flex flex-col items-center justify-center bg-transparent text-white p-6 relative overflow-hidden">
-            <div className="absolute inset-0 w-full h-full overflow-hidden">
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />
-                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-500/5 rounded-full mix-blend-normal filter blur-[128px] animate-pulse delay-700" />
-            </div>
-            <div className="w-full max-w-2xl mx-auto relative mt-8 mb-8">
-                <motion.div 
-                    className="relative z-10 space-y-8"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
-                >
-                    <div className="text-center space-y-3">
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2, duration: 0.5 }}
-                            className="inline-block"
-                        >
-                            <h1 className="text-3xl font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/40 pb-1">
-                                Study Assistant
-                            </h1>
-                            <motion.div 
-                                className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                                initial={{ width: 0, opacity: 0 }}
-                                animate={{ width: "100%", opacity: 1 }}
-                                transition={{ delay: 0.5, duration: 0.8 }}
-                            />
-                        </motion.div>
-                        <motion.p 
-                            className="text-sm text-white/40"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.3 }}
-                        >
-                            Ask anything about the experiments or course material
-                        </motion.p>
-                    </div>
-
-                    <motion.div 
-                        className="relative backdrop-blur-2xl bg-white/[0.02] rounded-2xl border border-white/[0.05] shadow-2xl"
-                        initial={{ scale: 0.98 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.1 }}
-                    >
-                        <AnimatePresence>
-                            {showCommandPalette && (
-                                <motion.div 
-                                    ref={commandPaletteRef}
-                                    className="absolute left-4 right-4 bottom-full mb-2 backdrop-blur-xl bg-black/90 rounded-lg z-50 shadow-lg border border-white/10 overflow-hidden"
-                                    initial={{ opacity: 0, y: 5 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 5 }}
-                                    transition={{ duration: 0.15 }}
-                                >
-                                    <div className="py-1 bg-black/95">
-                                        {commandSuggestions.map((suggestion, index) => (
-                                            <motion.div
-                                                key={suggestion.prefix}
-                                                className={cn(
-                                                    "flex items-center gap-2 px-3 py-2 text-xs transition-colors cursor-pointer",
-                                                    activeSuggestion === index 
-                                                        ? "bg-white/10 text-white" 
-                                                        : "text-white/70 hover:bg-white/5"
-                                                )}
-                                                onClick={() => selectCommandSuggestion(index)}
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                transition={{ delay: index * 0.03 }}
-                                            >
-                                                <div className="w-5 h-5 flex items-center justify-center text-white/60">
-                                                    {suggestion.icon}
-                                                </div>
-                                                <div className="font-medium">{suggestion.label}</div>
-                                                <div className="text-white/40 text-xs ml-1">
-                                                    {suggestion.prefix}
-                                                </div>
-                                            </motion.div>
-                                        ))}
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
-                        <div className="p-4">
-                            <Textarea
-                                ref={textareaRef}
-                                value={value}
-                                onChange={(e) => {
-                                    setValue(e.target.value);
-                                    adjustHeight();
-                                }}
-                                onKeyDown={handleKeyDown}
-                                onFocus={() => setInputFocused(true)}
-                                onBlur={() => setInputFocused(false)}
-                                placeholder="Type a message or use '/' for commands..."
-                                containerClassName="w-full"
-                                className={cn(
-                                    "w-full px-4 py-3",
-                                    "resize-none",
-                                    "bg-transparent",
-                                    "border-none",
-                                    "text-white/90 text-sm",
-                                    "focus:outline-none",
-                                    "placeholder:text-white/20",
-                                    "min-h-[60px]"
-                                )}
-                                style={{
-                                    overflow: "hidden",
-                                }}
-                                showRing={false}
-                            />
-                        </div>
-
-                        <AnimatePresence>
-                            {attachments.length > 0 && (
-                                <motion.div 
-                                    className="px-4 pb-3 flex gap-2 flex-wrap"
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                >
-                                    {attachments.map((file, index) => (
-                                        <motion.div
-                                            key={index}
-                                            className="flex items-center gap-2 text-xs bg-white/[0.03] py-1.5 px-3 rounded-lg text-white/70"
-                                            initial={{ opacity: 0, scale: 0.9 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            exit={{ opacity: 0, scale: 0.9 }}
-                                        >
-                                            <span>{file}</span>
-                                            <button 
-                                                onClick={() => removeAttachment(index)}
-                                                className="text-white/40 hover:text-white transition-colors"
-                                            >
-                                                <XIcon className="w-3 h-3" />
-                                            </button>
-                                        </motion.div>
-                                    ))}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
-                        <div className="p-4 border-t border-white/[0.05] flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                                <motion.button
-                                    type="button"
-                                    onClick={handleAttachFile}
-                                    whileTap={{ scale: 0.94 }}
-                                    className="p-2 text-white/40 hover:text-white/90 rounded-lg transition-colors relative group"
-                                >
-                                    <Paperclip className="w-4 h-4" />
-                                    <motion.span
-                                        className="absolute inset-0 bg-white/[0.05] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                                        layoutId="button-highlight"
-                                    />
-                                </motion.button>
-                                <motion.button
-                                    type="button"
-                                    data-command-button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setShowCommandPalette(prev => !prev);
-                                    }}
-                                    whileTap={{ scale: 0.94 }}
-                                    className={cn(
-                                        "p-2 text-white/40 hover:text-white/90 rounded-lg transition-colors relative group",
-                                        showCommandPalette && "bg-white/10 text-white/90"
-                                    )}
-                                >
-                                    <Command className="w-4 h-4" />
-                                    <motion.span
-                                        className="absolute inset-0 bg-white/[0.05] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                                        layoutId="button-highlight"
-                                    />
-                                </motion.button>
-                            </div>
-                            
-                            <motion.button
-                                type="button"
-                                onClick={handleSendMessage}
-                                whileHover={{ scale: 1.01 }}
-                                whileTap={{ scale: 0.98 }}
-                                disabled={isTyping || !value.trim()}
-                                className={cn(
-                                    "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                                    "flex items-center gap-2",
-                                    value.trim()
-                                        ? "bg-white text-[#0A0A0B] shadow-lg shadow-white/10"
-                                        : "bg-white/[0.05] text-white/40"
-                                )}
-                            >
-                                {isTyping ? (
-                                    <LoaderIcon className="w-4 h-4 animate-[spin_2s_linear_infinite]" />
-                                ) : (
-                                    <SendIcon className="w-4 h-4" />
-                                )}
-                                <span>Send</span>
-                            </motion.button>
-                        </div>
-                    </motion.div>
-
-                    <div className="flex flex-wrap items-center justify-center gap-2">
-                        {commandSuggestions.map((suggestion, index) => (
-                            <motion.button
-                                key={suggestion.prefix}
-                                onClick={() => selectCommandSuggestion(index)}
-                                className="flex items-center gap-2 px-3 py-2 bg-white/[0.02] hover:bg-white/[0.05] rounded-lg text-sm text-white/60 hover:text-white/90 transition-all relative group"
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                            >
-                                {suggestion.icon}
-                                <span>{suggestion.label}</span>
-                                <motion.div
-                                    className="absolute inset-0 border border-white/[0.05] rounded-lg"
-                                    initial={false}
-                                    animate={{
-                                        opacity: [0, 1],
-                                        scale: [0.98, 1],
-                                    }}
-                                    transition={{
-                                        duration: 0.3,
-                                        ease: "easeOut",
-                                    }}
-                                />
-                            </motion.button>
-                        ))}
-                    </div>
-                </motion.div>
-            </div>
-
-            <AnimatePresence>
-                {isTyping && (
-                    <motion.div 
-                        className="fixed bottom-8 mx-auto transform -translate-x-1/2 backdrop-blur-2xl bg-white/[0.02] rounded-full px-4 py-2 shadow-lg border border-white/[0.05]"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-7 rounded-full bg-white/[0.05] flex items-center justify-center text-center">
-                                <span className="text-xs font-medium text-white/90 mb-0.5">ai</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-white/70">
-                                <span>Thinking</span>
-                                <TypingDots />
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+          <div ref={messagesEndRef} />
         </div>
-    );
-}
+      </div>
 
-function TypingDots() {
-    return (
-        <div className="flex items-center ml-1">
-            {[1, 2, 3].map((dot) => (
-                <motion.div
-                    key={dot}
-                    className="w-1.5 h-1.5 bg-white/90 rounded-full mx-0.5"
-                    initial={{ opacity: 0.3 }}
-                    animate={{ 
-                        opacity: [0.3, 0.9, 0.3],
-                        scale: [0.85, 1.1, 0.85]
-                    }}
-                    transition={{
-                        duration: 1.2,
-                        repeat: Infinity,
-                        delay: dot * 0.15,
-                        ease: "easeInOut",
-                    }}
-                    style={{
-                        boxShadow: "0 0 4px rgba(255, 255, 255, 0.3)"
-                    }}
-                />
-            ))}
+      {/* Input bar */}
+      <div className="shrink-0 border-t border-neutral-800/60 bg-[#050508]/90 px-4 py-4 backdrop-blur-md md:px-8">
+        <div className="mx-auto max-w-2xl">
+          <div className="flex items-end gap-3 rounded-2xl border border-neutral-800 bg-neutral-900/80 px-4 py-3 shadow-lg focus-within:border-blue-500/50 transition">
+            <textarea
+              ref={textareaRef}
+              rows={1}
+              value={input}
+              onChange={handleInput}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask about KVL, rectifiers, op-amps, wiring…"
+              disabled={isLoading}
+              className="flex-1 resize-none bg-transparent text-sm text-white outline-none placeholder:text-neutral-600 disabled:opacity-50"
+              style={{ height: "44px", maxHeight: "160px", overflowY: "auto" }}
+            />
+            <button
+              onClick={() => void sendMessage()}
+              disabled={!input.trim() || isLoading}
+              className={cn(
+                "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition",
+                input.trim() && !isLoading
+                  ? "bg-blue-600 text-white hover:bg-blue-500"
+                  : "bg-neutral-800 text-neutral-600 cursor-not-allowed"
+              )}
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+          <p className="mt-2 text-center text-[11px] text-neutral-700">
+            Shift+Enter for new line · Enter to send
+          </p>
         </div>
-    );
-}
-
-const rippleKeyframes = `
-@keyframes ripple {
-  0% { transform: scale(0.5); opacity: 0.6; }
-  100% { transform: scale(2); opacity: 0; }
-}
-`;
-
-if (typeof document !== 'undefined') {
-    const style = document.createElement('style');
-    style.innerHTML = rippleKeyframes;
-    document.head.appendChild(style);
+      </div>
+    </div>
+  )
 }

@@ -2,22 +2,11 @@ import { NextResponse } from "next/server"
 import { auth } from "@/app/api/auth/[...nextauth]/route"
 import { connectToDatabase } from "@/lib/mongodb"
 import { normalizeEmail } from "@/lib/auth"
-import { createClient } from "@supabase/supabase-js"
+import { getSupabaseAdmin } from "@/lib/supabase"
 import fs from "fs/promises"
 import path from "path"
 
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-// Initialize Supabase only if keys are configured in .env
-const supabase = supabaseUrl && supabaseServiceKey
-  ? createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    })
-  : null
+const supabase = getSupabaseAdmin()
 
 export async function GET() {
   const session = await auth()

@@ -1,13 +1,12 @@
-"use client"
+﻿"use client"
+import { NavDock } from "@/components/nav-dock"
 
 import { useRef, useState, useEffect } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Search, Zap, Lightbulb, Cpu, ChevronRight, CircuitBoard, Activity, Library, User } from "lucide-react"
-import { FloatingDock } from "@/components/ui/floating-dock"
 import { GlowingCard } from "@/components/glowing-card"
 import { DigitalClock } from "@/components/digital-clock"
-import { DynamicSidebar } from "@/components/dynamic-sidebar"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -147,16 +146,6 @@ export default function ExperimentsPage() {
   const [activeCategory, setActiveCategory] = useState("All")
   const [filteredExperiments, setFilteredExperiments] = useState(experiments)
 
-  const dockItems = [
-    { title: "Home", icon: <Home className="h-full w-full text-neutral-300" />, href: "/" },
-    { title: "Experiments", icon: <BookOpen className="h-full w-full text-neutral-300" />, href: "/experiments" },
-    { title: "Study Room", icon: <Library className="h-full w-full text-neutral-300" />, href: "/study-room" },
-    { title: "Quizzes", icon: <FileQuestion className="h-full w-full text-neutral-300" />, href: "/quizzes" },
-    { title: "Team", icon: <Users className="h-full w-full text-neutral-300" />, href: "/team" },
-    { title: "About", icon: <Info className="h-full w-full text-neutral-300" />, href: "/about" },
-    { title: "Profile", icon: <User className="h-full w-full text-neutral-300" />, href: "/profile" }, { title: "Settings", icon: <Settings className="h-full w-full text-neutral-300" />, href: "/settings" },
-    { title: "Sign Up", icon: <LogIn className="h-full w-full text-neutral-300" />, href: "/signup" },
-  ]
 
   useEffect(() => {
     let filtered = experiments
@@ -191,18 +180,15 @@ export default function ExperimentsPage() {
   return (
     <div className="flex flex-col bg-[#050508] text-white min-h-screen overflow-x-hidden">
       {/* Sidebar */}
-      <DynamicSidebar />
 
       {/* Floating Dock */}
-      <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50">
-        <FloatingDock items={dockItems} className="w-auto" mobileClassName="w-auto" />
-      </div>
+      <NavDock />
 
       {/* Clock */}
       <DigitalClock />
 
       {/* ── HERO ── */}
-      <div className="relative pt-24 pb-16 pl-14 md:pl-16 overflow-hidden">
+      <div className="relative pt-24 pb-16 overflow-hidden">
         {/* Background glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-64 bg-blue-600/8 rounded-full blur-[100px] pointer-events-none" />
 
@@ -322,7 +308,7 @@ export default function ExperimentsPage() {
       </div>
 
       {/* ── STATS SECTION ── */}
-      <div className="w-full py-16 bg-gradient-to-b from-[#050508] to-[#0a0f1e] pl-14 md:pl-16">
+      <div className="w-full py-16 bg-gradient-to-b from-[#050508] to-[#0a0f1e]">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
@@ -347,7 +333,7 @@ export default function ExperimentsPage() {
       </div>
 
       {/* ── FOOTER ── */}
-      <footer className="w-full py-10 bg-black border-t border-neutral-900 pl-14 md:pl-16">
+      <footer className="w-full py-10 bg-black border-t border-neutral-900">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-neutral-500 text-sm">
@@ -374,3 +360,4 @@ export default function ExperimentsPage() {
     </div>
   )
 }
+

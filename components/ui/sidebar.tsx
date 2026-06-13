@@ -26,7 +26,7 @@ interface SidebarProps {
   children: React.ReactNode
 }
 
-export const SidebarProvider = ({ open, setOpen, children }: SidebarProps) => {
+export const SidebarProvider = ({ open, setOpen, children, ...rest }: SidebarProps & { [key: string]: unknown }) => {
   return <SidebarContext.Provider value={{ open, setOpen }}>{children}</SidebarContext.Provider>
 }
 
