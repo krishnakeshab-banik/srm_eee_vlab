@@ -46,8 +46,15 @@ export default function ExperimentsPage() {
       .then((res) => res.ok ? res.json() : null)
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
-          setExperiments(data)
-          setFilteredExperiments(data)
+          // Deduplicate by numeric id (guards against double-seeded MongoDB)
+          const seen = new Set<number>()
+          const unique = data.filter((e: any) => {
+            if (seen.has(e.id)) return false
+            seen.add(e.id)
+            return true
+          })
+          setExperiments(unique)
+          setFilteredExperiments(unique)
         }
       })
       .catch(() => {})
@@ -178,7 +185,7 @@ export default function ExperimentsPage() {
               <motion.ul layout className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredExperiments.map((experiment, i) => (
                   <motion.div
-                    key={experiment.id}
+                    key={(experiment as any)._id?.toString() || `exp-${experiment.id}-${i}`}
                     layout
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
