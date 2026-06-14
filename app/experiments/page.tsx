@@ -3,8 +3,9 @@ import { NavDock } from "@/components/nav-dock"
 
 import { useRef, useState, useEffect } from "react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, Zap, Lightbulb, Cpu, ChevronRight, CircuitBoard, Activity } from "lucide-react"
+import { Search, Zap, Lightbulb, Cpu, ChevronRight, CircuitBoard, Activity, Pencil } from "lucide-react"
 import { GlowingCard } from "@/components/glowing-card"
 import { DigitalClock } from "@/components/digital-clock"
 import { Input } from "@/components/ui/input"
@@ -36,6 +37,8 @@ const categoryColors: Record<string, string> = {
 }
 
 export default function ExperimentsPage() {
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.role === "admin"
   const [experiments, setExperiments] = useState<Experiment[]>(fallbackExperiments)
   const [searchTerm, setSearchTerm] = useState("")
   const [activeCategory, setActiveCategory] = useState("All")
@@ -191,6 +194,7 @@ export default function ExperimentsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ delay: i * 0.06 }}
+                    className="relative group/card"
                   >
                     <GlowingCard
                       href={`/experiments/${experiment.id}`}
@@ -201,6 +205,17 @@ export default function ExperimentsPage() {
                       difficulty={experiment.difficulty}
                       duration={experiment.duration}
                     />
+                    {isAdmin && (
+                      <Link
+                        href={`/admin?tab=experiments&edit=${experiment.id}`}
+                        className="absolute top-2.5 right-2.5 z-10 opacity-0 group-hover/card:opacity-100 transition-opacity duration-200 inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-neutral-900/90 border border-neutral-700 text-neutral-400 hover:border-blue-500/60 hover:text-blue-300 hover:bg-blue-900/20 backdrop-blur-sm"
+                        title="Edit in Admin Panel"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Pencil className="h-3 w-3" />
+                        Edit
+                      </Link>
+                    )}
                   </motion.div>
                 ))}
               </motion.ul>

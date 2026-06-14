@@ -2,9 +2,10 @@
 import { NavDock } from "@/components/nav-dock"
 
 import { useState, useEffect } from "react"
+import { useSession } from "next-auth/react"
 import { notFound, useParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Lightbulb, Zap, Cpu, Activity, Video, Image as ImageIcon, Library, User } from "lucide-react"
+import { ArrowLeft, Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Lightbulb, Zap, Cpu, Activity, Video, Image as ImageIcon, Library, User, Pencil, X, Save, Loader2, CheckCircle, AlertCircle } from "lucide-react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -1145,8 +1146,45 @@ const experiments = [
 
 export default function ExperimentPage() {
   const params = useParams()
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.role === "admin"
   const [experiment, setExperiment] = useState<any>(null)
   const [activeTab, setActiveTab] = useState("theory")
+  const [editOpen, setEditOpen] = useState(false)
+  const [editForm, setEditForm] = useState<any>(null)
+  const [saving, setSaving] = useState(false)
+  const [saveToast, setSaveToast] = useState<{ message: string; type: "success" | "error" } | null>(null)
+
+  const openEdit = () => {
+    setEditForm({ ...experiment })
+    setEditOpen(true)
+  }
+
+  const handleSave = async () => {
+    if (!editForm) return
+    setSaving(true)
+    try {
+      const res = await fetch(`/api/experiments/${editForm.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || "Failed to save")
+      }
+      const updated = await res.json()
+      setExperiment((prev: any) => ({ ...prev, ...updated }))
+      setEditOpen(false)
+      setSaveToast({ message: "Experiment updated successfully!", type: "success" })
+      setTimeout(() => setSaveToast(null), 3500)
+    } catch (e: any) {
+      setSaveToast({ message: e.message || "Failed to save experiment.", type: "error" })
+      setTimeout(() => setSaveToast(null), 4000)
+    } finally {
+      setSaving(false)
+    }
+  }
 
   useEffect(() => {
     const id = Number.parseInt(params.id as string)
@@ -1213,7 +1251,19 @@ export default function ExperimentPage() {
                      "Electrical Wiring"}
                   </div>
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-white break-words">{experiment.title}</h1>
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-white break-words">{experiment.title}</h1>
+                  {isAdmin && (
+                    <button
+                      onClick={openEdit}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-neutral-700 bg-neutral-900/60 text-neutral-400 hover:border-blue-500/60 hover:text-blue-300 hover:bg-blue-900/10 transition-all duration-200 shrink-0"
+                      title="Edit Experiment (Admin)"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      Edit Experiment
+                    </button>
+                  )}
+                </div>
                 <p className="text-neutral-400 mt-2 max-w-2xl text-sm sm:text-base">{experiment.aim}</p>
               </div>
               
@@ -1919,6 +1969,180 @@ export default function ExperimentPage() {
           </Tabs>
         </motion.div>
       </div>
+
+      {/* ── Admin Edit Panel ── */}
+      {editOpen && editForm && (
+        <div className="fixed inset-0 z-50 flex">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => !saving && setEditOpen(false)}
+          />
+          {/* Slide-over panel */}
+          <div className="relative ml-auto w-full max-w-2xl h-full bg-neutral-900 border-l border-neutral-800 shadow-2xl flex flex-col overflow-hidden">
+            {/* Panel header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800 bg-neutral-900/95 sticky top-0 z-10">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 border border-blue-500/20">
+                  <Pencil className="h-4 w-4 text-blue-400" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-white">Edit Experiment</h2>
+                  <p className="text-xs text-neutral-500">EXP-{editForm.id} · Admin only</p>
+                </div>
+              </div>
+              <button
+                onClick={() => !saving && setEditOpen(false)}
+                className="text-neutral-500 hover:text-white transition-colors p-1 rounded-lg hover:bg-neutral-800"
+                disabled={saving}
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Form body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
+              {/* Basic fields grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-medium text-neutral-400 mb-1.5">Title</label>
+                  <input
+                    type="text"
+                    value={editForm.title || ""}
+                    onChange={(e) => setEditForm((f: any) => ({ ...f, title: e.target.value }))}
+                    className="w-full bg-neutral-800 border border-neutral-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500/60 placeholder:text-neutral-600"
+                    placeholder="Experiment title"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-medium text-neutral-400 mb-1.5">Description</label>
+                  <textarea
+                    value={editForm.description || ""}
+                    onChange={(e) => setEditForm((f: any) => ({ ...f, description: e.target.value }))}
+                    rows={2}
+                    className="w-full bg-neutral-800 border border-neutral-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500/60 resize-y placeholder:text-neutral-600"
+                    placeholder="Short description"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-neutral-400 mb-1.5">Category</label>
+                  <input
+                    type="text"
+                    value={editForm.category || ""}
+                    onChange={(e) => setEditForm((f: any) => ({ ...f, category: e.target.value }))}
+                    className="w-full bg-neutral-800 border border-neutral-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500/60"
+                    placeholder="e.g. Circuit Analysis"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-neutral-400 mb-1.5">Difficulty</label>
+                  <select
+                    value={editForm.difficulty || "Intermediate"}
+                    onChange={(e) => setEditForm((f: any) => ({ ...f, difficulty: e.target.value }))}
+                    className="w-full bg-neutral-800 border border-neutral-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500/60"
+                  >
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-neutral-400 mb-1.5">Duration</label>
+                  <input
+                    type="text"
+                    value={editForm.duration || ""}
+                    onChange={(e) => setEditForm((f: any) => ({ ...f, duration: e.target.value }))}
+                    className="w-full bg-neutral-800 border border-neutral-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500/60"
+                    placeholder="e.g. 60 min"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-neutral-400 mb-1.5">Tinkercad Embed ID</label>
+                  <input
+                    type="text"
+                    value={editForm.embedId || ""}
+                    onChange={(e) => setEditForm((f: any) => ({ ...f, embedId: e.target.value }))}
+                    className="w-full bg-neutral-800 border border-neutral-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500/60 font-mono"
+                    placeholder="e.g. hNWAhAfShmV"
+                  />
+                </div>
+              </div>
+
+              {/* Aim */}
+              <div>
+                <label className="block text-xs font-medium text-neutral-400 mb-1.5">Aim</label>
+                <textarea
+                  value={editForm.aim || ""}
+                  onChange={(e) => setEditForm((f: any) => ({ ...f, aim: e.target.value }))}
+                  rows={3}
+                  className="w-full bg-neutral-800 border border-neutral-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500/60 resize-y placeholder:text-neutral-600"
+                  placeholder="Aim of the experiment"
+                />
+              </div>
+
+              {/* HTML fields */}
+              {[
+                { key: "apparatus", label: "Apparatus (HTML)", rows: 5 },
+                { key: "theory", label: "Theory (HTML)", rows: 8 },
+                { key: "procedure", label: "Procedure (HTML)", rows: 8 },
+                { key: "references", label: "References (HTML)", rows: 5 },
+              ].map(({ key, label, rows }) => (
+                <div key={key}>
+                  <label className="block text-xs font-medium text-neutral-400 mb-1.5">{label}</label>
+                  <textarea
+                    value={editForm[key] || ""}
+                    onChange={(e) => setEditForm((f: any) => ({ ...f, [key]: e.target.value }))}
+                    rows={rows}
+                    className="w-full bg-neutral-800 border border-neutral-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500/60 resize-y font-mono text-xs placeholder:text-neutral-600"
+                    placeholder={`HTML content for ${key}`}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Footer actions */}
+            <div className="px-6 py-4 border-t border-neutral-800 bg-neutral-900/95 sticky bottom-0 flex items-center justify-between gap-3">
+              <p className="text-xs text-neutral-500">Changes are saved to the database and take effect immediately.</p>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => setEditOpen(false)}
+                  disabled={saving}
+                  className="px-4 py-2 text-sm text-neutral-400 hover:text-white border border-neutral-700 hover:border-neutral-600 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {saving ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</>
+                  ) : (
+                    <><Save className="h-4 w-4" /> Save Changes</>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Toast notification ── */}
+      {saveToast && (
+        <div className={`fixed bottom-6 right-6 z-[60] flex items-center gap-3 px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium transition-all duration-300 ${
+          saveToast.type === "success"
+            ? "bg-green-900/90 border-green-700/60 text-green-200"
+            : "bg-red-900/90 border-red-700/60 text-red-200"
+        }`}>
+          {saveToast.type === "success" ? (
+            <CheckCircle className="h-4 w-4 text-green-400 shrink-0" />
+          ) : (
+            <AlertCircle className="h-4 w-4 text-red-400 shrink-0" />
+          )}
+          {saveToast.message}
+        </div>
+      )}
     </div>
   )
 }
