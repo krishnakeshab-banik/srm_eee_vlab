@@ -4,7 +4,7 @@ import { NavDock } from "@/components/nav-dock"
 import { useState, useEffect } from "react"
 import { notFound, useParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Lightbulb, Zap, Cpu, Video, Image as ImageIcon, Library, User } from "lucide-react"
+import { ArrowLeft, Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Lightbulb, Zap, Cpu, Activity, Video, Image as ImageIcon, Library, User } from "lucide-react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -15,19 +15,29 @@ import { Circuit3DViewer } from "@/components/circuit-3d-viewer"
 import { InteractiveRobotSpline } from "@/components/blocks/interactive-3d-robot"
 import { 
   KVLExperiment, 
-  TheveninExperiment, 
+  TheveninExperiment,
+  PNJunctionExperiment,
+  FullWaveRectifierExperiment,
+  ClipperExperiment,
+  OpAmpExperiment,
+  EnergyMeterExperiment,
   HouseWiringExperiment, 
   FluorescentLampExperiment, 
-  StaircaseWiringExperiment, 
-  FullWaveRectifierExperiment 
+  StaircaseWiringExperiment,
 } from "@/components/animated-experiment"
 import { 
   KVLQuiz, 
-  TheveninQuiz, 
+  TheveninQuiz,
+  PNJunctionQuiz,
+  FullWaveRectifierQuiz,
+  ClipperQuiz,
+  OpAmpQuiz,
+  LogicGatesQuiz,
+  AdderQuiz,
+  EnergyMeterQuiz,
   HouseWiringQuiz, 
   FluorescentLampQuiz, 
   StaircaseWiringQuiz, 
-  FullWaveRectifierQuiz 
 } from "@/components/experiment-quiz"
 import { LogicGatesVirtualLab, AdderVirtualLab } from "@/components/digital-experiments"
 
@@ -268,10 +278,11 @@ const experiments = [
     image: "/placeholder.svg?height=400&width=600",
     embedId: "lAusQJ3m4bF", // Tinkercad embed ID
   },
+  // ── Experiment 3: PN Junction Diode ──
   {
     id: 3,
-    title: "House Wiring",
-    aim: "To implement residential house wiring using switches, lamps, and energy meter",
+    title: "PN Junction Diode Characteristics",
+    aim: "To plot the V-I characteristics of a PN junction diode in forward bias and reverse bias modes.",
     apparatus: `
       <h3>Apparatus Required:</h3>
       <table class="w-full border-collapse my-4">
@@ -279,305 +290,84 @@ const experiments = [
           <tr>
             <th class="border border-neutral-700 px-4 py-2">Sl.No.</th>
             <th class="border border-neutral-700 px-4 py-2">Apparatus</th>
+            <th class="border border-neutral-700 px-4 py-2">Range / Specification</th>
             <th class="border border-neutral-700 px-4 py-2">Quantity</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-            <td class="border border-neutral-700 px-4 py-2">1 phase energy meter</td>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">2</td>
-            <td class="border border-neutral-700 px-4 py-2">Main Box</td>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">3</td>
-            <td class="border border-neutral-700 px-4 py-2">5 A Switch</td>
-            <td class="border border-neutral-700 px-4 py-2">3</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">4</td>
-            <td class="border border-neutral-700 px-4 py-2">Indicator</td>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">5</td>
-            <td class="border border-neutral-700 px-4 py-2">Incandescent lamp with holder</td>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">6</td>
-            <td class="border border-neutral-700 px-4 py-2">Fan</td>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">7</td>
-            <td class="border border-neutral-700 px-4 py-2">Three pin plug</td>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-          </tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">1</td><td class="border border-neutral-700 px-4 py-2">Regulated Power Supply (RPS)</td><td class="border border-neutral-700 px-4 py-2">(0–30V) DC</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">2</td><td class="border border-neutral-700 px-4 py-2">PN Junction Diode</td><td class="border border-neutral-700 px-4 py-2">IN4007 / IN4001</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">3</td><td class="border border-neutral-700 px-4 py-2">Resistance</td><td class="border border-neutral-700 px-4 py-2">1 kΩ</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">4</td><td class="border border-neutral-700 px-4 py-2">Voltmeter (DC)</td><td class="border border-neutral-700 px-4 py-2">(0–30V)</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">5</td><td class="border border-neutral-700 px-4 py-2">Milliammeter (DC)</td><td class="border border-neutral-700 px-4 py-2">(0–100 mA)</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">6</td><td class="border border-neutral-700 px-4 py-2">Microammeter (DC)</td><td class="border border-neutral-700 px-4 py-2">(0–200 μA)</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">7</td><td class="border border-neutral-700 px-4 py-2">Bread Board &amp; Connecting Wires</td><td class="border border-neutral-700 px-4 py-2">—</td><td class="border border-neutral-700 px-4 py-2">Required</td></tr>
         </tbody>
       </table>
     `,
     theory: `
-      <h3>House Wiring Theory:</h3>
-      <p class="mb-4">Residential electrical wiring involves the distribution of electrical power throughout a home. It includes circuits for lighting, outlets, and appliances.</p>
-      
-      <p class="mb-4">Key components include:</p>
-      <ul class="list-disc pl-6 mb-4">
-        <li>Service entrance: Where power enters the building</li>
-        <li>Main distribution panel: Contains circuit breakers or fuses</li>
-        <li>Branch circuits: Individual circuits serving different areas or appliances</li>
-        <li>Grounding system: Safety system to prevent electrical shocks</li>
+      <h3>Theory — PN Junction Diode:</h3>
+      <p class="mb-4">A PN junction diode is formed by joining P-type and N-type semiconductor materials. The P-region has holes as majority carriers and the N-region has electrons as majority carriers. At the junction, diffusion of carriers creates a depletion region with a built-in potential (≈0.3V for Ge, ≈0.7V for Si).</p>
+      <h4 class="font-semibold mt-4 mb-2">Forward Bias:</h4>
+      <p class="mb-3">When the positive terminal of the battery is connected to the P-side and negative to the N-side, the applied voltage opposes the built-in potential. Above the threshold voltage (V<sub>T</sub>), the depletion region narrows and current flows exponentially:</p>
+      <p class="mb-4 font-mono text-green-300">I = I<sub>0</sub> (e<sup>V/ηV<sub>T</sub></sup> − 1)</p>
+      <h4 class="font-semibold mt-4 mb-2">Reverse Bias:</h4>
+      <p class="mb-3">When bias is reversed, the depletion region widens and only a very small reverse saturation current (I<sub>0</sub>) flows due to minority carriers. If the reverse voltage exceeds the breakdown voltage (V<sub>BR</sub>), current increases sharply (Zener or avalanche breakdown).</p>
+      <h4 class="font-semibold mt-4 mb-2">Key Parameters:</h4>
+      <ul class="list-disc pl-6 mb-4 space-y-1">
+        <li>Threshold voltage (Si): ~0.7V, (Ge): ~0.3V</li>
+        <li>Reverse saturation current I<sub>0</sub>: nA range</li>
+        <li>Dynamic resistance r<sub>d</sub> = ηV<sub>T</sub>/I (η = ideality factor)</li>
       </ul>
-      
-      <p class="mb-4">Understanding proper wiring techniques and safety standards is essential for safe and reliable electrical installations.</p>
     `,
     procedure: `
-      <h3>Procedure:</h3>
-      <ol class="list-decimal pl-6 mb-4">
-        <li>Connections are given as per circuit diagram.</li>
-        <li>Switch is put to ON state one by one and energy meter readings are noted down.</li>
+      <h3>Procedure — Forward Bias:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>Connect the diode in forward bias: anode (+) to positive terminal of RPS through series resistor (1kΩ), cathode (−) to negative terminal.</li>
+        <li>Connect voltmeter across the diode and milliammeter in series.</li>
+        <li>Vary the RPS voltage from 0 V to 2 V in steps of 0.1 V.</li>
+        <li>Record the diode voltage (V<sub>F</sub>) and current (I<sub>F</sub>) for each setting.</li>
+        <li>Plot I<sub>F</sub> vs V<sub>F</sub> graph (forward characteristic).</li>
       </ol>
-      
-      <h3>Circuit Diagram:</h3>
-      <div class="my-4 p-4 bg-neutral-800 rounded-lg">
-        <p class="mb-2">The circuit includes:</p>
-        <ul class="list-disc pl-6 mb-4">
-          <li>AC supply (Phase and Neutral)</li>
-          <li>Energy meter</li>
-          <li>Main box with fuse</li>
-          <li>Switches for controlling lamps and fan</li>
-          <li>Ground connection</li>
-        </ul>
-      </div>
+      <h3>Procedure — Reverse Bias:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>Reverse the diode connections: cathode to positive terminal, anode to negative.</li>
+        <li>Connect microammeter in series to measure small reverse current.</li>
+        <li>Increase reverse voltage from 0 V to 30 V in steps of 2 V.</li>
+        <li>Record the reverse voltage (V<sub>R</sub>) and reverse current (I<sub>R</sub>) for each step.</li>
+        <li>Plot I<sub>R</sub> vs V<sub>R</sub> (reverse characteristic).</li>
+      </ol>
+      <h3>Observations (Sample — Forward Bias, Silicon Diode):</h3>
+      <table class="w-full border-collapse my-4 text-sm">
+        <thead><tr>
+          <th class="border border-neutral-700 px-3 py-2">V<sub>F</sub> (V)</th>
+          <th class="border border-neutral-700 px-3 py-2">I<sub>F</sub> (mA)</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-3 py-1 text-center">0.0</td><td class="border border-neutral-700 px-3 py-1 text-center">0.00</td></tr>
+          <tr><td class="border border-neutral-700 px-3 py-1 text-center">0.4</td><td class="border border-neutral-700 px-3 py-1 text-center">0.05</td></tr>
+          <tr><td class="border border-neutral-700 px-3 py-1 text-center">0.6</td><td class="border border-neutral-700 px-3 py-1 text-center">0.80</td></tr>
+          <tr><td class="border border-neutral-700 px-3 py-1 text-center">0.7</td><td class="border border-neutral-700 px-3 py-1 text-center">5.00</td></tr>
+          <tr><td class="border border-neutral-700 px-3 py-1 text-center">0.8</td><td class="border border-neutral-700 px-3 py-1 text-center">20.0</td></tr>
+        </tbody>
+      </table>
     `,
     references: `
       <h3>References:</h3>
       <ol class="list-decimal pl-6 mb-4">
-        <li>Mullin, R. (2017). Electrical Wiring Residential (19th ed.). Cengage Learning.</li>
-        <li>National Electrical Code (NEC) (2020). National Fire Protection Association.</li>
-        <li>Richter, H. P., & Schwan, W. C. (2016). Practical Electrical Wiring: Residential, Farm, Commercial, and Industrial. Park Publishing.</li>
-        <li>Black & Decker (2017). The Complete Guide to Wiring (7th ed.). Cool Springs Press.</li>
+        <li>Boylestad, R. L., &amp; Nashelsky, L. (2015). Electronic Devices and Circuit Theory (11th ed.). Pearson.</li>
+        <li>Sedra, A. S., &amp; Smith, K. C. (2014). Microelectronic Circuits (7th ed.). Oxford University Press.</li>
+        <li>Millman, J., &amp; Halkias, C. C. (2010). Integrated Electronics (2nd ed.). Tata McGraw-Hill.</li>
       </ol>
     `,
     image: "/placeholder.svg?height=400&width=600",
-    embedId: "2rTQ63Z8SdD", // Tinkercad embed ID
+    embedId: "",
   },
+  // ── Experiment 4: Full Wave Rectifier ──
   {
     id: 4,
-    title: "Fluorescent Lamp Wiring",
-    aim: "To make connections of a fluorescent lamp wiring and to study the accessories of the same.",
-    apparatus: `
-      <h3>Apparatus Required:</h3>
-      <table class="w-full border-collapse my-4">
-        <thead>
-          <tr>
-            <th class="border border-neutral-700 px-4 py-2">S.No</th>
-            <th class="border border-neutral-700 px-4 py-2">Components</th>
-            <th class="border border-neutral-700 px-4 py-2">Range/Type</th>
-            <th class="border border-neutral-700 px-4 py-2">Quality</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-            <td class="border border-neutral-700 px-4 py-2">Fluorescent Lamp fixture</td>
-            <td class="border border-neutral-700 px-4 py-2">4 ft</td>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">2</td>
-            <td class="border border-neutral-700 px-4 py-2">Fluorescent lamp</td>
-            <td class="border border-neutral-700 px-4 py-2">40W</td>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">3</td>
-            <td class="border border-neutral-700 px-4 py-2">Choke</td>
-            <td class="border border-neutral-700 px-4 py-2">40W, 230V</td>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">4</td>
-            <td class="border border-neutral-700 px-4 py-2">Starter</td>
-            <td class="border border-neutral-700 px-4 py-2">-</td>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">5</td>
-            <td class="border border-neutral-700 px-4 py-2">Connecting wires</td>
-            <td class="border border-neutral-700 px-4 py-2">-</td>
-            <td class="border border-neutral-700 px-4 py-2">As required</td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <h3>Tools Required:</h3>
-      <p>Wire man's tool Kit - 1 No</p>
-    `,
-    theory: `
-      <h3>Theory:</h3>
-      <ol class="list-decimal pl-6 mb-4">
-        <li>The electrode of the starter which is enclosed in a gas bulb filled with argon gas, cause discharge in the argon gas with consequent heating.</li>
-        <li>Due to heating, the bimetallic strip bends and causes in the starter to close. After this, the choke, the filaments (tube ends) to tube and starter becomes connected in series.</li>
-        <li>When the current flows through the tube end filaments the heat is produced. During the process the discharge in the starter tube disappears and the contacts in the starter move apart.</li>
-        <li>When sudden break in the circuit occur due to moving apart of starter terminals, this causes a high value of e.m.f to be induced in the choke.</li>
-        <li>According to Lenz's law, the direction of induced e.m.f in the choke will try to oppose the fall of current in the circuit.</li>
-        <li>The voltage thus acting across the tube ends will be high enough to cause a discharge to occur in the gas inside the tube. Thus the tube starts giving light.</li>
-        <li>The fluorescent lamp is a low pressure mercury lamp and is a long evacuated tube. It contains a small amount of mercury and argon gas at 2.5 mm pressure. At the time of switching in the tube, mercury is in the form of small drops. Therefore, to start the tube, filling up of argon gas is necessary. So, in the beginning, argon gas starts burning at the ends of the tube; the mercury is heated and controls the current and the tube starts giving light. At each end of the tube, there is a tungsten electrode which is coated with fast electron emitting material. Inside of the tube is coated with phosphor according to the type of light.</li>
-        <li>A starter helps to start the start the tube and break the circuit.</li>
-        <li>The choke coil is also called blast. It has a laminated core over which enameled wire is wound. The function of the choke is to increase the voltage to almost 1000V at the time of switching on the tube and when the tube starts working, it reduces the voltage across the tube and keeps the current constant.</li>
-      </ol>
-    `,
-    procedure: `
-      <h3>Procedure:</h3>
-      <ol class="list-decimal pl-6 mb-4">
-        <li>Give the connections as per the circuit diagram.</li>
-        <li>Fix the tube holder and the choke in the tube.</li>
-        <li>The phase wire is connected to the choke and neutral directly to the tube.</li>
-        <li>Connect the starter in series with the tube.</li>
-        <li>Switch on the supply and check the fluorescent lamp lighting.</li>
-      </ol>
-      
-      <h3>Circuit Diagram:</h3>
-      <div class="my-4 p-4 bg-neutral-800 rounded-lg">
-        <p class="mb-2">The circuit includes:</p>
-        <ul class="list-disc pl-6 mb-4">
-          <li>AC Supply (230V, 50Hz)</li>
-          <li>Switch</li>
-          <li>Choke (40W, 230V)</li>
-          <li>Starter</li>
-          <li>Fluorescent lamp (40W) with filaments at both ends</li>
-        </ul>
-      </div>
-    `,
-    references: `
-      <h3>References:</h3>
-      <ol class="list-decimal pl-6 mb-4">
-        <li>DiLouie, C. (2016). Lighting Controls Handbook. Fairmont Press.</li>
-        <li>Khanna, V. K. (2014). Fundamentals of Solid-State Lighting: LEDs, OLEDs, and Their Applications in Illumination and Displays. CRC Press.</li>
-        <li>National Electrical Code (NEC) (2020). National Fire Protection Association.</li>
-        <li>Grondzik, W. T., & Kwok, A. G. (2019). Mechanical and Electrical Equipment for Buildings (13th ed.). Wiley.</li>
-      </ol>
-    `,
-    image: "/placeholder.svg?height=400&width=600",
-    embedId: "hnFoQc772H0", // Tinkercad embed ID
-  },
-  {
-    id: 5,
-    title: "Staircase Wiring",
-    aim: "To control a single lamp from two different places.",
-    apparatus: `
-      <h3>Apparatus Required:</h3>
-      <table class="w-full border-collapse my-4">
-        <thead>
-          <tr>
-            <th class="border border-neutral-700 px-4 py-2">S.No</th>
-            <th class="border border-neutral-700 px-4 py-2">Components</th>
-            <th class="border border-neutral-700 px-4 py-2">Quan/Range</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-            <td class="border border-neutral-700 px-4 py-2">Incandescent Lamp</td>
-            <td class="border border-neutral-700 px-4 py-2">1 (230V, 40W)</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">2</td>
-            <td class="border border-neutral-700 px-4 py-2">Lamp holder</td>
-            <td class="border border-neutral-700 px-4 py-2">1</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">3</td>
-            <td class="border border-neutral-700 px-4 py-2">Two way switches</td>
-            <td class="border border-neutral-700 px-4 py-2">2 (230V, 5A)</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">4</td>
-            <td class="border border-neutral-700 px-4 py-2">Connecting Wires</td>
-            <td class="border border-neutral-700 px-4 py-2">As required</td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <h3>Tools Required:</h3>
-      <p>Wire man's tool Kit - 1 No.</p>
-    `,
-    theory: `
-      <h3>Theory:</h3>
-      <ol class="list-decimal pl-6 mb-4">
-        <li>A two way switch is installed near the first step of the stairs. The other two way switch is installed at the upper part where the stair ends.</li>
-        <li>The light point is provided between first and last stair at an adequate location and height if the light is switched on by the lower switch. It can be switched off by the switch at the top or vice versa.</li>
-        <li>The circuit can be used at the places like bed room where the person may not have to travel for switching off the light to the place from where the light is switched on.</li>
-        <li>Two numbers of Two-way switches are used for the purpose. The supply is given to the switch at the short circuited terminals.</li>
-        <li>The connection to the light point is taken from the similar short circuited terminal of the second switch. Other two independent terminals of each circuit are connected through cables.</li>
-      </ol>
-    `,
-    procedure: `
-      <h3>Procedure:</h3>
-      <ol class="list-decimal pl-6 mb-4">
-        <li>Give the connections as per the circuit diagram.</li>
-        <li>Verify the connections.</li>
-        <li>Switch on the supply.</li>
-        <li>Verify the conditions.</li>
-      </ol>
-      
-      <h3>Tabulation:</h3>
-      <table class="w-full border-collapse my-4">
-        <thead>
-          <tr>
-            <th class="border border-neutral-700 px-4 py-2" colspan="2">Position of switches</th>
-            <th class="border border-neutral-700 px-4 py-2" rowspan="2">Condition of lamp</th>
-          </tr>
-          <tr>
-            <th class="border border-neutral-700 px-4 py-2">S1</th>
-            <th class="border border-neutral-700 px-4 py-2">S2</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">on</td>
-            <td class="border border-neutral-700 px-4 py-2">off</td>
-            <td class="border border-neutral-700 px-4 py-2">glowing</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">off</td>
-            <td class="border border-neutral-700 px-4 py-2">on</td>
-            <td class="border border-neutral-700 px-4 py-2">glowing</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">off</td>
-            <td class="border border-neutral-700 px-4 py-2">off</td>
-            <td class="border border-neutral-700 px-4 py-2">not glowing</td>
-          </tr>
-          <tr>
-            <td class="border border-neutral-700 px-4 py-2">on</td>
-            <td class="border border-neutral-700 px-4 py-2">on</td>
-            <td class="border border-neutral-700 px-4 py-2">not glowing</td>
-          </tr>
-        </tbody>
-      </table>
-    `,
-    references: `
-      <h3>References:</h3>
-      <ol class="list-decimal pl-6 mb-4">
-        <li>Mullin, R. (2017). Electrical Wiring Residential (19th ed.). Cengage Learning.</li>
-        <li>National Electrical Code (NEC) (2020). National Fire Protection Association.</li>
-        <li>Richter, H. P., & Schwan, W. C. (2016). Practical Electrical Wiring: Residential, Farm, Commercial, and Industrial. Park Publishing.</li>
-        <li>Black & Decker (2017). The Complete Guide to Wiring (7th ed.). Cool Springs Press.</li>
-      </ol>
-    `,
-    image: "/placeholder.svg?height=400&width=600",
-    embedId: "94YWeHFB9oN", // Tinkercad embed ID
-  },
-  {
-    id: 6,
     title: "Full Wave Rectifier",
-    aim: "To construct a single phase full-wave bridge rectifier using diode and to draw its performance characteristics.",
+    aim: "To construct a single phase full-wave bridge rectifier using diodes and to draw its performance characteristics.",
     apparatus: `
       <h3>Apparatus Required:</h3>
       <table class="w-full border-collapse my-4">
@@ -719,14 +509,153 @@ const experiments = [
     references: `
       <h3>References:</h3>
       <ol class="list-decimal pl-6 mb-4">
-        <li>Boylestad, R. L., & Nashelsky, L. (2015). Electronic Devices and Circuit Theory (11th ed.). Pearson.</li>
-        <li>Malvino, A. P., & Bates, D. J. (2016). Electronic Principles (8th ed.). McGraw-Hill Education.</li>
+        <li>Boylestad, R. L., &amp; Nashelsky, L. (2015). Electronic Devices and Circuit Theory (11th ed.). Pearson.</li>
+        <li>Malvino, A. P., &amp; Bates, D. J. (2016). Electronic Principles (8th ed.). McGraw-Hill Education.</li>
         <li>Floyd, T. L. (2018). Electronic Devices (10th ed.). Pearson.</li>
-        <li>Sedra, A. S., & Smith, K. C. (2014). Microelectronic Circuits (7th ed.). Oxford University Press.</li>
+        <li>Sedra, A. S., &amp; Smith, K. C. (2014). Microelectronic Circuits (7th ed.). Oxford University Press.</li>
       </ol>
     `,
     image: "/placeholder.svg?height=400&width=600",
-    embedId: "jbRQbeSnAzj", // Tinkercad embed ID
+    embedId: "jbRQbeSnAzj",
+  },
+  // ── Experiment 5: Clipper Circuit ──
+  {
+    id: 5,
+    title: "Clipper Circuit",
+    aim: "To study and verify the operation of series and parallel diode clipper circuits and observe how they limit signal amplitude.",
+    apparatus: `
+      <h3>Apparatus Required:</h3>
+      <table class="w-full border-collapse my-4">
+        <thead><tr>
+          <th class="border border-neutral-700 px-4 py-2">Sl.No.</th>
+          <th class="border border-neutral-700 px-4 py-2">Apparatus</th>
+          <th class="border border-neutral-700 px-4 py-2">Range / Specification</th>
+          <th class="border border-neutral-700 px-4 py-2">Quantity</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-4 py-2">1</td><td class="border border-neutral-700 px-4 py-2">Function Generator</td><td class="border border-neutral-700 px-4 py-2">1 Hz – 1 MHz</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">2</td><td class="border border-neutral-700 px-4 py-2">CRO (Cathode Ray Oscilloscope)</td><td class="border border-neutral-700 px-4 py-2">20 MHz</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">3</td><td class="border border-neutral-700 px-4 py-2">Diode</td><td class="border border-neutral-700 px-4 py-2">IN4007</td><td class="border border-neutral-700 px-4 py-2">2</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">4</td><td class="border border-neutral-700 px-4 py-2">Resistor</td><td class="border border-neutral-700 px-4 py-2">1 kΩ</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">5</td><td class="border border-neutral-700 px-4 py-2">DC Battery / RPS</td><td class="border border-neutral-700 px-4 py-2">0–15V</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">6</td><td class="border border-neutral-700 px-4 py-2">Bread Board &amp; Connecting Wires</td><td class="border border-neutral-700 px-4 py-2">—</td><td class="border border-neutral-700 px-4 py-2">Required</td></tr>
+        </tbody>
+      </table>
+    `,
+    theory: `
+      <h3>Theory — Clipper Circuits:</h3>
+      <p class="mb-4">A clipper (limiter) is a diode circuit that removes (clips) portions of an input waveform above or below a reference voltage level, without distorting the remaining part of the waveform.</p>
+      <h4 class="font-semibold mt-4 mb-2">Types of Clippers:</h4>
+      <ul class="list-disc pl-6 mb-4 space-y-2">
+        <li><b>Series Positive Clipper:</b> Diode in series with load; clips the positive half-cycle. Output = negative half + zero (during positive half).</li>
+        <li><b>Series Negative Clipper:</b> Diode reversed; clips the negative half-cycle.</li>
+        <li><b>Parallel Positive Clipper:</b> Diode in parallel with load; during positive half, diode conducts and short-circuits the output to ~0.7V.</li>
+        <li><b>Biased Clipper:</b> A reference voltage V<sub>R</sub> is added in series with the diode. Clipping level shifts from 0 to V<sub>R</sub>.</li>
+        <li><b>Double Clipper (Combination):</b> Two diodes with opposite bias clip both positive and negative peaks — output is limited to a window [−V<sub>R2</sub>, +V<sub>R1</sub>].</li>
+      </ul>
+      <h4 class="font-semibold mt-4 mb-2">Ideal vs Practical Diode:</h4>
+      <p class="mb-4">In practical analysis, the 0.7V forward voltage drop of silicon diodes shifts the clipping level by 0.7V. For example, a parallel positive clipper clips at +0.7V, not 0V.</p>
+    `,
+    procedure: `
+      <h3>Procedure — Positive Series Clipper:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>Connect the diode in series with the load resistor (1kΩ) with anode facing input.</li>
+        <li>Apply a sinusoidal input (e.g., 5V peak, 1kHz) from the function generator.</li>
+        <li>Observe the input waveform on Channel 1 of CRO and output on Channel 2.</li>
+        <li>Verify that the positive half-cycle is clipped and negative half passes through.</li>
+      </ol>
+      <h3>Procedure — Positive Parallel Clipper:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>Connect the diode in parallel with the load resistor, anode toward the positive side of input.</li>
+        <li>Apply sinusoidal input and observe output on CRO.</li>
+        <li>Verify that output is limited to approximately 0.7V during the positive half-cycle.</li>
+      </ol>
+      <h3>Procedure — Biased Clipper:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>Add a DC reference voltage V<sub>R</sub> = 2V in series with the diode.</li>
+        <li>Observe that clipping now occurs at 2.7V (V<sub>R</sub> + V<sub>D</sub>).</li>
+      </ol>
+    `,
+    references: `
+      <h3>References:</h3>
+      <ol class="list-decimal pl-6 mb-4">
+        <li>Boylestad, R. L., &amp; Nashelsky, L. (2015). Electronic Devices and Circuit Theory (11th ed.). Pearson.</li>
+        <li>Malvino, A. P., &amp; Bates, D. J. (2016). Electronic Principles (8th ed.). McGraw-Hill Education.</li>
+        <li>Floyd, T. L. (2018). Electronic Devices (10th ed.). Pearson.</li>
+        <li>Millman, J., &amp; Halkias, C. C. (2010). Integrated Electronics (2nd ed.). Tata McGraw-Hill.</li>
+      </ol>
+    `,
+    image: "/placeholder.svg?height=400&width=600",
+    embedId: "",
+  },
+  // ── Experiment 6: Op-Amp Inverting / Non-Inverting Amplifier ──
+  {
+    id: 6,
+    title: "Op-Amp Inverting / Non-Inverting Amplifier",
+    aim: "To design inverting and non-inverting amplifier circuits using LM741 Op-Amp and verify the voltage gain experimentally.",
+    apparatus: `
+      <h3>Apparatus Required:</h3>
+      <table class="w-full border-collapse my-4">
+        <thead><tr>
+          <th class="border border-neutral-700 px-4 py-2">Sl.No.</th>
+          <th class="border border-neutral-700 px-4 py-2">Apparatus</th>
+          <th class="border border-neutral-700 px-4 py-2">Range / Specification</th>
+          <th class="border border-neutral-700 px-4 py-2">Quantity</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-4 py-2">1</td><td class="border border-neutral-700 px-4 py-2">Op-Amp IC</td><td class="border border-neutral-700 px-4 py-2">LM741 / μA741</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">2</td><td class="border border-neutral-700 px-4 py-2">Dual DC Power Supply</td><td class="border border-neutral-700 px-4 py-2">±15V</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">3</td><td class="border border-neutral-700 px-4 py-2">Function Generator</td><td class="border border-neutral-700 px-4 py-2">1 Hz – 1 MHz</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">4</td><td class="border border-neutral-700 px-4 py-2">CRO</td><td class="border border-neutral-700 px-4 py-2">20 MHz</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">5</td><td class="border border-neutral-700 px-4 py-2">Resistors</td><td class="border border-neutral-700 px-4 py-2">10kΩ, 22kΩ, 47kΩ</td><td class="border border-neutral-700 px-4 py-2">As required</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">6</td><td class="border border-neutral-700 px-4 py-2">Bread Board &amp; Connecting Wires</td><td class="border border-neutral-700 px-4 py-2">—</td><td class="border border-neutral-700 px-4 py-2">Required</td></tr>
+        </tbody>
+      </table>
+    `,
+    theory: `
+      <h3>Theory — Operational Amplifier:</h3>
+      <p class="mb-4">An operational amplifier (Op-Amp) is a high-gain, DC-coupled differential amplifier with high input impedance and low output impedance. The LM741 has an open-loop gain of ~200,000 V/V. Practical applications use negative feedback to set a precise closed-loop gain.</p>
+      <h4 class="font-semibold mt-4 mb-2">Inverting Amplifier:</h4>
+      <p class="mb-3">The input signal is applied to the inverting (−) terminal through resistor R<sub>1</sub>. The feedback resistor R<sub>f</sub> connects the output to the inverting terminal. The non-inverting (+) terminal is grounded.</p>
+      <p class="mb-4 font-mono text-orange-300">Closed-loop gain A<sub>v</sub> = −R<sub>f</sub> / R<sub>1</sub></p>
+      <p class="mb-4">The output is 180° out of phase with the input. Negative sign indicates phase inversion.</p>
+      <h4 class="font-semibold mt-4 mb-2">Non-Inverting Amplifier:</h4>
+      <p class="mb-3">The input signal is applied to the non-inverting (+) terminal. The voltage divider (R<sub>1</sub> and R<sub>f</sub>) provides feedback to the inverting terminal.</p>
+      <p class="mb-4 font-mono text-cyan-300">Closed-loop gain A<sub>v</sub> = 1 + R<sub>f</sub> / R<sub>1</sub></p>
+      <p class="mb-4">The output is in phase with the input. The gain is always ≥ 1.</p>
+      <h4 class="font-semibold mt-4 mb-2">Virtual Ground Concept:</h4>
+      <p class="mb-4">Due to the high open-loop gain and negative feedback, the voltage difference between the two input terminals is virtually zero (virtual short). This simplifies analysis of Op-Amp circuits.</p>
+    `,
+    procedure: `
+      <h3>Procedure — Inverting Amplifier:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>Connect LM741 on the bread board. Apply ±15V to pins 7 (+V<sub>CC</sub>) and 4 (−V<sub>CC</sub>).</li>
+        <li>Connect R<sub>1</sub> = 10kΩ from the function generator to pin 2 (inverting input).</li>
+        <li>Connect R<sub>f</sub> = 47kΩ between pin 2 and pin 6 (output).</li>
+        <li>Ground pin 3 (non-inverting input) through R<sub>1</sub> (for bias current compensation).</li>
+        <li>Apply a sinusoidal input of 100 mV peak at 1 kHz.</li>
+        <li>Measure V<sub>in</sub> on Ch-1 and V<sub>out</sub> on Ch-2 of CRO.</li>
+        <li>Calculate experimental gain = V<sub>out</sub>/V<sub>in</sub> and compare with theoretical gain = −R<sub>f</sub>/R<sub>1</sub> = −4.7.</li>
+      </ol>
+      <h3>Procedure — Non-Inverting Amplifier:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>Apply the input signal to pin 3 (non-inverting input).</li>
+        <li>Connect R<sub>1</sub> = 10kΩ between pin 2 and ground.</li>
+        <li>Connect R<sub>f</sub> = 22kΩ between pin 2 and pin 6 (output).</li>
+        <li>Measure input and output and calculate gain.</li>
+        <li>Compare with theoretical gain = 1 + R<sub>f</sub>/R<sub>1</sub> = 3.2.</li>
+      </ol>
+    `,
+    references: `
+      <h3>References:</h3>
+      <ol class="list-decimal pl-6 mb-4">
+        <li>Gayakwad, R. A. (2000). Op-Amps and Linear Integrated Circuits (4th ed.). Pearson.</li>
+        <li>Coughlin, R. F., &amp; Driscoll, F. F. (2001). Operational Amplifiers and Linear Integrated Circuits (6th ed.). Pearson.</li>
+        <li>Sedra, A. S., &amp; Smith, K. C. (2014). Microelectronic Circuits (7th ed.). Oxford University Press.</li>
+      </ol>
+    `,
+    image: "/placeholder.svg?height=400&width=600",
+    embedId: "",
   },
   // ── Experiment 7: Basic Logic Gates ──
   {
@@ -868,6 +797,350 @@ const experiments = [
     image: "/placeholder.svg?height=400&width=600",
     embedId: "",
   },
+  // ── Unit 4: Electrical Instruments ──
+  // ── Experiment 9: Energy Measurement ──
+  {
+    id: 9,
+    title: "Energy Measurement",
+    aim: "To measure electrical energy consumption using a single-phase energy meter and calculate the units consumed by different electrical loads.",
+    apparatus: `
+      <h3>Apparatus Required:</h3>
+      <table class="w-full border-collapse my-4">
+        <thead><tr>
+          <th class="border border-neutral-700 px-4 py-2">Sl.No.</th>
+          <th class="border border-neutral-700 px-4 py-2">Apparatus</th>
+          <th class="border border-neutral-700 px-4 py-2">Range / Specification</th>
+          <th class="border border-neutral-700 px-4 py-2">Quantity</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-4 py-2">1</td><td class="border border-neutral-700 px-4 py-2">Single-Phase Energy Meter</td><td class="border border-neutral-700 px-4 py-2">230V, 50Hz, 5A</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">2</td><td class="border border-neutral-700 px-4 py-2">Wattmeter</td><td class="border border-neutral-700 px-4 py-2">230V, 5A</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">3</td><td class="border border-neutral-700 px-4 py-2">Voltmeter (AC)</td><td class="border border-neutral-700 px-4 py-2">(0–300V)</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">4</td><td class="border border-neutral-700 px-4 py-2">Ammeter (AC)</td><td class="border border-neutral-700 px-4 py-2">(0–5A)</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">5</td><td class="border border-neutral-700 px-4 py-2">Resistive Load (Lamp)</td><td class="border border-neutral-700 px-4 py-2">100W, 230V</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">6</td><td class="border border-neutral-700 px-4 py-2">Inductive Load (Fan / Motor)</td><td class="border border-neutral-700 px-4 py-2">230V, 50Hz</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">7</td><td class="border border-neutral-700 px-4 py-2">Stop Watch / Timer</td><td class="border border-neutral-700 px-4 py-2">—</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">8</td><td class="border border-neutral-700 px-4 py-2">Connecting Wires</td><td class="border border-neutral-700 px-4 py-2">—</td><td class="border border-neutral-700 px-4 py-2">Required</td></tr>
+        </tbody>
+      </table>
+    `,
+    theory: `
+      <h3>Theory — Single-Phase Energy Meter:</h3>
+      <p class="mb-4">An energy meter (also called a kWh meter or watt-hour meter) measures the total electrical energy consumed by a load over a period of time. It integrates power (watts) over time (hours) to give energy in kilowatt-hours (kWh).</p>
+      <h4 class="font-semibold mt-4 mb-2">Construction:</h4>
+      <p class="mb-3">A conventional induction-type single-phase energy meter consists of:</p>
+      <ul class="list-disc pl-6 mb-4 space-y-1">
+        <li><b>Shunt Magnet (Voltage Coil):</b> Connected across the supply; produces a flux proportional to the supply voltage.</li>
+        <li><b>Series Magnet (Current Coil):</b> Carries the load current; produces a flux proportional to the current.</li>
+        <li><b>Aluminium Disc:</b> Rotates due to the interaction of the two fluxes (by eddy current principle). Speed is proportional to power.</li>
+        <li><b>Braking Magnet:</b> A permanent magnet that creates a braking torque proportional to disc speed, ensuring steady rotation at a speed proportional to power.</li>
+        <li><b>Counter / Register:</b> Counts the number of disc revolutions and displays energy in kWh.</li>
+      </ul>
+      <h4 class="font-semibold mt-4 mb-2">Working Principle (Induction Type):</h4>
+      <p class="mb-4">The rotating disc develops an eddy-current torque T<sub>d</sub> ∝ V × I × cos φ = P (real power). The braking torque T<sub>b</sub> ∝ n (disc speed). At steady state, T<sub>d</sub> = T<sub>b</sub>, so n ∝ P.</p>
+      <h4 class="font-semibold mt-4 mb-2">Key Formula:</h4>
+      <p class="mb-2 font-mono text-green-300">Energy (kWh) = Power (kW) × Time (h)</p>
+      <p class="mb-2 font-mono text-yellow-300">Meter Constant (K) = No. of revolutions per kWh (marked on the meter)</p>
+      <p class="mb-4 font-mono text-cyan-300">Measured Power = (No. of revolutions × 3600) / (K × Time in seconds) kW</p>
+      <h4 class="font-semibold mt-4 mb-2">Error Calculation:</h4>
+      <p class="mb-4 font-mono text-orange-300">% Error = [(Measured kWh − True kWh) / True kWh] × 100</p>
+    `,
+    procedure: `
+      <h3>Procedure:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>Connect the energy meter, wattmeter, voltmeter, ammeter, and load as per the circuit diagram (supply → energy meter current coil → load; voltage coil across supply).</li>
+        <li>Note the initial reading on the energy meter register (R<sub>1</sub>) in kWh.</li>
+        <li>Switch ON the load (e.g., 100W lamp) and simultaneously start the stopwatch.</li>
+        <li>Count the number of disc revolutions (N) using the red mark on the disc for a fixed time t (e.g., 5 minutes).</li>
+        <li>Record the wattmeter reading (P<sub>true</sub>) in watts.</li>
+        <li>After time t, note the final energy meter reading (R<sub>2</sub>) in kWh.</li>
+        <li>Calculate the measured power from disc revolutions: P<sub>meas</sub> = (N × 3600) / (K × t) kW.</li>
+        <li>Compare P<sub>meas</sub> with P<sub>true</sub> and compute % error.</li>
+        <li>Repeat with different loads (fan, two lamps) and record observations.</li>
+      </ol>
+      <h3>Observations Table:</h3>
+      <table class="w-full border-collapse my-4 text-sm">
+        <thead><tr>
+          <th class="border border-neutral-700 px-3 py-2">Load</th>
+          <th class="border border-neutral-700 px-3 py-2">V (V)</th>
+          <th class="border border-neutral-700 px-3 py-2">I (A)</th>
+          <th class="border border-neutral-700 px-3 py-2">P<sub>true</sub> (W)</th>
+          <th class="border border-neutral-700 px-3 py-2">Revolutions (N)</th>
+          <th class="border border-neutral-700 px-3 py-2">Time t (s)</th>
+          <th class="border border-neutral-700 px-3 py-2">P<sub>meas</sub> (W)</th>
+          <th class="border border-neutral-700 px-3 py-2">% Error</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-3 py-1">100W Lamp</td><td class="border border-neutral-700 px-3 py-1">230</td><td class="border border-neutral-700 px-3 py-1">0.43</td><td class="border border-neutral-700 px-3 py-1">100</td><td class="border border-neutral-700 px-3 py-1">—</td><td class="border border-neutral-700 px-3 py-1">300</td><td class="border border-neutral-700 px-3 py-1">—</td><td class="border border-neutral-700 px-3 py-1">—</td></tr>
+          <tr><td class="border border-neutral-700 px-3 py-1">Fan (Inductive)</td><td class="border border-neutral-700 px-3 py-1">230</td><td class="border border-neutral-700 px-3 py-1">—</td><td class="border border-neutral-700 px-3 py-1">—</td><td class="border border-neutral-700 px-3 py-1">—</td><td class="border border-neutral-700 px-3 py-1">300</td><td class="border border-neutral-700 px-3 py-1">—</td><td class="border border-neutral-700 px-3 py-1">—</td></tr>
+        </tbody>
+      </table>
+    `,
+    references: `
+      <h3>References:</h3>
+      <ol class="list-decimal pl-6 mb-4">
+        <li>Golding, E. W., &amp; Widdis, F. C. (1963). Electrical Measurements and Measuring Instruments (5th ed.). Pitman.</li>
+        <li>Gupta, J. B. (2012). A Course in Electrical and Electronic Measurements and Instrumentation. S. K. Kataria.</li>
+        <li>Sawhney, A. K. (2015). A Course in Electrical Machine Design. Dhanpat Rai.</li>
+        <li>IS 722 (2008). Specification for AC Electricity Meters. Bureau of Indian Standards.</li>
+      </ol>
+    `,
+    image: "/placeholder.svg?height=400&width=600",
+    embedId: "",
+  },
+  // ── Unit 5: Electric Wiring & Safety ──
+  // ── Experiment 10: House Wiring ──
+  {
+    id: 10,
+    title: "House Wiring",
+    aim: "To implement residential house wiring with energy meter, MCB, switches, lamp, and fan, and to read the energy meter in kWh.",
+    apparatus: `
+      <h3>Apparatus Required:</h3>
+      <table class="w-full border-collapse my-4">
+        <thead><tr>
+          <th class="border border-neutral-700 px-4 py-2">Sl.No.</th>
+          <th class="border border-neutral-700 px-4 py-2">Component</th>
+          <th class="border border-neutral-700 px-4 py-2">Specification</th>
+          <th class="border border-neutral-700 px-4 py-2">Quantity</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-4 py-2">1</td><td class="border border-neutral-700 px-4 py-2">Single-Phase Energy Meter</td><td class="border border-neutral-700 px-4 py-2">230V, 50Hz, 5A</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">2</td><td class="border border-neutral-700 px-4 py-2">MCB (Miniature Circuit Breaker)</td><td class="border border-neutral-700 px-4 py-2">230V, 6A</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">3</td><td class="border border-neutral-700 px-4 py-2">One-Way Switch</td><td class="border border-neutral-700 px-4 py-2">230V, 5A</td><td class="border border-neutral-700 px-4 py-2">3</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">4</td><td class="border border-neutral-700 px-4 py-2">Incandescent Lamp with Holder</td><td class="border border-neutral-700 px-4 py-2">60W, 230V</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">5</td><td class="border border-neutral-700 px-4 py-2">Ceiling Fan with Regulator</td><td class="border border-neutral-700 px-4 py-2">230V, 50Hz</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">6</td><td class="border border-neutral-700 px-4 py-2">3-Pin Socket with Plug</td><td class="border border-neutral-700 px-4 py-2">230V, 5A</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">7</td><td class="border border-neutral-700 px-4 py-2">Phase / Neutral / Earth Wires</td><td class="border border-neutral-700 px-4 py-2">1.5 mm² PVC (Red/Black/Green)</td><td class="border border-neutral-700 px-4 py-2">As required</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">8</td><td class="border border-neutral-700 px-4 py-2">Wireman's Tool Kit</td><td class="border border-neutral-700 px-4 py-2">—</td><td class="border border-neutral-700 px-4 py-2">1 set</td></tr>
+        </tbody>
+      </table>
+    `,
+    theory: `
+      <h3>Theory — Residential House Wiring:</h3>
+      <p class="mb-4">House wiring is the distribution of electrical energy from the utility supply point to various loads (lights, fans, sockets) within a building. Standard Indian supply is 230V AC, 50Hz, single-phase.</p>
+      <h4 class="font-semibold mt-4 mb-2">Key Components:</h4>
+      <ul class="list-disc pl-6 mb-4 space-y-2">
+        <li><b>Energy Meter:</b> Measures the total energy consumed in kWh. It is the first component after the utility supply and records consumption for billing.</li>
+        <li><b>MCB (Miniature Circuit Breaker):</b> Replaces the traditional fuse box. Provides overcurrent and short-circuit protection. Can be reset manually after tripping.</li>
+        <li><b>One-Way Switch:</b> Controls a single load from one location. Has two terminals — LINE IN and LINE OUT.</li>
+        <li><b>Lamp / Light:</b> Converts electrical energy to light. Connected in phase line through the switch.</li>
+        <li><b>Fan Regulator:</b> A variable resistor (older type) or TRIAC-based (modern) device to control fan speed.</li>
+        <li><b>3-Pin Socket:</b> Provides Phase (L), Neutral (N), and Earth (E) for portable appliances.</li>
+      </ul>
+      <h4 class="font-semibold mt-4 mb-2">Wiring Rules:</h4>
+      <ul class="list-disc pl-6 mb-4 space-y-1">
+        <li>Phase (Red wire) is always switched — switches must be on the Phase line, NEVER on Neutral.</li>
+        <li>Neutral (Black wire) runs directly to all loads.</li>
+        <li>Earth (Green/Yellow wire) is connected to the metallic body of all appliances and sockets for safety.</li>
+        <li>All joints must be done in junction boxes, not in open air.</li>
+      </ul>
+    `,
+    procedure: `
+      <h3>Procedure:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>Note the initial reading on the energy meter (R<sub>1</sub>).</li>
+        <li>Connect the circuit as per the wiring diagram: Supply → Energy Meter → MCB → Distribution Board.</li>
+        <li>From the distribution board, wire Switch-1 to control the lamp; Switch-2 to control the fan (with regulator); Socket outlet with earth.</li>
+        <li>Verify all connections: Phase through switch to load; Neutral directly to load; Earth bonded to socket and appliance bodies.</li>
+        <li>Switch ON the MCB. Switch ON loads one by one and verify operation.</li>
+        <li>Run all loads for a fixed time (e.g., 30 minutes). Note the final reading (R<sub>2</sub>).</li>
+        <li>Calculate energy consumed: E = R<sub>2</sub> − R<sub>1</sub> kWh.</li>
+        <li>Adjust fan speed using regulator and note the change in fan operation.</li>
+      </ol>
+      <h3>Observations Table:</h3>
+      <table class="w-full border-collapse my-4 text-sm">
+        <thead><tr>
+          <th class="border border-neutral-700 px-3 py-2">Load Status</th>
+          <th class="border border-neutral-700 px-3 py-2">Energy Meter Reading (kWh)</th>
+          <th class="border border-neutral-700 px-3 py-2">Time (min)</th>
+          <th class="border border-neutral-700 px-3 py-2">Energy Consumed (kWh)</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-3 py-1">Lamp ON only</td><td class="border border-neutral-700 px-3 py-1">—</td><td class="border border-neutral-700 px-3 py-1">30</td><td class="border border-neutral-700 px-3 py-1">—</td></tr>
+          <tr><td class="border border-neutral-700 px-3 py-1">Fan ON only</td><td class="border border-neutral-700 px-3 py-1">—</td><td class="border border-neutral-700 px-3 py-1">30</td><td class="border border-neutral-700 px-3 py-1">—</td></tr>
+          <tr><td class="border border-neutral-700 px-3 py-1">Lamp + Fan ON</td><td class="border border-neutral-700 px-3 py-1">—</td><td class="border border-neutral-700 px-3 py-1">30</td><td class="border border-neutral-700 px-3 py-1">—</td></tr>
+        </tbody>
+      </table>
+    `,
+    references: `
+      <h3>References:</h3>
+      <ol class="list-decimal pl-6 mb-4">
+        <li>Mullin, R. (2017). Electrical Wiring Residential (19th ed.). Cengage Learning.</li>
+        <li>National Electrical Code (NEC) 2020. National Fire Protection Association.</li>
+        <li>Bureau of Indian Standards, IS 732 — Code of Practice for Electrical Wiring Installations.</li>
+        <li>Nagrath, I. J., &amp; Kothari, D. P. (2010). Basic Electrical Engineering (3rd ed.). Tata McGraw-Hill.</li>
+      </ol>
+    `,
+    image: "/placeholder.svg?height=400&width=600",
+    embedId: "2rTQ63Z8SdD",
+  },
+  // ── Experiment 11: Fluorescent Lamp Wiring ──
+  {
+    id: 11,
+    title: "Fluorescent Lamp Wiring",
+    aim: "To connect a 40W fluorescent lamp with choke and starter and verify the role of each component in the starting and operation of the lamp.",
+    apparatus: `
+      <h3>Apparatus Required:</h3>
+      <table class="w-full border-collapse my-4">
+        <thead><tr>
+          <th class="border border-neutral-700 px-4 py-2">Sl.No.</th>
+          <th class="border border-neutral-700 px-4 py-2">Component</th>
+          <th class="border border-neutral-700 px-4 py-2">Specification</th>
+          <th class="border border-neutral-700 px-4 py-2">Quantity</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-4 py-2">1</td><td class="border border-neutral-700 px-4 py-2">Fluorescent Lamp (Tube Light)</td><td class="border border-neutral-700 px-4 py-2">40W, 230V, 4 ft</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">2</td><td class="border border-neutral-700 px-4 py-2">Choke (Ballast / Inductor)</td><td class="border border-neutral-700 px-4 py-2">40W, 230V, 50Hz</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">3</td><td class="border border-neutral-700 px-4 py-2">Starter</td><td class="border border-neutral-700 px-4 py-2">FS-2 type</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">4</td><td class="border border-neutral-700 px-4 py-2">Tube Light Holder/Fixture</td><td class="border border-neutral-700 px-4 py-2">4 ft</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">5</td><td class="border border-neutral-700 px-4 py-2">One-Way Switch</td><td class="border border-neutral-700 px-4 py-2">230V, 5A</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">6</td><td class="border border-neutral-700 px-4 py-2">Connecting Wires &amp; Tool Kit</td><td class="border border-neutral-700 px-4 py-2">—</td><td class="border border-neutral-700 px-4 py-2">Required</td></tr>
+        </tbody>
+      </table>
+    `,
+    theory: `
+      <h3>Theory — Fluorescent Lamp:</h3>
+      <p class="mb-4">A fluorescent lamp is a low-pressure mercury-vapour gas-discharge lamp that uses fluorescence to produce visible light. It is filled with mercury vapour and an inert gas (argon) at low pressure (~2.5 mmHg). The inner surface is coated with a phosphor powder that emits visible light when struck by UV radiation from the mercury arc.</p>
+      <h4 class="font-semibold mt-4 mb-2">Components and Their Roles:</h4>
+      <ul class="list-disc pl-6 mb-4 space-y-3">
+        <li>
+          <b>Fluorescent Tube:</b> Contains mercury vapour and argon gas. When the arc strikes, mercury emits UV radiation (253.7 nm) which excites the phosphor coating, producing white/warm/cool visible light.
+        </li>
+        <li>
+          <b>Choke (Ballast / Inductor):</b> A series inductor with an iron core. It serves two critical functions:
+          <ul class="list-circle pl-4 mt-1 space-y-1">
+            <li><i>Starting:</i> When the starter opens the circuit, the collapsing magnetic field in the choke induces a high EMF (≈1000V) that strikes the arc in the tube.</li>
+            <li><i>Running:</i> Acts as a current limiter (ballast), dropping voltage across itself to maintain the tube at its rated operating voltage (~110V).</li>
+          </ul>
+        </li>
+        <li>
+          <b>Starter:</b> A glow switch (bimetallic strip in argon-filled glass bulb) connected in parallel with the tube. When power is switched ON:
+          <ol class="list-decimal pl-4 mt-1 space-y-1">
+            <li>Full voltage appears across starter → glow discharge heats the bimetallic strip → contacts CLOSE.</li>
+            <li>Current flows through choke and tube filaments → preheats the filaments (electron emission).</li>
+            <li>Starter cools → bimetallic strip opens → sudden interruption → choke induces high kick voltage → arc strikes in tube.</li>
+            <li>Once tube lights, voltage across it (~110V) is too low to reignite the starter → starter remains open.</li>
+          </ol>
+        </li>
+      </ul>
+      <h4 class="font-semibold mt-4 mb-2">Power Factor:</h4>
+      <p class="mb-4">The choke (inductive) lowers the power factor of the circuit. A capacitor (5–10 μF) is often connected in parallel with the supply to improve the power factor to ~0.85 lagging.</p>
+    `,
+    procedure: `
+      <h3>Procedure:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>Identify all components: tube, choke, starter, switch.</li>
+        <li>Connect the switch to the Phase line (incoming supply).</li>
+        <li>Connect the choke in series with the tube (Phase → Switch → Choke → one filament of tube).</li>
+        <li>Connect the starter in parallel with the tube (across the two tube terminals).</li>
+        <li>Connect the Neutral directly to the other filament of the tube.</li>
+        <li>Double-check all connections before applying power.</li>
+        <li>Switch ON the supply. Observe the tube flickering briefly (~1–3 flickers) and then lighting steadily.</li>
+        <li>Switch OFF and switch ON again to re-observe the starting sequence.</li>
+        <li>Try removing the starter while the tube is running — observe that the tube continues to glow (no starter needed during steady operation).</li>
+      </ol>
+      <h3>Result:</h3>
+      <p class="text-neutral-300">The fluorescent lamp was successfully wired and operated. The starting sequence (starter closes → filaments preheat → starter opens → choke kick → arc strikes) was verified.</p>
+    `,
+    references: `
+      <h3>References:</h3>
+      <ol class="list-decimal pl-6 mb-4">
+        <li>DiLouie, C. (2016). Lighting Controls Handbook. Fairmont Press.</li>
+        <li>National Electrical Code (NEC) 2020. National Fire Protection Association.</li>
+        <li>Bureau of Indian Standards, IS 418 — Tungsten Filament Lamps / Fluorescent Lamps.</li>
+        <li>Nagrath, I. J., &amp; Kothari, D. P. (2010). Basic Electrical Engineering (3rd ed.). Tata McGraw-Hill.</li>
+      </ol>
+    `,
+    image: "/placeholder.svg?height=400&width=600",
+    embedId: "hnFoQc772H0",
+  },
+  // ── Experiment 12: Staircase Wiring ──
+  {
+    id: 12,
+    title: "Staircase Wiring",
+    aim: "To control a single lamp from two different locations using two-way (SPDT) switches and understand the staircase wiring principle.",
+    apparatus: `
+      <h3>Apparatus Required:</h3>
+      <table class="w-full border-collapse my-4">
+        <thead><tr>
+          <th class="border border-neutral-700 px-4 py-2">Sl.No.</th>
+          <th class="border border-neutral-700 px-4 py-2">Component</th>
+          <th class="border border-neutral-700 px-4 py-2">Specification</th>
+          <th class="border border-neutral-700 px-4 py-2">Quantity</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-4 py-2">1</td><td class="border border-neutral-700 px-4 py-2">Two-Way (SPDT) Switch</td><td class="border border-neutral-700 px-4 py-2">230V, 5A</td><td class="border border-neutral-700 px-4 py-2">2</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">2</td><td class="border border-neutral-700 px-4 py-2">Incandescent Lamp with Holder</td><td class="border border-neutral-700 px-4 py-2">60W, 230V</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">3</td><td class="border border-neutral-700 px-4 py-2">Connecting Wires</td><td class="border border-neutral-700 px-4 py-2">1 mm² PVC</td><td class="border border-neutral-700 px-4 py-2">As required</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">4</td><td class="border border-neutral-700 px-4 py-2">AC Supply</td><td class="border border-neutral-700 px-4 py-2">230V, 50Hz</td><td class="border border-neutral-700 px-4 py-2">1</td></tr>
+          <tr><td class="border border-neutral-700 px-4 py-2">5</td><td class="border border-neutral-700 px-4 py-2">Wireman's Tool Kit</td><td class="border border-neutral-700 px-4 py-2">—</td><td class="border border-neutral-700 px-4 py-2">1 set</td></tr>
+        </tbody>
+      </table>
+    `,
+    theory: `
+      <h3>Theory — Staircase Wiring (Two-Way Switch Control):</h3>
+      <p class="mb-4">Staircase wiring allows a single lamp to be switched ON or OFF from either of two locations. This is essential for staircases, long corridors, and bedrooms — where you need to control a light from both ends.</p>
+      <h4 class="font-semibold mt-4 mb-2">Two-Way Switch (SPDT):</h4>
+      <p class="mb-3">A two-way (SPDT — Single Pole Double Throw) switch has three terminals: one Common (C) and two travellers (L1 and L2). The common is always connected, and it toggles between L1 and L2.</p>
+      <h4 class="font-semibold mt-4 mb-2">Circuit Principle:</h4>
+      <p class="mb-3">Phase → Switch S1 (Common) → either L1 or L2 traveller wires → Switch S2 (L1 or L2) → Common of S2 → Lamp → Neutral.</p>
+      <p class="mb-3">The lamp glows when the two switches create a complete path (both on L1, or both on L2). The lamp is off when the switches are on opposite travellers (S1 on L1, S2 on L2, or vice versa).</p>
+      <h4 class="font-semibold mt-4 mb-2">Truth Table:</h4>
+      <table class="w-full border-collapse my-4 text-sm">
+        <thead><tr>
+          <th class="border border-neutral-700 px-3 py-2">S1 Position</th>
+          <th class="border border-neutral-700 px-3 py-2">S2 Position</th>
+          <th class="border border-neutral-700 px-3 py-2">Lamp State</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-3 py-1 text-center">L1</td><td class="border border-neutral-700 px-3 py-1 text-center">L1</td><td class="border border-neutral-700 px-3 py-1 text-center text-green-400">ON ✓</td></tr>
+          <tr><td class="border border-neutral-700 px-3 py-1 text-center">L1</td><td class="border border-neutral-700 px-3 py-1 text-center">L2</td><td class="border border-neutral-700 px-3 py-1 text-center text-red-400">OFF ✗</td></tr>
+          <tr><td class="border border-neutral-700 px-3 py-1 text-center">L2</td><td class="border border-neutral-700 px-3 py-1 text-center">L1</td><td class="border border-neutral-700 px-3 py-1 text-center text-red-400">OFF ✗</td></tr>
+          <tr><td class="border border-neutral-700 px-3 py-1 text-center">L2</td><td class="border border-neutral-700 px-3 py-1 text-center">L2</td><td class="border border-neutral-700 px-3 py-1 text-center text-green-400">ON ✓</td></tr>
+        </tbody>
+      </table>
+      <p class="mb-3 text-neutral-300 text-sm">This is equivalent to an XNOR logic gate: lamp = NOT (S1 XOR S2).</p>
+    `,
+    procedure: `
+      <h3>Procedure:</h3>
+      <ol class="list-decimal pl-6 mb-4 space-y-2">
+        <li>Identify the three terminals on each SPDT switch: C (common), L1, L2.</li>
+        <li>Connect Phase to the Common (C) of Switch S1.</li>
+        <li>Connect the two traveller wires: S1 L1 → S2 L1, and S1 L2 → S2 L2.</li>
+        <li>Connect the Common (C) of Switch S2 to one terminal of the lamp.</li>
+        <li>Connect the other terminal of the lamp to the Neutral supply.</li>
+        <li>Check all connections and switch ON the supply.</li>
+        <li>Toggle S1 and S2 in all four combinations and record lamp state.</li>
+        <li>Verify the truth table matches the theoretical predictions.</li>
+      </ol>
+      <h3>Verification of Truth Table:</h3>
+      <table class="w-full border-collapse my-4 text-sm">
+        <thead><tr>
+          <th class="border border-neutral-700 px-3 py-2">S1 Position</th>
+          <th class="border border-neutral-700 px-3 py-2">S2 Position</th>
+          <th class="border border-neutral-700 px-3 py-2">Expected</th>
+          <th class="border border-neutral-700 px-3 py-2">Observed</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="border border-neutral-700 px-3 py-1 text-center">L1</td><td class="border border-neutral-700 px-3 py-1 text-center">L1</td><td class="border border-neutral-700 px-3 py-1 text-center">ON</td><td class="border border-neutral-700 px-3 py-1 text-center">—</td></tr>
+          <tr><td class="border border-neutral-700 px-3 py-1 text-center">L1</td><td class="border border-neutral-700 px-3 py-1 text-center">L2</td><td class="border border-neutral-700 px-3 py-1 text-center">OFF</td><td class="border border-neutral-700 px-3 py-1 text-center">—</td></tr>
+          <tr><td class="border border-neutral-700 px-3 py-1 text-center">L2</td><td class="border border-neutral-700 px-3 py-1 text-center">L1</td><td class="border border-neutral-700 px-3 py-1 text-center">OFF</td><td class="border border-neutral-700 px-3 py-1 text-center">—</td></tr>
+          <tr><td class="border border-neutral-700 px-3 py-1 text-center">L2</td><td class="border border-neutral-700 px-3 py-1 text-center">L2</td><td class="border border-neutral-700 px-3 py-1 text-center">ON</td><td class="border border-neutral-700 px-3 py-1 text-center">—</td></tr>
+        </tbody>
+      </table>
+    `,
+    references: `
+      <h3>References:</h3>
+      <ol class="list-decimal pl-6 mb-4">
+        <li>Mullin, R. (2017). Electrical Wiring Residential (19th ed.). Cengage Learning.</li>
+        <li>Bureau of Indian Standards, IS 732 — Code of Practice for Electrical Wiring Installations.</li>
+        <li>National Electrical Code (NEC) 2020. National Fire Protection Association.</li>
+        <li>Nagrath, I. J., &amp; Kothari, D. P. (2010). Basic Electrical Engineering (3rd ed.). Tata McGraw-Hill.</li>
+      </ol>
+    `,
+    image: "/placeholder.svg?height=400&width=600",
+    embedId: "94YWeHFB9oN",
+  },
 ]
 
 export default function ExperimentPage() {
@@ -923,9 +1196,11 @@ export default function ExperimentPage() {
                     {experiment.id}
                   </div>
                   <div className="px-2 py-1 rounded-md bg-blue-900/20 text-blue-400 text-xs font-medium">
-                    {experiment.id <= 2 ? "Circuit Analysis" : 
-                     experiment.id <= 5 ? "Electrical Installation" : 
-                     "Electronics"}
+                    {experiment.id <= 2 ? "Circuit Analysis" :
+                     experiment.id <= 6 ? "Analog / Digital Electronics" :
+                     experiment.id <= 8 ? "Digital Electronics" :
+                     experiment.id === 9 ? "Electrical Instruments" :
+                     "Electrical Wiring"}
                   </div>
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-white break-words">{experiment.title}</h1>
@@ -936,10 +1211,14 @@ export default function ExperimentPage() {
                 <div className="flex flex-col items-center justify-center h-16 w-16 rounded-lg bg-neutral-900 border border-neutral-800">
                   {experiment.id <= 2 ? (
                     <Zap className="h-6 w-6 text-yellow-400 mb-1" />
-                  ) : experiment.id <= 5 ? (
-                    <Lightbulb className="h-6 w-6 text-yellow-400 mb-1" />
+                  ) : experiment.id <= 6 ? (
+                    <Activity className="h-6 w-6 text-cyan-400 mb-1" />
+                  ) : experiment.id <= 8 ? (
+                    <Cpu className="h-6 w-6 text-green-400 mb-1" />
+                  ) : experiment.id === 9 ? (
+                    <Zap className="h-6 w-6 text-orange-400 mb-1" />
                   ) : (
-                    <Cpu className="h-6 w-6 text-blue-400 mb-1" />
+                    <Lightbulb className="h-6 w-6 text-yellow-400 mb-1" />
                   )}
                   <span className="text-xs text-neutral-400">EXP-{experiment.id}</span>
                 </div>
@@ -1063,19 +1342,16 @@ export default function ExperimentPage() {
               >
                 {experiment.id === 1 && <KVLExperiment />}
                 {experiment.id === 2 && <TheveninExperiment />}
-                {experiment.id === 3 && <HouseWiringExperiment />}
-                {experiment.id === 4 && <FluorescentLampExperiment />}
-                {experiment.id === 5 && <StaircaseWiringExperiment />}
-                {experiment.id === 6 && <FullWaveRectifierExperiment />}
-                {experiment.id > 6 && (
-                  <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-6 text-neutral-300">
-                    <h3 className="text-xl font-bold text-white mb-4">Interactive Demonstration</h3>
-                    <p>Interactive demonstration for this experiment is coming soon!</p>
-                    <div className="mt-8 p-6 bg-neutral-800 rounded-lg flex items-center justify-center">
-                      <CircuitAnimation />
-                    </div>
-                  </div>
-                )}
+                {experiment.id === 3 && <PNJunctionExperiment />}
+                {experiment.id === 4 && <FullWaveRectifierExperiment />}
+                {experiment.id === 5 && <ClipperExperiment />}
+                {experiment.id === 6 && <OpAmpExperiment />}
+                {experiment.id === 7 && <LogicGatesVirtualLab />}
+                {experiment.id === 8 && <AdderVirtualLab />}
+                {experiment.id === 9 && <EnergyMeterExperiment />}
+                {experiment.id === 10 && <HouseWiringExperiment />}
+                {experiment.id === 11 && <FluorescentLampExperiment />}
+                {experiment.id === 12 && <StaircaseWiringExperiment />}
               </motion.div>
             </TabsContent>
 
@@ -1125,22 +1401,16 @@ export default function ExperimentPage() {
               >
                 {experiment.id === 1 && <KVLQuiz />}
                 {experiment.id === 2 && <TheveninQuiz />}
-                {experiment.id === 3 && <HouseWiringQuiz />}
-                {experiment.id === 4 && <FluorescentLampQuiz />}
-                {experiment.id === 5 && <StaircaseWiringQuiz />}
-                {experiment.id === 6 && <FullWaveRectifierQuiz />}
-                {experiment.id > 6 && (
-                  <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-6 text-neutral-300">
-                    <h3 className="text-xl font-bold text-white mb-4">Knowledge Check</h3>
-                    <p>Quiz for this experiment is coming soon!</p>
-                    <div className="mt-8 p-6 bg-neutral-800 rounded-lg flex items-center justify-center h-64">
-                      <div className="text-center">
-                        <FileQuestion className="h-16 w-16 text-yellow-500/50 mx-auto mb-4" />
-                        <p className="text-neutral-400">Check back later for a quiz on this topic</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {experiment.id === 3 && <PNJunctionQuiz />}
+                {experiment.id === 4 && <FullWaveRectifierQuiz />}
+                {experiment.id === 5 && <ClipperQuiz />}
+                {experiment.id === 6 && <OpAmpQuiz />}
+                {experiment.id === 7 && <LogicGatesQuiz />}
+                {experiment.id === 8 && <AdderQuiz />}
+                {experiment.id === 9 && <EnergyMeterQuiz />}
+                {experiment.id === 10 && <HouseWiringQuiz />}
+                {experiment.id === 11 && <FluorescentLampQuiz />}
+                {experiment.id === 12 && <StaircaseWiringQuiz />}
               </motion.div>
             </TabsContent>
 
@@ -1160,10 +1430,16 @@ export default function ExperimentPage() {
                     const videoMap: Record<number, { src: string; title: string }> = {
                       1: { src: "https://www.youtube.com/embed/jdgr56G6bIs", title: "Kirchhoff's Voltage Law - Verified" },
                       2: { src: "https://www.youtube.com/embed/QJQS_5wYDGw", title: "Thevenin's Theorem Explained" },
-                      3: { src: "https://www.youtube.com/embed/3RL0dDghkYw", title: "House Wiring Demonstration" },
-                      4: { src: "https://www.youtube.com/embed/nkxgGg3PCGE", title: "Fluorescent Lamp Working" },
-                      5: { src: "https://www.youtube.com/embed/0MqYkiKFxJA", title: "Staircase Wiring Explained" },
-                      6: { src: "https://www.youtube.com/embed/sI_7GkbcKBo", title: "Full Wave Bridge Rectifier" },
+                      3: { src: "https://www.youtube.com/embed/3RL0dDghkYw", title: "PN Junction Diode Characteristics" },
+                      4: { src: "https://www.youtube.com/embed/sI_7GkbcKBo", title: "Full Wave Bridge Rectifier" },
+                      5: { src: "https://www.youtube.com/embed/nkxgGg3PCGE", title: "Clipper Circuits Explained" },
+                      6: { src: "https://www.youtube.com/embed/kqeqTJnEp1g", title: "Op-Amp Inverting & Non-Inverting Amplifier" },
+                      7: { src: "https://www.youtube.com/embed/9EL2XTCFqaE", title: "Basic Logic Gates" },
+                      8: { src: "https://www.youtube.com/embed/W7B0DIsBz_g", title: "Half Adder and Full Adder" },
+                      9: { src: "https://www.youtube.com/embed/V4P9tHM5XJ4", title: "Energy Meter Working Principle" },
+                      10: { src: "https://www.youtube.com/embed/3RL0dDghkYw", title: "House Wiring Demonstration" },
+                      11: { src: "https://www.youtube.com/embed/nkxgGg3PCGE", title: "Fluorescent Lamp Working" },
+                      12: { src: "https://www.youtube.com/embed/0MqYkiKFxJA", title: "Staircase Wiring Explained" },
                     }
                     const video = videoMap[experiment.id]
                     if (video) {
@@ -1190,14 +1466,6 @@ export default function ExperimentPage() {
                     )
                   })()}
                   
-                  {experiment.id > 6 && (
-                    <div className="mt-8 p-6 bg-neutral-800 rounded-lg flex items-center justify-center h-64">
-                      <div className="text-center">
-                        <Video className="h-16 w-16 text-red-500/50 mx-auto mb-4" />
-                        <p className="text-neutral-400">Video demonstration coming soon</p>
-                      </div>
-                    </div>
-                  )}
                   
                   <div className="mt-6 p-4 bg-neutral-800 rounded-lg">
                     <h4 className="text-white font-semibold mb-2">Video Notes:</h4>
@@ -1613,14 +1881,6 @@ export default function ExperimentPage() {
                     </div>
                   )}
                   
-                  {experiment.id > 6 && (
-                    <div className="mt-8 p-6 bg-neutral-800 rounded-lg flex items-center justify-center h-64">
-                      <div className="text-center">
-                        <ImageIcon className="h-16 w-16 text-indigo-500/50 mx-auto mb-4" />
-                        <p className="text-neutral-400">Equipment gallery coming soon</p>
-                      </div>
-                    </div>
-                  )}
                   
                   <div className="mt-6 p-4 bg-neutral-800 rounded-lg">
                     <h4 className="text-white font-semibold mb-2">Equipment Notes:</h4>

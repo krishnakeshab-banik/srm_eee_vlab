@@ -643,5 +643,291 @@ export const FullWaveRectifierQuiz = () => {
     }
   ]
 
-  return <ExperimentQuiz experimentId={6} title="Full Wave Rectifier" questions={questions} />
+  return <ExperimentQuiz experimentId={4} title="Full Wave Rectifier" questions={questions} />
+}
+
+export const PNJunctionQuiz = () => {
+  const questions: QuizQuestion[] = [
+    {
+      id: 1,
+      question: "What is the approximate threshold voltage (forward voltage) of a Silicon PN junction diode?",
+      options: ["0.3 V", "0.7 V", "1.2 V", "2.5 V"],
+      correctAnswer: 1,
+      explanation: "Silicon diodes have a threshold (knee) voltage of approximately 0.7V. Below this voltage, very little current flows. Germanium diodes have a lower threshold of about 0.3V.",
+    },
+    {
+      id: 2,
+      question: "In reverse bias, the depletion region of a PN junction diode:",
+      options: ["Narrows completely", "Remains unchanged", "Widens, increasing resistance", "Disappears"],
+      correctAnswer: 2,
+      explanation: "In reverse bias, the applied voltage aids the built-in potential. This causes the depletion region to widen, increasing the junction resistance and blocking current flow (except for tiny leakage current).",
+    },
+    {
+      id: 3,
+      question: "The Shockley diode equation is I = I₀(e^(V/ηVT) − 1). What does I₀ represent?",
+      options: ["Peak forward current", "Reverse saturation current", "Breakdown current", "Threshold current"],
+      correctAnswer: 1,
+      explanation: "I₀ is the reverse saturation current — the tiny current that flows due to minority carriers in reverse bias. It is typically in the nanoampere (nA) range for silicon diodes.",
+    },
+    {
+      id: 4,
+      question: "Dynamic resistance (r_d) of a diode is given by:",
+      options: ["r_d = V/I", "r_d = ηVT/I", "r_d = I/V", "r_d = VCC/I"],
+      correctAnswer: 1,
+      explanation: "Dynamic (AC) resistance of a diode is r_d = ηVT/I, where η is the ideality factor (~1 for Ge, ~2 for Si), VT is thermal voltage (26 mV at room temperature), and I is the DC bias current.",
+    },
+    {
+      id: 5,
+      question: "Which of the following is a practical application of the reverse breakdown region of a diode?",
+      options: ["Rectification", "Voltage regulation (Zener diode)", "Signal amplification", "Modulation"],
+      correctAnswer: 1,
+      explanation: "Zener diodes are specially designed PN junction diodes that operate in the controlled breakdown region to provide a stable reference voltage — used widely in voltage regulation circuits.",
+    },
+  ]
+  return <ExperimentQuiz experimentId={3} title="PN Junction Diode Characteristics" questions={questions} />
+}
+
+export const ClipperQuiz = () => {
+  const questions: QuizQuestion[] = [
+    {
+      id: 1,
+      question: "A positive series clipper circuit:",
+      options: [
+        "Clips the negative half of the input",
+        "Clips the positive half of the input",
+        "Amplifies the positive half",
+        "Has no effect on the waveform",
+      ],
+      correctAnswer: 1,
+      explanation: "In a positive series clipper, the diode is in series with the load and conducts only during the negative half. During the positive half, the diode is reverse biased and blocks current, clipping the positive half.",
+    },
+    {
+      id: 2,
+      question: "In a positive parallel (shunt) clipper, the output during the positive half-cycle is approximately:",
+      options: ["0 V", "+0.7 V", "Equal to input", "Doubled"],
+      correctAnswer: 1,
+      explanation: "During the positive half-cycle, the diode in a positive parallel clipper conducts and creates a low-resistance path, clamping the output to the diode forward voltage drop (~0.7V for silicon).",
+    },
+    {
+      id: 3,
+      question: "What shifts the clipping level in a biased clipper circuit?",
+      options: ["Adding a capacitor", "Adding a reference voltage V_R in series with the diode", "Using a Zener diode", "Increasing the load resistance"],
+      correctAnswer: 1,
+      explanation: "In a biased clipper, a DC reference voltage V_R is added in series with the diode. This shifts the clipping level from 0V (or 0.7V) to V_R (or V_R + 0.7V), allowing the clipping level to be set to any desired value.",
+    },
+    {
+      id: 4,
+      question: "Which instrument is used to observe the clipped waveform in a clipper circuit experiment?",
+      options: ["Ammeter", "Voltmeter", "CRO (Cathode Ray Oscilloscope)", "Wattmeter"],
+      correctAnswer: 2,
+      explanation: "A CRO (Cathode Ray Oscilloscope) is used to observe the input and output waveforms of a clipper circuit, allowing direct visual comparison of the waveform before and after clipping.",
+    },
+    {
+      id: 5,
+      question: "A double clipper circuit uses two diodes. What does it do to the waveform?",
+      options: [
+        "Clips only the positive half",
+        "Clips only the negative half",
+        "Clips both positive and negative peaks — limits output to a window",
+        "Inverts the entire waveform",
+      ],
+      correctAnswer: 2,
+      explanation: "A double clipper uses two oppositely biased diodes (one positive, one negative clipper). This limits the output voltage to a defined window [−V_R2, +V_R1], clipping both positive and negative peaks.",
+    },
+  ]
+  return <ExperimentQuiz experimentId={5} title="Clipper Circuit" questions={questions} />
+}
+
+export const OpAmpQuiz = () => {
+  const questions: QuizQuestion[] = [
+    {
+      id: 1,
+      question: "The voltage gain of an inverting amplifier with R₁ = 10kΩ and Rf = 47kΩ is:",
+      options: ["+4.7", "−4.7", "+5.7", "−10"],
+      correctAnswer: 1,
+      explanation: "For an inverting amplifier, Av = −Rf/R₁ = −47kΩ/10kΩ = −4.7. The negative sign indicates the output is inverted (180° phase shift) relative to the input.",
+    },
+    {
+      id: 2,
+      question: "The voltage gain of a non-inverting amplifier with R₁ = 10kΩ and Rf = 22kΩ is:",
+      options: ["2.2", "3.2", "−3.2", "1.0"],
+      correctAnswer: 1,
+      explanation: "For a non-inverting amplifier, Av = 1 + Rf/R₁ = 1 + 22/10 = 3.2. The gain is always greater than or equal to 1, and the output is in phase with the input.",
+    },
+    {
+      id: 3,
+      question: "The 'virtual ground' concept in an inverting Op-Amp means:",
+      options: [
+        "The inverting terminal is physically grounded",
+        "Due to high open-loop gain, both input terminals are at approximately the same potential",
+        "The output is always zero",
+        "The power supply is grounded",
+      ],
+      correctAnswer: 1,
+      explanation: "Due to the extremely high open-loop gain and negative feedback, the voltage at the inverting terminal is forced to approximately equal the non-inverting terminal. In an inverting amplifier (non-inverting = GND), the inverting input is a 'virtual ground' (≈0V) even though it is not physically grounded.",
+    },
+    {
+      id: 4,
+      question: "What happens to the Op-Amp output if it tries to exceed the supply voltage (±VCC)?",
+      options: [
+        "Output becomes zero",
+        "Output clips (saturates) at ±(VCC − 1.5V) approximately",
+        "Op-Amp gets damaged",
+        "Gain doubles",
+      ],
+      correctAnswer: 1,
+      explanation: "When the required output exceeds the supply voltage, the Op-Amp saturates (clips). The output is limited to approximately ±(VCC − 1.5V), e.g., ±13.5V for a ±15V supply. This is called output clipping.",
+    },
+    {
+      id: 5,
+      question: "For LM741 Op-Amp, what is the typical supply voltage?",
+      options: ["±5V only", "±15V (max ±22V)", "+5V single supply", "±1.5V"],
+      correctAnswer: 1,
+      explanation: "The LM741 Op-Amp is typically operated with a dual (bipolar) supply of ±15V. Its maximum supply voltage is ±22V. Modern op-amps (like LM358) can also operate on single supply, but the 741 is designed for dual supply.",
+    },
+  ]
+  return <ExperimentQuiz experimentId={6} title="Op-Amp Inverting / Non-Inverting Amplifier" questions={questions} />
+}
+
+export const LogicGatesQuiz = () => {
+  const questions: QuizQuestion[] = [
+    {
+      id: 1,
+      question: "Which logic gate is known as the 'universal gate' because it can implement any logic function?",
+      options: ["AND gate", "OR gate", "NAND gate", "XOR gate"],
+      correctAnswer: 2,
+      explanation: "NAND gate (and NOR gate) is called a universal gate because any Boolean function can be implemented using only NAND gates. NOT, AND, OR, and all other gates can be constructed from NAND gates alone.",
+    },
+    {
+      id: 2,
+      question: "The Boolean expression for an XOR gate is:",
+      options: ["Y = A·B", "Y = A+B", "Y = A⊕B (A'B + AB')", "Y = (A·B)'"],
+      correctAnswer: 2,
+      explanation: "The XOR (Exclusive OR) gate output is HIGH when the inputs are different. Its Boolean expression is Y = A⊕B = A'B + AB'. This is equivalent to A XOR B — output is 1 only when A ≠ B.",
+    },
+    {
+      id: 3,
+      question: "IC 7408 is a:",
+      options: ["Quad 2-input NAND gate", "Quad 2-input AND gate", "Hex inverter (NOT gate)", "Quad 2-input NOR gate"],
+      correctAnswer: 1,
+      explanation: "IC 7408 is a TTL Quad 2-input AND gate. It contains four separate 2-input AND gates in a single 14-pin DIP package. Pin 14 is VCC (+5V) and Pin 7 is GND.",
+    },
+    {
+      id: 4,
+      question: "For a NOR gate with inputs A=1, B=0, the output Y is:",
+      options: ["0", "1", "Undefined", "High-impedance"],
+      correctAnswer: 0,
+      explanation: "NOR gate = NOT OR. OR(1,0) = 1, so NOR(1,0) = NOT(1) = 0. A NOR gate output is HIGH only when ALL inputs are LOW (both A=0 AND B=0).",
+    },
+    {
+      id: 5,
+      question: "In TTL logic, what voltage level represents logic '1' (HIGH)?",
+      options: ["0V", "Between 0V and 0.8V", "Between 2V and 5V (typically 3.5V–5V)", "12V"],
+      correctAnswer: 2,
+      explanation: "In TTL (Transistor-Transistor Logic) family, logic HIGH ('1') is typically between 2V and 5V (output: 2.4V–5V, input threshold: 2V). Logic LOW ('0') is 0V to 0.8V. The nominal supply is +5V.",
+    },
+  ]
+  return <ExperimentQuiz experimentId={7} title="Basic Logic Gates" questions={questions} />
+}
+
+export const AdderQuiz = () => {
+  const questions: QuizQuestion[] = [
+    {
+      id: 1,
+      question: "A half adder has inputs A and B. The Sum output is given by:",
+      options: ["S = A AND B", "S = A OR B", "S = A XOR B", "S = A NAND B"],
+      correctAnswer: 2,
+      explanation: "The Sum of a half adder is S = A ⊕ B (A XOR B). The Carry is C = A · B (A AND B). The half adder adds two single bits but cannot accept a carry input from a previous stage.",
+    },
+    {
+      id: 2,
+      question: "A Full Adder differs from a Half Adder because:",
+      options: [
+        "It uses more ICs",
+        "It can also accept a Carry-In (C_in) from a previous stage",
+        "It only adds one bit",
+        "It has no carry output",
+      ],
+      correctAnswer: 1,
+      explanation: "A Full Adder adds three bits: A, B, and a Carry-In (C_in) from the previous stage. This allows Full Adders to be chained together to build multi-bit binary adders (ripple carry adder).",
+    },
+    {
+      id: 3,
+      question: "For a Full Adder with A=1, B=1, C_in=1, the outputs are:",
+      options: ["Sum=1, C_out=1", "Sum=0, C_out=0", "Sum=1, C_out=0", "Sum=0, C_out=1"],
+      correctAnswer: 0,
+      explanation: "1+1+1 = 3 in decimal = 11 in binary. So Sum = 1 and C_out = 1. Formula: S = A⊕B⊕C_in = 1⊕1⊕1 = 1; C_out = A·B + B·C_in + A·C_in = 1+1+1 = 1.",
+    },
+    {
+      id: 4,
+      question: "How many XOR gates are needed to build a Full Adder?",
+      options: ["1", "2", "3", "4"],
+      correctAnswer: 1,
+      explanation: "A Full Adder uses 2 XOR gates (for Sum = A⊕B⊕C_in, implemented as (A⊕B)⊕C_in), plus 2 AND gates and 1 OR gate for the Carry output. Total: 2 XOR + 2 AND + 1 OR = 5 gates.",
+    },
+    {
+      id: 5,
+      question: "Which IC is used for the XOR gate in the adder experiment?",
+      options: ["IC 7400", "IC 7432", "IC 7486", "IC 7408"],
+      correctAnswer: 2,
+      explanation: "IC 7486 is a TTL Quad 2-input XOR gate. It contains four separate XOR gates in a 14-pin DIP package. For the adder circuit, two gates from IC 7486 are used for the Sum computation.",
+    },
+  ]
+  return <ExperimentQuiz experimentId={8} title="Half Adder & Full Adder" questions={questions} />
+}
+
+export const EnergyMeterQuiz = () => {
+  const questions: QuizQuestion[] = [
+    {
+      id: 1,
+      question: "What does an energy meter (kWh meter) measure?",
+      options: ["Instantaneous power", "Voltage only", "Total electrical energy consumed over time", "Current only"],
+      correctAnswer: 2,
+      explanation: "An energy meter measures the total electrical energy consumed by a load over a period of time. It integrates power (watts) over time (hours) to give energy in kilowatt-hours (kWh), which is used for electricity billing.",
+    },
+    {
+      id: 2,
+      question: "In an induction-type energy meter, the aluminium disc rotates because:",
+      options: [
+        "It is connected to a motor",
+        "Eddy currents in the disc interact with the magnetic fluxes of the voltage and current coils",
+        "The voltage coil pulls it magnetically",
+        "It is spring-loaded",
+      ],
+      correctAnswer: 1,
+      explanation: "The rotating aluminium disc develops an eddy-current torque due to the interaction of fluxes from the voltage coil (Φ_v) and current coil (Φ_I). The driving torque is T_d ∝ V × I × cosφ = real power P.",
+    },
+    {
+      id: 3,
+      question: "If a meter constant is 1600 rev/kWh and 40 revolutions are counted in 5 minutes, the measured power is:",
+      options: ["100 W", "300 W", "150 W", "200 W"],
+      correctAnswer: 1,
+      explanation: "P = (N × 3600) / (K × t) = (40 × 3600) / (1600 × 300) = 144000 / 480000 = 0.3 kW = 300 W. Always convert time to seconds and use t in seconds.",
+    },
+    {
+      id: 4,
+      question: "The braking magnet in an energy meter:",
+      options: [
+        "Provides the driving torque",
+        "Starts the disc rotating",
+        "Creates an opposing (braking) torque proportional to disc speed, ensuring steady rotation",
+        "Measures voltage",
+      ],
+      correctAnswer: 2,
+      explanation: "The permanent braking magnet creates eddy currents in the rotating disc, producing a braking torque T_b ∝ disc speed n. At steady state, T_d = T_b, so disc speed n ∝ power P, enabling accurate energy measurement.",
+    },
+    {
+      id: 5,
+      question: "The voltage coil (pressure coil) of an energy meter is connected:",
+      options: [
+        "In series with the load",
+        "Across the supply (in parallel with load)",
+        "In series with the current coil",
+        "Between phase and earth",
+      ],
+      correctAnswer: 1,
+      explanation: "The voltage coil (pressure coil) is connected in parallel across the supply terminals — it measures voltage. The current coil is connected in series with the load — it carries load current. This is similar to how a wattmeter is connected.",
+    },
+  ]
+  return <ExperimentQuiz experimentId={9} title="Energy Measurement" questions={questions} />
 }

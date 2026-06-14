@@ -1811,3 +1811,686 @@ export const FullWaveRectifierExperiment = () => {
   return <AnimatedExperiment experimentId={6} title="Full Wave Rectifier" steps={steps} />
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Experiment 3 — PN Junction Diode Characteristics
+// ─────────────────────────────────────────────────────────────────────────────
+export function PNJunctionExperiment() {
+  const [biasMode, setBiasMode] = useState<"forward" | "reverse">("forward")
+  const [voltage, setVoltage] = useState(0)
+
+  const forwardCurrent = (v: number) => {
+    // Shockley equation simplified: I = I0 * (exp(V/VT) - 1), I0=1e-9, VT=0.026
+    if (v < 0) return 0
+    const raw = 1e-9 * (Math.exp(v / 0.026) - 1) * 1000 // mA
+    return Math.min(raw, 60)
+  }
+  const reverseCurrent = (v: number) => {
+    // Very small leakage current until breakdown (~30V)
+    if (v > 28) return -(v - 27) * 3
+    return -0.001
+  }
+
+  const fwdV = voltage / 100 // 0–1V range for forward
+  const revV = voltage / 10  // 0–30V range for reverse
+
+  const displayV = biasMode === "forward" ? fwdV : revV
+  const displayI = biasMode === "forward" ? forwardCurrent(fwdV) : reverseCurrent(revV)
+  const isOn = biasMode === "forward" && fwdV >= 0.65
+
+  const steps: Step[] = [
+    {
+      title: "Step 1 — PN Junction Basics",
+      description: "A PN junction is formed by joining P-type (holes) and N-type (electrons) semiconductors. At the junction, a depletion region forms with a built-in potential (~0.7V for Si).",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl">
+          <div className="flex items-center justify-center gap-0 mb-4">
+            <div className="w-28 h-20 bg-red-900/60 border-2 border-red-500 rounded-l-lg flex flex-col items-center justify-center">
+              <span className="text-red-300 font-bold text-lg">P</span>
+              <span className="text-red-400 text-xs mt-1">Holes (+)</span>
+            </div>
+            <div className="w-8 h-20 bg-gradient-to-r from-red-900/40 to-blue-900/40 border-y-2 border-neutral-500 flex items-center justify-center">
+              <div className="w-0.5 h-12 bg-neutral-400" />
+            </div>
+            <div className="w-28 h-20 bg-blue-900/60 border-2 border-blue-500 rounded-r-lg flex flex-col items-center justify-center">
+              <span className="text-blue-300 font-bold text-lg">N</span>
+              <span className="text-blue-400 text-xs mt-1">Electrons (−)</span>
+            </div>
+          </div>
+          <p className="text-center text-neutral-300 text-sm">Depletion region: ~0.7V built-in potential (Silicon)</p>
+        </div>
+      ),
+    },
+    {
+      title: "Step 2 — Forward Bias Setup",
+      description: "Connect the positive terminal to P-side and negative to N-side. This opposes the built-in potential. Above the threshold (~0.7V), current flows exponentially.",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="text-red-400 font-bold text-sm border border-red-500 rounded px-2 py-1">+V</div>
+            <div className="flex items-center gap-0">
+              <div className="w-20 h-16 bg-red-900/60 border-2 border-red-500 rounded-l-lg flex items-center justify-center text-red-300 font-bold">P</div>
+              <div className="w-5 h-16 bg-neutral-700 border-y-2 border-neutral-500 flex items-center justify-center">
+                <div className="w-0.5 h-10 bg-neutral-400" />
+              </div>
+              <div className="w-20 h-16 bg-blue-900/60 border-2 border-blue-500 rounded-r-lg flex items-center justify-center text-blue-300 font-bold">N</div>
+            </div>
+            <div className="text-blue-400 font-bold text-sm border border-blue-500 rounded px-2 py-1">−V</div>
+          </div>
+          <p className="text-center text-green-400 text-sm font-medium">Current flows → P to N direction</p>
+          <p className="text-center text-neutral-400 text-xs mt-1">Depletion region narrows → low resistance path</p>
+        </div>
+      ),
+    },
+    {
+      title: "Step 3 — Interactive V-I Characteristic",
+      description: "Drag the slider to change the applied voltage. Observe how the diode current changes non-linearly (exponentially in forward, micro-amps in reverse).",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl space-y-4">
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => { setBiasMode("forward"); setVoltage(0) }}
+              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${biasMode === "forward" ? "bg-green-700 text-white" : "bg-neutral-700 text-neutral-300"}`}
+            >Forward Bias</button>
+            <button
+              onClick={() => { setBiasMode("reverse"); setVoltage(0) }}
+              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${biasMode === "reverse" ? "bg-red-700 text-white" : "bg-neutral-700 text-neutral-300"}`}
+            >Reverse Bias</button>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-neutral-300 text-sm">Applied Voltage: <span className="font-mono text-yellow-300">{displayV.toFixed(2)} V</span></label>
+            <input type="range" min={0} max={100} value={voltage} onChange={e => setVoltage(Number(e.target.value))}
+              className="w-full accent-yellow-400" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className={`p-3 rounded-lg border ${isOn ? "border-green-500 bg-green-900/30" : "border-neutral-600 bg-neutral-700"}`}>
+              <p className="text-xs text-neutral-400 mb-1">Current (I)</p>
+              <p className={`font-mono text-lg font-bold ${isOn ? "text-green-300" : "text-neutral-300"}`}>
+                {biasMode === "forward" ? `${displayI.toFixed(3)} mA` : `${displayI.toFixed(3)} mA`}
+              </p>
+            </div>
+            <div className={`p-3 rounded-lg border ${isOn ? "border-green-500 bg-green-900/30" : "border-neutral-600 bg-neutral-700"}`}>
+              <p className="text-xs text-neutral-400 mb-1">Diode State</p>
+              <p className={`font-bold text-sm ${isOn ? "text-green-300" : "text-red-400"}`}>
+                {biasMode === "reverse" ? "🔴 Blocking" : isOn ? "🟢 Conducting" : "🔴 Cut-off"}
+              </p>
+            </div>
+          </div>
+
+          {/* Mini characteristic curve */}
+          <div className="bg-neutral-900 rounded-lg p-3">
+            <p className="text-xs text-neutral-400 mb-2">V-I Characteristic Preview</p>
+            <svg viewBox="0 0 200 100" className="w-full h-20">
+              <line x1="30" y1="90" x2="190" y2="90" stroke="#555" strokeWidth="1" />
+              <line x1="30" y1="10" x2="30" y2="90" stroke="#555" strokeWidth="1" />
+              <text x="100" y="98" fill="#888" fontSize="8" textAnchor="middle">V →</text>
+              <text x="22" y="50" fill="#888" fontSize="8" textAnchor="middle" transform="rotate(-90,22,50)">I →</text>
+              {/* Forward curve */}
+              <path d="M 30 89 C 100 88, 140 80, 155 40, 165 10" fill="none" stroke="#22c55e" strokeWidth="2" />
+              {/* Reverse flat line */}
+              <path d="M 30 89 L 10 89" fill="none" stroke="#f87171" strokeWidth="2" />
+              {/* Current point */}
+              {biasMode === "forward" && (
+                <circle
+                  cx={30 + (voltage / 100) * 135}
+                  cy={90 - Math.min(forwardCurrent(fwdV) / 60 * 80, 80)}
+                  r="4" fill="#fbbf24"
+                />
+              )}
+            </svg>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Step 4 — Reverse Bias & Breakdown",
+      description: "In reverse bias, only a tiny leakage current (μA) flows. Beyond the breakdown voltage (typically 30–50V for general-purpose diodes), avalanche/Zener breakdown occurs.",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-neutral-700 rounded-lg p-3">
+              <p className="text-white font-medium text-sm mb-1">Forward Bias</p>
+              <p className="text-xs text-neutral-300">Depletion region narrows → low resistance → current flows exponentially above 0.7V</p>
+              <p className="text-green-400 text-xs mt-1 font-mono">I = I₀(e^(V/ηVT) − 1)</p>
+            </div>
+            <div className="bg-neutral-700 rounded-lg p-3">
+              <p className="text-white font-medium text-sm mb-1">Reverse Bias</p>
+              <p className="text-xs text-neutral-300">Depletion region widens → high resistance → only leakage current (nA–μA)</p>
+              <p className="text-red-400 text-xs mt-1 font-mono">I ≈ −I₀ (saturation)</p>
+            </div>
+          </div>
+          <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-3">
+            <p className="text-yellow-300 text-sm font-medium">⚠ Breakdown Region</p>
+            <p className="text-yellow-200 text-xs mt-1">At V_BR, current increases sharply. Zener diodes are designed to operate in this region (for voltage regulation).</p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Step 5 — Observations & Calculations",
+      description: "Plot the V-I characteristics on graph paper. Determine the threshold voltage, dynamic resistance, and reverse saturation current from your readings.",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl space-y-3">
+          <p className="text-white font-medium">Key Measurements to Record:</p>
+          <table className="w-full text-sm text-neutral-300 border-collapse">
+            <thead>
+              <tr>
+                <th className="border border-neutral-600 px-2 py-1 text-left">Parameter</th>
+                <th className="border border-neutral-600 px-2 py-1 text-left">Formula</th>
+                <th className="border border-neutral-600 px-2 py-1 text-left">Typical Value (Si)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td className="border border-neutral-600 px-2 py-1">Threshold Voltage (V_T)</td><td className="border border-neutral-600 px-2 py-1 font-mono">Graph knee point</td><td className="border border-neutral-600 px-2 py-1">~0.7V</td></tr>
+              <tr><td className="border border-neutral-600 px-2 py-1">Dynamic Resistance (r_d)</td><td className="border border-neutral-600 px-2 py-1 font-mono">ΔV / ΔI</td><td className="border border-neutral-600 px-2 py-1">2–25Ω</td></tr>
+              <tr><td className="border border-neutral-600 px-2 py-1">Reverse Saturation (I₀)</td><td className="border border-neutral-600 px-2 py-1 font-mono">Flat reverse I</td><td className="border border-neutral-600 px-2 py-1">~1 μA</td></tr>
+            </tbody>
+          </table>
+          <div className="bg-green-900/30 border border-green-700 rounded-lg p-3">
+            <p className="text-green-300 text-sm">✅ Result: V-I characteristics of PN junction diode plotted. Threshold voltage confirmed ≈ 0.7V for Silicon.</p>
+          </div>
+        </div>
+      ),
+    },
+  ]
+
+  return <AnimatedExperiment experimentId={3} title="PN Junction Diode Characteristics" steps={steps} />
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Experiment 5 — Clipper Circuit
+// ─────────────────────────────────────────────────────────────────────────────
+export function ClipperExperiment() {
+  const [clipperType, setClipperType] = useState<"pos-series" | "neg-series" | "pos-parallel" | "biased">("pos-series")
+  const [inputAmp, setInputAmp] = useState(5)
+  const [refV, setRefV] = useState(2)
+
+  const getPoints = () => {
+    const pts: { x: number; yin: number; yout: number }[] = []
+    for (let i = 0; i <= 100; i++) {
+      const t = (i / 100) * Math.PI * 4
+      const yin = inputAmp * Math.sin(t)
+      let yout = yin
+      if (clipperType === "pos-series") yout = Math.min(yin, 0)
+      else if (clipperType === "neg-series") yout = Math.max(yin, 0)
+      else if (clipperType === "pos-parallel") yout = Math.min(yin, 0.7)
+      else if (clipperType === "biased") yout = Math.min(yin, refV + 0.7)
+      pts.push({ x: i, yin, yout })
+    }
+    return pts
+  }
+
+  const toSvgY = (v: number, amp: number, midY: number, scale: number) => midY - (v / amp) * scale
+
+  const steps: Step[] = [
+    {
+      title: "Step 1 — What is a Clipper?",
+      description: "A clipper (limiter) circuit removes portions of the waveform that exceed a reference level, without affecting the remaining part of the signal.",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            {([
+              { type: "pos-series", label: "Positive Series Clipper", color: "text-green-400", desc: "Diode in series; positive half clipped" },
+              { type: "neg-series", label: "Negative Series Clipper", color: "text-blue-400", desc: "Diode reversed; negative half clipped" },
+              { type: "pos-parallel", label: "Positive Parallel Clipper", color: "text-orange-400", desc: "Diode in parallel; positive peak →0.7V" },
+              { type: "biased", label: "Biased Clipper", color: "text-purple-400", desc: "Reference voltage shifts clipping level" },
+            ] as const).map(({ type, label, color, desc }) => (
+              <button key={type} onClick={() => setClipperType(type)}
+                className={`p-3 rounded-lg border text-left transition-colors ${clipperType === type ? "border-yellow-500 bg-yellow-900/20" : "border-neutral-600 bg-neutral-700"}`}>
+                <p className={`font-medium text-sm ${color}`}>{label}</p>
+                <p className="text-xs text-neutral-400 mt-1">{desc}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Step 2 — Circuit Connection",
+      description: "Set up the selected clipper circuit on a bread board. Apply sinusoidal input from the function generator and observe input and output on the CRO.",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl">
+          <div className="flex items-center justify-center gap-4 p-4 bg-neutral-900 rounded-lg">
+            <div className="text-center">
+              <div className="w-14 h-10 border-2 border-blue-400 rounded flex items-center justify-center text-blue-300 text-xs font-medium">FG</div>
+              <p className="text-xs text-neutral-400 mt-1">Input</p>
+            </div>
+            <div className="text-neutral-400">→</div>
+            {clipperType === "pos-series" || clipperType === "neg-series" ? (
+              <div className="text-center">
+                <div className="flex items-center gap-1">
+                  <div className="w-16 h-10 border-2 border-yellow-400 rounded flex items-center justify-center text-yellow-300 text-xs">
+                    {clipperType === "pos-series" ? "→|" : "|←"}
+                  </div>
+                  <div className="w-12 h-10 border-2 border-green-400 rounded flex items-center justify-center text-green-300 text-xs">RL</div>
+                </div>
+                <p className="text-xs text-neutral-400 mt-1">Diode + Load (series)</p>
+              </div>
+            ) : (
+              <div className="text-center">
+                <div className="flex items-center gap-1">
+                  <div className="w-12 h-10 border-2 border-green-400 rounded flex items-center justify-center text-green-300 text-xs">RL</div>
+                  <div className="w-12 h-10 border-2 border-yellow-400 rounded flex items-center justify-center text-yellow-300 text-xs" style={{writingMode: "vertical-lr"}}>→|</div>
+                </div>
+                <p className="text-xs text-neutral-400 mt-1">Load ∥ Diode {clipperType === "biased" ? "+ V_ref" : ""}</p>
+              </div>
+            )}
+            <div className="text-neutral-400">→</div>
+            <div className="text-center">
+              <div className="w-14 h-10 border-2 border-purple-400 rounded flex items-center justify-center text-purple-300 text-xs font-medium">CRO</div>
+              <p className="text-xs text-neutral-400 mt-1">Output</p>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Step 3 — Interactive Waveform Viewer",
+      description: "Adjust the input amplitude and (for biased clipper) the reference voltage to see how clipping occurs in real-time.",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl space-y-3">
+          <div className="space-y-2">
+            <label className="text-sm text-neutral-300">Input Amplitude: <span className="text-yellow-300 font-mono">{inputAmp} V</span></label>
+            <input type="range" min={1} max={10} value={inputAmp} onChange={e => setInputAmp(Number(e.target.value))} className="w-full accent-yellow-400" />
+          </div>
+          {clipperType === "biased" && (
+            <div className="space-y-2">
+              <label className="text-sm text-neutral-300">Reference Voltage: <span className="text-purple-300 font-mono">{refV} V</span></label>
+              <input type="range" min={0} max={8} value={refV} onChange={e => setRefV(Number(e.target.value))} className="w-full accent-purple-400" />
+            </div>
+          )}
+          <svg viewBox="0 0 220 100" className="w-full bg-neutral-900 rounded-lg p-2">
+            <line x1="10" y1="50" x2="210" y2="50" stroke="#444" strokeWidth="0.5" />
+            {(() => {
+              const pts = getPoints()
+              const mid = 50
+              const scale = 40 // pixel radius for full amplitude
+              return pts.slice(1).map((pt, i) => {
+                const prev = pts[i]
+                return (
+                  <g key={i}>
+                    <line x1={10 + prev.x * 2} y1={toSvgY(prev.yin, inputAmp, mid, scale)} x2={10 + pt.x * 2} y2={toSvgY(pt.yin, inputAmp, mid, scale)} stroke="#60a5fa" strokeWidth="1.2" />
+                    <line x1={10 + prev.x * 2} y1={toSvgY(prev.yout, inputAmp, mid, scale)} x2={10 + pt.x * 2} y2={toSvgY(pt.yout, inputAmp, mid, scale)} stroke="#f59e0b" strokeWidth="1.5" />
+                  </g>
+                )
+              })
+            })()}
+            <text x="12" y="10" fill="#60a5fa" fontSize="7">— Input</text>
+            <text x="60" y="10" fill="#f59e0b" fontSize="7">— Output (clipped)</text>
+          </svg>
+          <p className="text-xs text-neutral-400 text-center">
+            {clipperType === "pos-series" && "Positive half clipped | Negative half passes"}
+            {clipperType === "neg-series" && "Negative half clipped | Positive half passes"}
+            {clipperType === "pos-parallel" && "Output clamped to +0.7V during positive half"}
+            {clipperType === "biased" && `Output clamped to ${(refV + 0.7).toFixed(1)}V (V_ref + V_D)`}
+          </p>
+        </div>
+      ),
+    },
+    {
+      title: "Step 4 — Observations on CRO",
+      description: "Record the input and output waveforms. Note the clipping level and verify it matches the theoretical prediction (0V for series, 0.7V for parallel, V_R+0.7V for biased).",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl space-y-3">
+          <table className="w-full text-sm text-neutral-300 border-collapse">
+            <thead>
+              <tr>
+                <th className="border border-neutral-600 px-2 py-1 text-left">Clipper Type</th>
+                <th className="border border-neutral-600 px-2 py-1 text-left">Clipping Level</th>
+                <th className="border border-neutral-600 px-2 py-1 text-left">Part Passed</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td className="border border-neutral-600 px-2 py-1">+ve Series</td><td className="border border-neutral-600 px-2 py-1 font-mono">0 V</td><td className="border border-neutral-600 px-2 py-1">Negative half</td></tr>
+              <tr><td className="border border-neutral-600 px-2 py-1">−ve Series</td><td className="border border-neutral-600 px-2 py-1 font-mono">0 V</td><td className="border border-neutral-600 px-2 py-1">Positive half</td></tr>
+              <tr><td className="border border-neutral-600 px-2 py-1">+ve Parallel</td><td className="border border-neutral-600 px-2 py-1 font-mono">+0.7 V</td><td className="border border-neutral-600 px-2 py-1">Below +0.7V</td></tr>
+              <tr><td className="border border-neutral-600 px-2 py-1">Biased</td><td className="border border-neutral-600 px-2 py-1 font-mono">V_R + 0.7 V</td><td className="border border-neutral-600 px-2 py-1">Below reference</td></tr>
+            </tbody>
+          </table>
+          <div className="bg-green-900/30 border border-green-700 rounded-lg p-3">
+            <p className="text-green-300 text-sm">✅ Result: Clipper circuit verified. Output waveform confirms clipping at expected levels.</p>
+          </div>
+        </div>
+      ),
+    },
+  ]
+
+  return <AnimatedExperiment experimentId={5} title="Clipper Circuit" steps={steps} />
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Experiment 6 — Op-Amp Inverting / Non-Inverting Amplifier
+// ─────────────────────────────────────────────────────────────────────────────
+export function OpAmpExperiment() {
+  const [mode, setMode] = useState<"inverting" | "noninverting">("inverting")
+  const [rf, setRf] = useState(47)
+  const [r1, setR1] = useState(10)
+  const [inputV, setInputV] = useState(1.0)
+
+  const theoreticalGain = mode === "inverting" ? -(rf / r1) : (1 + rf / r1)
+  const outputV = Math.max(-14, Math.min(14, theoreticalGain * inputV))
+  const isClipping = Math.abs(outputV) >= 13.5
+
+  const steps: Step[] = [
+    {
+      title: "Step 1 — Op-Amp Basics (LM741)",
+      description: "The LM741 is a general-purpose operational amplifier. With negative feedback, its enormous open-loop gain (200,000) is reduced to a precise, stable closed-loop gain set by external resistors.",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl space-y-3">
+          <div className="flex justify-center">
+            <svg viewBox="0 0 200 120" className="w-48 h-32">
+              {/* Op-Amp triangle */}
+              <polygon points="60,20 60,100 150,60" fill="#1e293b" stroke="#60a5fa" strokeWidth="2" />
+              {/* Inverting input */}
+              <line x1="20" y1="40" x2="60" y2="40" stroke="#f87171" strokeWidth="1.5" />
+              <text x="40" y="37" fill="#f87171" fontSize="10">−</text>
+              {/* Non-inverting input */}
+              <line x1="20" y1="80" x2="60" y2="80" stroke="#4ade80" strokeWidth="1.5" />
+              <text x="40" y="77" fill="#4ade80" fontSize="10">+</text>
+              {/* Output */}
+              <line x1="150" y1="60" x2="185" y2="60" stroke="#fbbf24" strokeWidth="1.5" />
+              <text x="160" y="57" fill="#fbbf24" fontSize="8">Vout</text>
+              {/* VCC labels */}
+              <text x="95" y="15" fill="#a3a3a3" fontSize="7">+VCC</text>
+              <text x="95" y="112" fill="#a3a3a3" fontSize="7">−VCC</text>
+              <text x="88" y="63" fill="#60a5fa" fontSize="8" textAnchor="middle">741</text>
+            </svg>
+          </div>
+          <div className="grid grid-cols-3 gap-2 text-center text-xs">
+            <div className="bg-neutral-700 rounded p-2"><p className="text-neutral-400">Open-loop gain</p><p className="text-white font-mono">~200,000</p></div>
+            <div className="bg-neutral-700 rounded p-2"><p className="text-neutral-400">Supply</p><p className="text-white font-mono">±15V</p></div>
+            <div className="bg-neutral-700 rounded p-2"><p className="text-neutral-400">Bandwidth</p><p className="text-white font-mono">1 MHz</p></div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Step 2 — Choose Configuration",
+      description: "Select inverting or non-inverting mode. In inverting mode the output is 180° phase-shifted; in non-inverting mode the output is in phase.",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl space-y-4">
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => setMode("inverting")}
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${mode === "inverting" ? "bg-red-700 text-white" : "bg-neutral-700 text-neutral-300"}`}
+            >Inverting</button>
+            <button
+              onClick={() => setMode("noninverting")}
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${mode === "noninverting" ? "bg-green-700 text-white" : "bg-neutral-700 text-neutral-300"}`}
+            >Non-Inverting</button>
+          </div>
+          <div className="bg-neutral-700 rounded-lg p-4">
+            {mode === "inverting" ? (
+              <>
+                <p className="text-red-300 font-medium mb-2">Inverting Amplifier</p>
+                <p className="text-neutral-300 text-sm mb-2">Input applied to inverting (−) terminal via R₁. Feedback from output to (−) via Rf.</p>
+                <p className="text-yellow-300 font-mono text-sm">Av = −Rf / R₁</p>
+                <p className="text-neutral-400 text-xs mt-1">Output is 180° phase-inverted</p>
+              </>
+            ) : (
+              <>
+                <p className="text-green-300 font-medium mb-2">Non-Inverting Amplifier</p>
+                <p className="text-neutral-300 text-sm mb-2">Input applied to non-inverting (+) terminal. Voltage divider (R₁, Rf) provides feedback to (−).</p>
+                <p className="text-yellow-300 font-mono text-sm">Av = 1 + Rf / R₁</p>
+                <p className="text-neutral-400 text-xs mt-1">Output is in phase with input, gain ≥ 1</p>
+              </>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Step 3 — Gain Calculator & Simulator",
+      description: "Adjust the resistor values to set the gain. Observe how the output voltage changes and whether it clips at the supply rails.",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl space-y-3">
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1">
+              <label className="text-xs text-neutral-400">R₁ (kΩ)</label>
+              <input type="range" min={1} max={47} value={r1} onChange={e => setR1(Number(e.target.value))} className="w-full accent-blue-400" />
+              <p className="font-mono text-blue-300 text-sm text-center">{r1} kΩ</p>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-neutral-400">Rf (kΩ)</label>
+              <input type="range" min={1} max={100} value={rf} onChange={e => setRf(Number(e.target.value))} className="w-full accent-orange-400" />
+              <p className="font-mono text-orange-300 text-sm text-center">{rf} kΩ</p>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-neutral-400">Vin (V)</label>
+              <input type="range" min={-5} max={5} step={0.1} value={inputV} onChange={e => setInputV(Number(e.target.value))} className="w-full accent-green-400" />
+              <p className="font-mono text-green-300 text-sm text-center">{inputV.toFixed(1)} V</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-neutral-700 rounded-lg p-3 text-center">
+              <p className="text-xs text-neutral-400">Theoretical Gain</p>
+              <p className="font-mono text-yellow-300 text-lg font-bold">{theoreticalGain.toFixed(1)}</p>
+            </div>
+            <div className={`rounded-lg p-3 text-center border ${isClipping ? "bg-red-900/30 border-red-600" : "bg-neutral-700 border-neutral-600"}`}>
+              <p className="text-xs text-neutral-400">Output (Vout)</p>
+              <p className={`font-mono text-lg font-bold ${isClipping ? "text-red-400" : "text-cyan-300"}`}>{outputV.toFixed(2)} V</p>
+              {isClipping && <p className="text-xs text-red-400">⚠ Clipping!</p>}
+            </div>
+            <div className="bg-neutral-700 rounded-lg p-3 text-center">
+              <p className="text-xs text-neutral-400">Phase</p>
+              <p className="font-mono text-purple-300 text-sm font-bold">{mode === "inverting" ? "180° shifted" : "In phase"}</p>
+            </div>
+          </div>
+
+          {/* Visual waveform */}
+          <svg viewBox="0 0 220 80" className="w-full bg-neutral-900 rounded-lg">
+            {Array.from({ length: 101 }, (_, i) => i).map(i => {
+              if (i === 0) return null
+              const t = (i / 100) * Math.PI * 4
+              const tPrev = ((i - 1) / 100) * Math.PI * 4
+              const vin = inputV * Math.sin(t)
+              const vinPrev = inputV * Math.sin(tPrev)
+              const vout = Math.max(-14, Math.min(14, theoreticalGain * vin))
+              const voutPrev = Math.max(-14, Math.min(14, theoreticalGain * vinPrev))
+              const scale = 3
+              return (
+                <g key={i}>
+                  <line x1={10 + (i - 1) * 2} y1={40 - vinPrev * scale} x2={10 + i * 2} y2={40 - vin * scale} stroke="#60a5fa" strokeWidth="1.2" />
+                  <line x1={10 + (i - 1) * 2} y1={40 - voutPrev * scale} x2={10 + i * 2} y2={40 - vout * scale} stroke="#f59e0b" strokeWidth="1.5" />
+                </g>
+              )
+            })}
+            <line x1="10" y1="40" x2="210" y2="40" stroke="#333" strokeWidth="0.5" />
+            <text x="12" y="10" fill="#60a5fa" fontSize="7">— Vin</text>
+            <text x="50" y="10" fill="#f59e0b" fontSize="7">— Vout</text>
+          </svg>
+        </div>
+      ),
+    },
+    {
+      title: "Step 4 — Results & Verification",
+      description: "Compare theoretical and experimental gain. Note the phase relationship and clipping behavior near the supply rails (±15V).",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl space-y-3">
+          <table className="w-full text-sm text-neutral-300 border-collapse">
+            <thead>
+              <tr>
+                <th className="border border-neutral-600 px-2 py-1 text-left">Measurement</th>
+                <th className="border border-neutral-600 px-2 py-1 text-left">Formula</th>
+                <th className="border border-neutral-600 px-2 py-1 text-left">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td className="border border-neutral-600 px-2 py-1">R₁</td><td className="border border-neutral-600 px-2 py-1 font-mono">—</td><td className="border border-neutral-600 px-2 py-1 font-mono">{r1} kΩ</td></tr>
+              <tr><td className="border border-neutral-600 px-2 py-1">Rf</td><td className="border border-neutral-600 px-2 py-1 font-mono">—</td><td className="border border-neutral-600 px-2 py-1 font-mono">{rf} kΩ</td></tr>
+              <tr><td className="border border-neutral-600 px-2 py-1">Theoretical Gain</td><td className="border border-neutral-600 px-2 py-1 font-mono">{mode === "inverting" ? "−Rf/R₁" : "1+Rf/R₁"}</td><td className="border border-neutral-600 px-2 py-1 font-mono">{theoreticalGain.toFixed(2)}</td></tr>
+              <tr><td className="border border-neutral-600 px-2 py-1">Vin (peak)</td><td className="border border-neutral-600 px-2 py-1 font-mono">Applied</td><td className="border border-neutral-600 px-2 py-1 font-mono">{inputV} V</td></tr>
+              <tr><td className="border border-neutral-600 px-2 py-1">Vout (calculated)</td><td className="border border-neutral-600 px-2 py-1 font-mono">Av × Vin</td><td className="border border-neutral-600 px-2 py-1 font-mono">{outputV.toFixed(2)} V</td></tr>
+            </tbody>
+          </table>
+          <div className="bg-green-900/30 border border-green-700 rounded-lg p-3">
+            <p className="text-green-300 text-sm">✅ Result: Op-Amp {mode === "inverting" ? "inverting" : "non-inverting"} amplifier with gain {Math.abs(theoreticalGain).toFixed(1)} verified. Phase relationship confirmed.</p>
+          </div>
+        </div>
+      ),
+    },
+  ]
+
+  return <AnimatedExperiment experimentId={6} title="Op-Amp Inverting / Non-Inverting Amplifier" steps={steps} />
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Experiment 9 — Energy Measurement
+// ─────────────────────────────────────────────────────────────────────────────
+export function EnergyMeterExperiment() {
+  const [load, setLoad] = useState(100)
+  const [time, setTime] = useState(60)
+  const [revolutions, setRevolutions] = useState(0)
+  const [isRunning, setIsRunning] = useState(false)
+  const meterConstant = 1600 // rev/kWh
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout
+    if (isRunning) {
+      const revsPerSec = (load / 1000) * (meterConstant / 3600)
+      interval = setInterval(() => {
+        setRevolutions(r => r + revsPerSec * 0.1)
+      }, 100)
+    }
+    return () => clearInterval(interval)
+  }, [isRunning, load])
+
+  const truePower = load
+  const measuredPower = revolutions > 0 ? (revolutions * 3600) / (meterConstant * (time / 60)) * 1000 : 0
+  const energyConsumed = (load / 1000) * (time / 3600)
+  const discSpeed = (load / 1000) * (meterConstant / 3600)
+
+  const steps: Step[] = [
+    {
+      title: "Step 1 — Energy Meter Construction",
+      description: "A single-phase induction energy meter consists of a shunt magnet (voltage coil), series magnet (current coil), aluminium disc, braking magnet, and a counter.",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { name: "Voltage Coil (Shunt Magnet)", color: "text-blue-300", desc: "Connected across supply. Flux ∝ Voltage" },
+              { name: "Current Coil (Series Magnet)", color: "text-orange-300", desc: "In series with load. Flux ∝ Current" },
+              { name: "Aluminium Disc", color: "text-green-300", desc: "Rotates due to interaction of fluxes. Speed ∝ Power" },
+              { name: "Braking Magnet", color: "text-purple-300", desc: "Permanent magnet. Creates opposing torque ∝ speed" },
+            ].map(({ name, color, desc }) => (
+              <div key={name} className="bg-neutral-700 rounded-lg p-3">
+                <p className={`font-medium text-sm ${color}`}>{name}</p>
+                <p className="text-xs text-neutral-400 mt-1">{desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="bg-neutral-700 rounded-lg p-3 text-center">
+            <p className="text-white text-sm font-medium">Meter Constant (K) = 1600 rev/kWh</p>
+            <p className="text-neutral-400 text-xs mt-1">(Printed on the energy meter nameplate)</p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Step 2 — Circuit Connections",
+      description: "Connect the energy meter such that the current coil is in series with the load and the voltage coil (pressure coil) is connected across the supply.",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-center gap-2">
+              <div className="border border-yellow-400 rounded px-3 py-2 text-yellow-300 text-xs text-center w-20">AC Supply<br/>230V</div>
+              <div className="text-neutral-400">→</div>
+              <div className="border border-blue-400 rounded px-3 py-2 text-blue-300 text-xs text-center w-24">Energy Meter<br/>(I-coil series)</div>
+              <div className="text-neutral-400">→</div>
+              <div className="border border-green-400 rounded px-3 py-2 text-green-300 text-xs text-center w-20">Load<br/>{load}W</div>
+            </div>
+            <div className="text-center text-xs text-neutral-400">Voltage coil (V-coil) connected across supply terminals</div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Step 3 — Live Energy Measurement Simulation",
+      description: "Set the load wattage and run the simulation. Count the disc revolutions and calculate the measured power. Compare with the true power.",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="text-xs text-neutral-400">Load Power (W)</label>
+              <input type="range" min={40} max={500} step={10} value={load} onChange={e => { setLoad(Number(e.target.value)); setRevolutions(0) }}
+                className="w-full accent-orange-400" />
+              <p className="font-mono text-orange-300 text-sm text-center">{load} W</p>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-neutral-400">Measurement Time (s)</label>
+              <input type="range" min={30} max={300} step={10} value={time} onChange={e => setTime(Number(e.target.value))}
+                className="w-full accent-blue-400" />
+              <p className="font-mono text-blue-300 text-sm text-center">{time} s</p>
+            </div>
+          </div>
+
+          <div className="flex gap-3 justify-center">
+            <button onClick={() => { setIsRunning(!isRunning) }}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isRunning ? "bg-red-700 text-white" : "bg-green-700 text-white"}`}
+            >{isRunning ? "⏹ Stop" : "▶ Start Meter"}</button>
+            <button onClick={() => { setRevolutions(0); setIsRunning(false) }}
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-neutral-700 text-neutral-300"
+            >↺ Reset</button>
+          </div>
+
+          {/* Spinning disc animation */}
+          <div className="flex items-center justify-center">
+            <svg viewBox="0 0 100 100" className="w-24 h-24">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#334155" strokeWidth="3" />
+              <circle cx="50" cy="50" r="30" fill="#1e293b" stroke="#475569" strokeWidth="1" />
+              {/* Red mark on disc */}
+              <line
+                x1="50" y1="20" x2="50" y2="35"
+                stroke="#ef4444" strokeWidth="3" strokeLinecap="round"
+                transform={`rotate(${(revolutions * 360) % 360}, 50, 50)`}
+              />
+              <circle cx="50" cy="50" r="4" fill="#60a5fa" />
+            </svg>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="bg-neutral-700 rounded p-2">
+              <p className="text-xs text-neutral-400">Revolutions</p>
+              <p className="font-mono text-white text-sm">{revolutions.toFixed(1)}</p>
+            </div>
+            <div className="bg-neutral-700 rounded p-2">
+              <p className="text-xs text-neutral-400">Disc Speed</p>
+              <p className="font-mono text-yellow-300 text-sm">{discSpeed.toFixed(2)} rev/s</p>
+            </div>
+            <div className="bg-neutral-700 rounded p-2">
+              <p className="text-xs text-neutral-400">Energy (kWh)</p>
+              <p className="font-mono text-green-300 text-sm">{energyConsumed.toFixed(5)}</p>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Step 4 — Power & Error Calculation",
+      description: "Calculate measured power from disc revolutions and compare with true (wattmeter) power. Compute percentage error.",
+      content: (
+        <div className="w-full p-4 bg-neutral-800 rounded-xl space-y-3">
+          <div className="bg-neutral-700 rounded-lg p-4 font-mono text-sm space-y-2">
+            <p className="text-neutral-300">P<sub>measured</sub> = (N × 3600) / (K × t)</p>
+            <p className="text-neutral-300">= ({revolutions.toFixed(1)} × 3600) / ({meterConstant} × {time})</p>
+            <p className="text-yellow-300">= {revolutions > 0 ? measuredPower.toFixed(1) : "—"} W</p>
+          </div>
+          <div className="bg-neutral-700 rounded-lg p-4 font-mono text-sm space-y-2">
+            <p className="text-neutral-300">% Error = [(P<sub>meas</sub> − P<sub>true</sub>) / P<sub>true</sub>] × 100</p>
+            <p className="text-cyan-300">True Power = {truePower} W</p>
+            <p className={`font-bold ${Math.abs(measuredPower - truePower) < 2 ? "text-green-400" : "text-orange-400"}`}>
+              % Error = {revolutions > 0 ? (((measuredPower - truePower) / truePower) * 100).toFixed(2) : "—"} %
+            </p>
+          </div>
+          <div className="bg-green-900/30 border border-green-700 rounded-lg p-3">
+            <p className="text-green-300 text-sm">✅ Result: Energy measurement verified. Power calculated from disc revolutions closely matches the true load power.</p>
+          </div>
+        </div>
+      ),
+    },
+  ]
+
+  return <AnimatedExperiment experimentId={9} title="Energy Measurement" steps={steps} />
+}
