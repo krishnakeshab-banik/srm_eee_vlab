@@ -293,7 +293,16 @@ function ExperimentsTab() {
     setLoading(true)
     try {
       const res = await fetch("/api/experiments")
-      if (res.ok) setExperiments(await res.json())
+      if (res.ok) {
+        const data = await res.json()
+        // Deduplicate by numeric id (guards against double-seeded MongoDB)
+        const seen = new Set<number>()
+        setExperiments(data.filter((e: any) => {
+          if (seen.has(e.id)) return false
+          seen.add(e.id)
+          return true
+        }))
+      }
     } finally {
       setLoading(false)
     }
@@ -394,7 +403,7 @@ function ExperimentsTab() {
             </thead>
             <tbody className="divide-y divide-neutral-800/50">
               {experiments.map((exp) => (
-                <tr key={exp.id} className="bg-neutral-900 hover:bg-neutral-800/50 transition-colors">
+                <tr key={(exp as any)._id?.toString() || `exp-${exp.id}`} className="bg-neutral-900 hover:bg-neutral-800/50 transition-colors">
                   <td className="px-4 py-3 text-neutral-500 font-mono text-xs">{exp.id}</td>
                   <td className="px-4 py-3">
                     <span className="font-medium text-white">{exp.title}</span>
