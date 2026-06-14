@@ -2,7 +2,12 @@ import { MongoClient, Db } from "mongodb"
 import fs from "fs/promises"
 import path from "path"
 
-const options = {}
+const options = {
+  tls: true,
+  // Allow invalid TLS certificates in non-production environments
+  // to work around OpenSSL compatibility issues on some platforms
+  tlsAllowInvalidCertificates: process.env.NODE_ENV !== "production",
+}
 
 function getMongoUri(): string | null {
   const uri = process.env.MONGODB_URI?.trim()
@@ -29,6 +34,7 @@ async function seedDatabaseIfNeeded(db: Db) {
     { name: "academic_resources", file: "academic_resources.json" },
     { name: "admins", file: "admins.json" },
     { name: "books", file: "books.json" },
+    { name: "experiments", file: "experiments.json" },
     { name: "formulas", file: "formulas.json" },
     { name: "manuals", file: "manual.json" },
     { name: "notes", file: "notes.json" },

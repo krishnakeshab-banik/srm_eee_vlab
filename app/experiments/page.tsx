@@ -4,192 +4,80 @@ import { NavDock } from "@/components/nav-dock"
 import { useRef, useState, useEffect } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { Home, BookOpen, Settings, LogIn, FileQuestion, Users, Info, Search, Zap, Lightbulb, Cpu, ChevronRight, CircuitBoard, Activity, Library, User } from "lucide-react"
+import { Search, Zap, Lightbulb, Cpu, ChevronRight, CircuitBoard, Activity } from "lucide-react"
 import { GlowingCard } from "@/components/glowing-card"
 import { DigitalClock } from "@/components/digital-clock"
 import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-// All 12 experiments from the 26EEE1001T syllabus
-const experiments = [
-  // ── Unit 1: Electric Circuit Analysis ──
-  {
-    id: 1,
-    title: "Kirchhoff's Voltage Law",
-    description: "Verify KVL in a closed-loop DC circuit. Measure voltage drops across resistors and confirm the algebraic sum equals zero.",
-    category: "Circuit Analysis",
-    difficulty: "Beginner",
-    duration: "45 min",
-    embedId: "hNWAhAfShmV",
-    icon: <Zap className="h-5 w-5 text-blue-400" />,
-  },
-  {
-    id: 2,
-    title: "Thevenin's Theorem",
-    description: "Replace a complex linear circuit with its Thevenin equivalent (V_TH and R_TH) and verify load current.",
-    category: "Circuit Analysis",
-    difficulty: "Intermediate",
-    duration: "60 min",
-    embedId: "lAusQJ3m4bF",
-    icon: <Zap className="h-5 w-5 text-blue-400" />,
-  },
-  // ── Unit 2: Analog Electronics ──
-  {
-    id: 3,
-    title: "PN Junction Diode Characteristics",
-    description: "Plot V-I characteristics of a PN junction diode in forward and reverse bias modes.",
-    category: "Analog Electronics",
-    difficulty: "Beginner",
-    duration: "60 min",
-    embedId: "",
-    icon: <Activity className="h-5 w-5 text-cyan-400" />,
-  },
-  {
-    id: 4,
-    title: "Full Wave Rectifier",
-    description: "Build a bridge rectifier using 4 IN4007 diodes. Observe output waveforms with and without a filter capacitor.",
-    category: "Analog Electronics",
-    difficulty: "Intermediate",
-    duration: "60 min",
-    embedId: "jbRQbeSnAzj",
-    icon: <Activity className="h-5 w-5 text-cyan-400" />,
-  },
-  {
-    id: 5,
-    title: "Clipper Circuit",
-    description: "Study series and parallel clipping circuits using diodes and observe how they limit signal amplitude.",
-    category: "Analog Electronics",
-    difficulty: "Intermediate",
-    duration: "60 min",
-    embedId: "",
-    icon: <Activity className="h-5 w-5 text-cyan-400" />,
-  },
-  {
-    id: 6,
-    title: "Op-Amp Inverting / Non-Inverting Amplifier",
-    description: "Design inverting and non-inverting amplifier circuits using LM741 Op-Amp and verify gain experimentally.",
-    category: "Analog Electronics",
-    difficulty: "Advanced",
-    duration: "75 min",
-    embedId: "",
-    icon: <Cpu className="h-5 w-5 text-cyan-400" />,
-  },
-  // ── Unit 3: Digital Electronics ──
-  {
-    id: 7,
-    title: "Basic Logic Gates",
-    description: "Implement AND, OR, NOT, NAND, NOR, XOR, XNOR gates using ICs and verify truth tables experimentally.",
-    category: "Digital Electronics",
-    difficulty: "Beginner",
-    duration: "60 min",
-    embedId: "",
-    icon: <CircuitBoard className="h-5 w-5 text-green-400" />,
-  },
-  {
-    id: 8,
-    title: "Half Adder & Full Adder",
-    description: "Design and implement Half Adder and Full Adder circuits using logic gates. Verify sum and carry outputs.",
-    category: "Digital Electronics",
-    difficulty: "Intermediate",
-    duration: "75 min",
-    embedId: "",
-    icon: <CircuitBoard className="h-5 w-5 text-green-400" />,
-  },
-  // ── Unit 4: Electrical Machines & Instruments ──
-  {
-    id: 9,
-    title: "Energy Measurement",
-    description: "Measure electrical energy consumption using a single-phase energy meter. Calculate units consumed by different loads.",
-    category: "Electrical Machines",
-    difficulty: "Beginner",
-    duration: "45 min",
-    embedId: "",
-    icon: <Lightbulb className="h-5 w-5 text-orange-400" />,
-  },
-  // ── Unit 5: Electric Wiring & Safety ──
-  {
-    id: 10,
-    title: "House Wiring",
-    description: "Implement residential wiring with energy meter, MCB, switches, lamp, and fan. Read energy meter in kWh.",
-    category: "Electrical Installation",
-    difficulty: "Intermediate",
-    duration: "90 min",
-    embedId: "2rTQ63Z8SdD",
-    icon: <Lightbulb className="h-5 w-5 text-yellow-400" />,
-  },
-  {
-    id: 11,
-    title: "Fluorescent Lamp Wiring",
-    description: "Connect a 40W fluorescent lamp with choke and starter. Understand the role of each component.",
-    category: "Electrical Installation",
-    difficulty: "Intermediate",
-    duration: "60 min",
-    embedId: "hnFoQc772H0",
-    icon: <Lightbulb className="h-5 w-5 text-yellow-400" />,
-  },
-  {
-    id: 12,
-    title: "Staircase Wiring",
-    description: "Control a lamp from two locations using two-way switches. Understand SPDT switch operation.",
-    category: "Electrical Installation",
-    difficulty: "Intermediate",
-    duration: "75 min",
-    embedId: "94YWeHFB9oN",
-    icon: <Lightbulb className="h-5 w-5 text-yellow-400" />,
-  },
+// Hardcoded fallback data (used when API is unavailable)
+const fallbackExperiments = [
+  { id: 1, title: "Kirchhoff's Voltage Law", description: "Verify KVL in a closed-loop DC circuit. Measure voltage drops across resistors and confirm the algebraic sum equals zero.", category: "Circuit Analysis", difficulty: "Beginner", duration: "45 min", embedId: "hNWAhAfShmV" },
+  { id: 2, title: "Thevenin's Theorem", description: "Replace a complex linear circuit with its Thevenin equivalent (V_TH and R_TH) and verify load current.", category: "Circuit Analysis", difficulty: "Intermediate", duration: "60 min", embedId: "lAusQJ3m4bF" },
+  { id: 3, title: "PN Junction Diode Characteristics", description: "Plot V-I characteristics of a PN junction diode in forward and reverse bias modes.", category: "Analog Electronics", difficulty: "Beginner", duration: "60 min", embedId: "" },
+  { id: 4, title: "Full Wave Rectifier", description: "Build a bridge rectifier using 4 IN4007 diodes. Observe output waveforms with and without a filter capacitor.", category: "Analog Electronics", difficulty: "Intermediate", duration: "60 min", embedId: "jbRQbeSnAzj" },
+  { id: 5, title: "Clipper Circuit", description: "Study series and parallel clipping circuits using diodes and observe how they limit signal amplitude.", category: "Analog Electronics", difficulty: "Intermediate", duration: "60 min", embedId: "" },
+  { id: 6, title: "Op-Amp Inverting / Non-Inverting Amplifier", description: "Design inverting and non-inverting amplifier circuits using LM741 Op-Amp and verify gain experimentally.", category: "Analog Electronics", difficulty: "Advanced", duration: "75 min", embedId: "" },
+  { id: 7, title: "Basic Logic Gates", description: "Implement AND, OR, NOT, NAND, NOR, XOR, XNOR gates using ICs and verify truth tables experimentally.", category: "Digital Electronics", difficulty: "Beginner", duration: "60 min", embedId: "" },
+  { id: 8, title: "Half Adder & Full Adder", description: "Design and implement Half Adder and Full Adder circuits using logic gates. Verify sum and carry outputs.", category: "Digital Electronics", difficulty: "Intermediate", duration: "75 min", embedId: "" },
+  { id: 9, title: "Energy Measurement", description: "Measure electrical energy consumption using a single-phase energy meter. Calculate units consumed by different loads.", category: "Electrical Machines", difficulty: "Beginner", duration: "45 min", embedId: "" },
+  { id: 10, title: "House Wiring", description: "Implement residential wiring with energy meter, MCB, switches, lamp, and fan. Read energy meter in kWh.", category: "Electrical Installation", difficulty: "Intermediate", duration: "90 min", embedId: "2rTQ63Z8SdD" },
+  { id: 11, title: "Fluorescent Lamp Wiring", description: "Connect a 40W fluorescent lamp with choke and starter. Understand the role of each component.", category: "Electrical Installation", difficulty: "Intermediate", duration: "60 min", embedId: "hnFoQc772H0" },
+  { id: 12, title: "Staircase Wiring", description: "Control a lamp from two locations using two-way switches. Understand SPDT switch operation.", category: "Electrical Installation", difficulty: "Intermediate", duration: "75 min", embedId: "94YWeHFB9oN" },
 ]
 
-const categories = ["All", ...Array.from(new Set(experiments.map(e => e.category)))]
+type Experiment = typeof fallbackExperiments[0]
+
+const categoryColors: Record<string, string> = {
+  "Circuit Analysis": "text-blue-400",
+  "Analog Electronics": "text-cyan-400",
+  "Digital Electronics": "text-green-400",
+  "Electrical Machines": "text-orange-400",
+  "Electrical Installation": "text-yellow-400",
+}
 
 export default function ExperimentsPage() {
+  const [experiments, setExperiments] = useState<Experiment[]>(fallbackExperiments)
   const [searchTerm, setSearchTerm] = useState("")
   const [activeCategory, setActiveCategory] = useState("All")
-  const [filteredExperiments, setFilteredExperiments] = useState(experiments)
+  const [filteredExperiments, setFilteredExperiments] = useState<Experiment[]>(fallbackExperiments)
 
+  useEffect(() => {
+    fetch("/api/experiments")
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setExperiments(data)
+          setFilteredExperiments(data)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  const categories = ["All", ...Array.from(new Set(experiments.map((e) => e.category)))]
 
   useEffect(() => {
     let filtered = experiments
     if (searchTerm) {
-      filtered = filtered.filter(exp =>
-        exp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        exp.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        exp.category.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (exp) =>
+          exp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          exp.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          exp.category.toLowerCase().includes(searchTerm.toLowerCase()),
       )
     }
     if (activeCategory !== "All") {
-      filtered = filtered.filter(exp => exp.category === activeCategory)
+      filtered = filtered.filter((exp) => exp.category === activeCategory)
     }
     setFilteredExperiments(filtered)
-  }, [searchTerm, activeCategory])
-
-  // Group by category
-  const grouped = experiments.reduce<Record<string, typeof experiments>>((acc, exp) => {
-    acc[exp.category] = acc[exp.category] || []
-    acc[exp.category].push(exp)
-    return acc
-  }, {})
-
-  const categoryColors: Record<string, string> = {
-    "Circuit Analysis": "text-blue-400",
-    "Analog Electronics": "text-cyan-400",
-    "Digital Electronics": "text-green-400",
-    "Electrical Machines": "text-orange-400",
-    "Electrical Installation": "text-yellow-400",
-  }
+  }, [searchTerm, activeCategory, experiments])
 
   return (
     <div className="flex flex-col bg-[#050508] text-white min-h-screen overflow-x-hidden">
-      {/* Sidebar */}
-
-      {/* Floating Dock */}
       <NavDock />
-
-      {/* Clock */}
       <DigitalClock />
 
       {/* ── HERO ── */}
       <div className="relative pt-28 sm:pt-32 pb-16 overflow-hidden">
-        {/* Background glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-64 bg-blue-600/8 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="container mx-auto px-4 sm:px-6 max-w-6xl relative z-10">
@@ -244,7 +132,7 @@ export default function ExperimentsPage() {
                 {cat}
                 {cat !== "All" && (
                   <span className="ml-1.5 text-xs opacity-60">
-                    ({experiments.filter(e => e.category === cat).length})
+                    ({experiments.filter((e) => e.category === cat).length})
                   </span>
                 )}
               </button>
@@ -253,9 +141,16 @@ export default function ExperimentsPage() {
 
           {/* Results info */}
           <div className="text-neutral-500 text-sm mb-6">
-            Showing <span className="text-neutral-300 font-medium">{filteredExperiments.length}</span> of {experiments.length} experiments
+            Showing <span className="text-neutral-300 font-medium">{filteredExperiments.length}</span> of {experiments.length}{" "}
+            experiments
             {activeCategory !== "All" && (
-              <span> in <span className={`font-medium ${categoryColors[activeCategory] || "text-blue-300"}`}>{activeCategory}</span></span>
+              <span>
+                {" "}
+                in{" "}
+                <span className={`font-medium ${categoryColors[activeCategory] || "text-blue-300"}`}>
+                  {activeCategory}
+                </span>
+              </span>
             )}
           </div>
 
@@ -270,17 +165,17 @@ export default function ExperimentsPage() {
                 <Search className="h-12 w-12 mx-auto mb-4 opacity-30" />
                 <p className="text-lg">No experiments found for "{searchTerm}"</p>
                 <button
-                  onClick={() => { setSearchTerm(""); setActiveCategory("All"); }}
+                  onClick={() => {
+                    setSearchTerm("")
+                    setActiveCategory("All")
+                  }}
                   className="mt-4 text-blue-400 hover:text-blue-300 text-sm"
                 >
                   Clear filters
                 </button>
               </motion.div>
             ) : (
-              <motion.ul
-                layout
-                className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
-              >
+              <motion.ul layout className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredExperiments.map((experiment, i) => (
                   <motion.div
                     key={experiment.id}
@@ -312,9 +207,9 @@ export default function ExperimentsPage() {
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
-              { value: "12", label: "Experiments" },
-              { value: "5", label: "Subject Areas" },
-              { value: "6", label: "Tinkercad Sims" },
+              { value: String(experiments.length), label: "Experiments" },
+              { value: String(new Set(experiments.map((e) => e.category)).size), label: "Subject Areas" },
+              { value: String(experiments.filter((e) => e.embedId).length), label: "Tinkercad Sims" },
               { value: "100%", label: "Interactive" },
             ].map((stat, i) => (
               <motion.div
@@ -346,7 +241,11 @@ export default function ExperimentsPage() {
                 { label: "Team", href: "/team" },
                 { label: "About", href: "/about" },
               ].map((link) => (
-                <Link key={link.label} href={link.href} className="text-neutral-500 hover:text-neutral-200 transition-colors text-sm">
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="text-neutral-500 hover:text-neutral-200 transition-colors text-sm"
+                >
                   {link.label}
                 </Link>
               ))}
@@ -360,4 +259,3 @@ export default function ExperimentsPage() {
     </div>
   )
 }
-

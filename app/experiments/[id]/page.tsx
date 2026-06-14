@@ -1145,29 +1145,39 @@ const experiments = [
 
 export default function ExperimentPage() {
   const params = useParams()
-  const [experiment, setExperiment] = useState(null)
+  const [experiment, setExperiment] = useState<any>(null)
   const [activeTab, setActiveTab] = useState("theory")
-  
 
   useEffect(() => {
-    const id = Number.parseInt(params.id)
-    const exp = experiments.find((e) => e.id === id)
+    const id = Number.parseInt(params.id as string)
 
-    if (!exp) {
+    // Load hardcoded data immediately as baseline
+    const hardcodedExp = experiments.find((e) => e.id === id)
+    if (!hardcodedExp) {
       notFound()
+      return
     }
 
-    setExperiment(exp)
+    setExperiment(hardcodedExp as any)
 
     // Check for hash in URL to set active tab
     const hash = window.location.hash
     if (hash) {
       const tabName = hash.replace("#", "")
-      // 'simulation' is the correct tab value (was incorrectly '3d' previously)
       if (["aim", "apparatus", "theory", "procedure", "interactive", "simulation", "quiz", "references"].includes(tabName)) {
         setActiveTab(tabName)
       }
     }
+
+    // Fetch from API and merge (API data overrides hardcoded for any existing field)
+    fetch(`/api/experiments/${id}`)
+      .then((res) => res.ok ? res.json() : null)
+      .then((apiData) => {
+        if (apiData && !apiData.error) {
+          setExperiment((prev: any) => ({ ...prev, ...apiData }))
+        }
+      })
+      .catch(() => {})
   }, [params.id])
 
   if (!experiment) {
